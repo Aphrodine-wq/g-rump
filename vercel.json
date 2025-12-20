@@ -1,0 +1,17 @@
+{
+  "buildCommand": "cd web && npm install && npm run build",
+  "outputDirectory": "web/dist",
+  "framework": "vite",
+  "env": {
+    "VITE_API_URL": {
+      "description": "API endpoint for the backend service",
+      "example": "https://api.g-rump.com"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/api/:path*",
+      "destination": "${VITE_API_URL}/api/:path*"
+    }
+  ]
+}
