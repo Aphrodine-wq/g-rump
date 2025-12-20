@@ -66,7 +66,7 @@ export default function ChatHistoryView() {
     return session.messages[session.messages.length - 1].content
   }
 
-  const handleSessionClick = (session: ChatSession) => {
+  const handleSessionClick = (_session: ChatSession) => {
     // Load session messages into chat
     // This would require updating the ChatStore to accept a session
     // For now, we'll show a message and the user can manually switch to chat tab
