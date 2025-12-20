@@ -1,1 +1,88 @@
-node_modules
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.lock-wscript
+
+# Build outputs
+dist/
+build/
+*.tgz
+*.tar.gz
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# iOS
+ios/Pods/
+ios/build/
+ios/*.xcworkspace
+ios/*.xcuserdata
+ios/DerivedData/
+ios/.swiftpm/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Android
+android/app/build/
+android/.gradle/
+android/local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# Expo
+.expo/
+.expo-shared/
+dist/
+web-build/
+
+# EAS
+.eas/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# PDFs in knowledge base (keep structure, ignore content)
+docs/knowledge-base/*.pdf
+!docs/knowledge-base/.gitkeep
+!docs/knowledge-base/README.md
+!docs/knowledge-base/*.md
+
+# PDFs in pdfs folder (keep structure, ignore content)
+docs/pdfs/*.pdf
+!docs/pdfs/.gitkeep
+!docs/pdfs/README.md
+!docs/pdfs/*.md
