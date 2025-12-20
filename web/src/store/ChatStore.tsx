@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useRef, useMemo, ReactNode } from 'react'
 import axios from 'axios'
 import { canSendMessage, incrementMessageCount, getRemainingMessages } from '../config/pricing'
+import { logger } from '../utils/logger'
 
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3000'
 
@@ -17,15 +18,22 @@ interface ChatContextType {
   errorMessage: string | null
   sendMessage: (content: string) => Promise<void>
   createNewSession: () => void
+  retryLastMessage: () => Promise<void>
+  clearError: () => void
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([])
+  const messagesRef = useRef<Message[]>([])
   const [isTyping, setIsTyping] = useState(false)
+  const isSendingRef = useRef(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(null)
+  
+  // Keep ref in sync with state
+  messagesRef.current = messages
   
   // Expose setter for clearing error
   const clearError = useCallback(() => {
@@ -34,6 +42,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim()) return
+    
+    // Prevent duplicate sends while a message is being sent
+    if (isSendingRef.current) {
+      return
+    }
     
     // Input validation
     const trimmedContent = content.trim()
@@ -50,6 +63,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    // Set sending flag after all validations pass
+    isSendingRef.current = true
+
     const userMessage: Message = {
       id: Date.now().toString(),
       content: trimmedContent,
@@ -58,7 +74,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
 
       setMessages(prev => {
-        const updated = [...prev, userMessage]
+        // Create a new array reference to ensure React detects the change
+        const updated = Array.from(prev)
+        updated.push(userMessage)
         // Save to localStorage for history
         saveSessionToHistory(updated)
         return updated
@@ -69,14 +87,27 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setLastFailedMessage(trimmedContent) // Store for retry
 
     try {
+      // Include the user message we just added since React state updates are async
+      // and messagesRef.current might not be updated yet
+      const allMessagesForAPI = [...messagesRef.current, userMessage]
       const response = await axios.post(`${API_BASE_URL}/api/chat`, {
         message: content.trim(),
-        conversationHistory: messages.map(m => ({
+        conversationHistory: allMessagesForAPI.map(m => ({
           sender: m.sender,
           content: m.content,
           timestamp: m.timestamp.toISOString()
         }))
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        timeout: 30000 // 30 second timeout
       })
+      
+      if (!response.data || !response.data.response) {
+        logger.error('Invalid response format:', response.data)
+        throw new Error('Invalid response from server')
+      }
 
       // Increment message count only after successful API response
       incrementMessageCount()
@@ -89,13 +120,22 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       }
 
       setMessages(prev => {
-        const updated = [...prev, grumpMessage]
+        // Create a completely new array to ensure React detects the change
+        const updated = Array.from(prev)
+        updated.push(grumpMessage)
         // Save to localStorage for history
         saveSessionToHistory(updated)
         return updated
       })
     } catch (error: any) {
-      console.error('Error sending message:', error)
+      logger.error('Error sending message:', error)
+      logger.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        status: error.response?.status,
+        data: error.response?.data,
+        config: error.config?.url
+      })
       if (error.response?.status === 429) {
         setErrorMessage('Too many requests. Grump is tired. Try again later.')
       } else if (error.response?.status === 500) {
@@ -107,13 +147,20 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       }
     } finally {
       setIsTyping(false)
+      isSendingRef.current = false
     }
-  }, [messages])
+  }, [])
 
   const createNewSession = useCallback(() => {
     setMessages([])
     setErrorMessage(null)
   }, [])
+
+  const retryLastMessage = useCallback(async () => {
+    if (lastFailedMessage) {
+      await sendMessage(lastFailedMessage)
+    }
+  }, [lastFailedMessage, sendMessage])
 
   const saveSessionToHistory = (messages: Message[]) => {
     if (messages.length === 0) return
@@ -142,12 +189,24 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       
       localStorage.setItem('grumpSessions', JSON.stringify(sessions))
     } catch (e) {
-      console.error('Error saving session:', e)
+      logger.error('Error saving session:', e)
     }
   }
 
+  // Create context value - memoized to prevent unnecessary re-renders
+  // Only recreate when dependencies actually change
+  const contextValue = useMemo(() => ({
+    messages,
+    isTyping,
+    errorMessage,
+    sendMessage,
+    createNewSession,
+    retryLastMessage,
+    clearError
+  }), [messages, isTyping, errorMessage, sendMessage, createNewSession, retryLastMessage, clearError])
+  
   return (
-    <ChatContext.Provider value={{ messages, isTyping, errorMessage, sendMessage, createNewSession, retryLastMessage, clearError }}>
+    <ChatContext.Provider value={contextValue}>
       {children}
     </ChatContext.Provider>
   )

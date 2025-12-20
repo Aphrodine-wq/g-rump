@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './ChatHistoryView.css'
+import { logger } from '../utils/logger'
 
 interface ChatSession {
   id: string
@@ -34,7 +35,7 @@ export default function ChatHistoryView() {
           }))
         })))
       } catch (e) {
-        console.error('Error loading sessions:', e)
+        logger.error('Error loading sessions:', e)
       }
     }
   }
@@ -69,7 +70,6 @@ export default function ChatHistoryView() {
     // Load session messages into chat
     // This would require updating the ChatStore to accept a session
     // For now, we'll show a message and the user can manually switch to chat tab
-    console.log('Loading session:', session)
     // In a full implementation, you'd dispatch an action to load this session
   }
 

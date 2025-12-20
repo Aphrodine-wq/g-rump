@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAnimation } from '../store/AnimationStore'
 import { pupilNoise, eyebrowNoise, headNoise, mouthNoise, getMicroMovement, getMicroMovement2D } from '../utils/PerlinNoise'
 
@@ -12,6 +12,9 @@ import { pupilNoise, eyebrowNoise, headNoise, mouthNoise, getMicroMovement, getM
  */
 export function useMicroMovements() {
   const { state, updateMicroMovements } = useAnimation()
+  // Use ref to track current state and avoid stale closures
+  const stateRef = useRef(state)
+  stateRef.current = state
 
   useEffect(() => {
     let startTime = Date.now()
@@ -19,13 +22,15 @@ export function useMicroMovements() {
 
     const animate = () => {
       const elapsed = (Date.now() - startTime) / 1000
+      // Access current state from ref to avoid stale closure
+      const currentState = stateRef.current.currentState
 
       // Only run micro-movements when idle or in appropriate states
       const shouldRunMicroMovements = 
-        state.currentState === 'idle' ||
-        state.currentState === 'listening' ||
-        state.currentState === 'responding' ||
-        state.currentState === 'softMode'
+        currentState === 'idle' ||
+        currentState === 'listening' ||
+        currentState === 'responding' ||
+        currentState === 'softMode'
 
       if (!shouldRunMicroMovements) {
         // Reset micro-movements
@@ -76,6 +81,6 @@ export function useMicroMovements() {
         cancelAnimationFrame(animationFrame)
       }
     }
-  }, [state.currentState, updateMicroMovements])
+  }, [updateMicroMovements]) // Only depend on updateMicroMovements, state is accessed via ref
 }
 

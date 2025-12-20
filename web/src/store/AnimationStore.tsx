@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 
 export type EmotionalState = 
   | 'idle' | 'listening' | 'processing' | 'responding'
@@ -210,27 +210,34 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
     return () => cancelAnimationFrame(animationFrame)
   }, [])
 
-  // Blink timer
+  // Blink timer - optimized to 60ms (every 4 frames at 60fps) instead of 16ms
   useEffect(() => {
     const interval = setInterval(() => {
       setState(prev => ({
         ...prev,
-        blinkTimer: (prev.blinkTimer + 16) % 4000
+        blinkTimer: (prev.blinkTimer + 60) % 4000
       }))
-    }, 16)
+    }, 60)
     return () => clearInterval(interval)
   }, [])
 
   // Auto-blink
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!state.isBlinking && Math.random() > 0.7) {
-        triggerBlink()
-      }
+      setState(prev => {
+        if (!prev.isBlinking && Math.random() > 0.7) {
+          // Trigger blink via state update to avoid dependency issues
+          setTimeout(() => {
+            setState(p => ({ ...p, isBlinking: false }))
+          }, 150)
+          return { ...prev, isBlinking: true, blinkType: 'standard' }
+        }
+        return prev
+      })
     }, 3000 + Math.random() * 3000)
 
     return () => clearInterval(interval)
-  }, [state.isBlinking])
+  }, [])
 
   // Update context time
   useEffect(() => {
@@ -342,19 +349,22 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    state,
+    transitionToState,
+    triggerBlink,
+    updateEyeTracking,
+    triggerEyeRoll,
+    triggerScreenShake,
+    setParticleType,
+    setAccessory,
+    updateContext,
+    updateMicroMovements
+  }), [state, transitionToState, triggerBlink, updateEyeTracking, triggerEyeRoll, triggerScreenShake, setParticleType, setAccessory, updateContext, updateMicroMovements])
+
   return (
-    <AnimationContext.Provider value={{
-      state,
-      transitionToState,
-      triggerBlink,
-      updateEyeTracking,
-      triggerEyeRoll,
-      triggerScreenShake,
-      setParticleType,
-      setAccessory,
-      updateContext,
-      updateMicroMovements
-    }}>
+    <AnimationContext.Provider value={contextValue}>
       {children}
     </AnimationContext.Provider>
   )
