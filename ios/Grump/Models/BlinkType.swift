@@ -1,22 +1,37 @@
 import Foundation
 
-enum BlinkType {
-    case standard  // 150ms
-    case slow      // 400ms
-    case heavy     // 600ms
-    case quickDouble // 250ms total
-    case half      // 100ms
-    case wink      // 200ms, one eye only
+/// Types of blinks for different emotional states
+enum BlinkType: String {
+    case standard
+    case slow
+    case heavy
+    case quickDouble
+    case half
+    case wink
     
     var duration: TimeInterval {
         switch self {
-        case .standard: return 0.15
-        case .slow: return 0.4
-        case .heavy: return 0.6
-        case .quickDouble: return 0.125 // per blink
-        case .half: return 0.1
-        case .wink: return 0.2
+        case .standard:
+            return AnimationConstants.blinkDuration // 180ms
+        case .slow:
+            return AnimationConstants.blinkDuration * 2.0 // 360ms
+        case .heavy:
+            return AnimationConstants.blinkDuration * 3.0 // 540ms
+        case .quickDouble:
+            return AnimationConstants.blinkDuration * 0.7 // ~126ms per blink
+        case .half:
+            return AnimationConstants.blinkDuration * 0.5 // 90ms
+        case .wink:
+            return AnimationConstants.blinkDuration * 1.1 // ~198ms
         }
     }
 }
 
+/// Variation types for eye roll animations
+enum EyeRollVariation {
+    case full
+    case half
+    case double
+    case slow
+    case quick
+}

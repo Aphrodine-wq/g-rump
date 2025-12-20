@@ -66,7 +66,10 @@ struct AnimationState {
     var mouthState: MouthState = .flat
     var mouthWidth: Double = 40.0 // Default 40pt
     var mouthHeight: Double = 2.0 // Default 2pt (flat)
-    var mouthCurveDepth: Double = 0.0 // For smiles/frowns
+    var mouthCurveDepth: Double = 0.0 // For smiles/frowns (-1.0 to +1.0)
+    var mouthAsymmetry: Double = 0.0 // NEW: -1.0 (left up) to +1.0 (right up)
+    var mouthCornerAnchorLeft: CGPoint = CGPoint(x: -16, y: 0) // Corner points for anchoring
+    var mouthCornerAnchorRight: CGPoint = CGPoint(x: 16, y: 0)
     
     // Glow ring
     var glowIntensity: Double = 0.4
