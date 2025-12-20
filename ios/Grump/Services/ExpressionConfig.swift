@@ -19,6 +19,7 @@ struct ExpressionConfig {
                 rightEyelidTopY: -24,
                 mouthState: .flat,
                 mouthWidth: 40,
+                mouthHeight: 2.0,
                 mouthCurveDepth: 0,
                 glowIntensity: 0.4,
                 glowPulseRate: 2.0,
@@ -41,6 +42,7 @@ struct ExpressionConfig {
                 rightEyelidTopY: -24,
                 mouthState: .flat,
                 mouthWidth: 36,
+                mouthHeight: 2.0,
                 mouthCurveDepth: 0,
                 glowIntensity: 0.6,
                 glowPulseRate: 1.0,
@@ -85,6 +87,7 @@ struct ExpressionConfig {
                 rightEyelidTopY: -24,
                 mouthState: .open,
                 mouthWidth: 12,
+                mouthHeight: 8.0,
                 mouthCurveDepth: 0,
                 glowIntensity: 0.3,
                 glowPulseRate: 2.0,
@@ -241,6 +244,7 @@ struct ExpressionConfig {
                 rightEyelidTopY: -6,
                 mouthState: .flat,
                 mouthWidth: 36,
+                mouthHeight: 2.0,
                 mouthCurveDepth: 0,
                 glowIntensity: 0.2,
                 glowPulseRate: 4.0,
@@ -351,6 +355,7 @@ struct ExpressionConfig {
                 rightEyelidTopY: -24,
                 mouthState: .flat,
                 mouthWidth: 40,
+                mouthHeight: 2.0,
                 mouthCurveDepth: 0,
                 glowIntensity: 0.3,
                 glowPulseRate: 2.0,
@@ -371,6 +376,7 @@ struct ExpressionConfig {
                 rightEyelidTopY: 18,
                 mouthState: .flat,
                 mouthWidth: 36,
+                mouthHeight: 2.0,
                 mouthCurveDepth: 0,
                 glowIntensity: 0.1,
                 glowPulseRate: 4.0,
@@ -437,6 +443,7 @@ struct ExpressionConfig {
                 rightEyelidTopY: -8,
                 mouthState: .flat,
                 mouthWidth: 36,
+                mouthHeight: 2.0,
                 mouthCurveDepth: 0,
                 glowIntensity: 0.3,
                 glowPulseRate: 3.0,
@@ -465,6 +472,7 @@ struct ExpressionComponents {
     var rightEyelidBottomY: Double = 20
     var mouthState: MouthState = .flat
     var mouthWidth: Double = 40
+    var mouthHeight: Double = 2.0 // v2.1: Added for morph targets
     var mouthCurveDepth: Double = 0
     var glowIntensity: Double = 0.4
     var glowPulseRate: Double = 2.0

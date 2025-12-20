@@ -28,17 +28,162 @@ class AnimationService: ObservableObject {
     
     func transitionToState(_ newState: EmotionalState) {
         let previousState = state.currentState
+        
+        // Check emotion buffer system (v2.1)
+        if !TransitionMatrix.shouldAllowTransition(
+            from: previousState,
+            to: newState,
+            lastChangeTime: state.lastStateChange
+        ) {
+            // Queue the transition or intensify current if same state
+            if previousState == newState {
+                // Re-trigger: Intensify slightly (+5%)
+                intensifyCurrentExpression()
+            }
+            return
+        }
+        
+        // Get transition spec from matrix
+        let transition = TransitionMatrix.getTransition(from: previousState, to: newState)
+        
+        // Apply staggered component transitions (v2.1)
+        applyStaggeredTransition(
+            from: previousState,
+            to: newState,
+            transitionType: transition.type,
+            duration: transition.duration
+        )
+        
         state.currentState = newState
         state.lastStateChange = Date()
+    }
+    
+    private func intensifyCurrentExpression() {
+        // Intensify current expression by 5% on applicable values
+        // This allows same-expression re-triggers to build intensity
+        withAnimation(GrumpEasingCurve.snap(duration: 0.1)) {
+            // Intensify eyebrow rotations, glow, etc. by 5%
+            let intensityMultiplier = 1.05
+            state.leftEyebrowRotation *= intensityMultiplier
+            state.rightEyebrowRotation *= intensityMultiplier
+            state.glowIntensity = min(1.0, state.glowIntensity * intensityMultiplier)
+        }
+    }
+    
+    private func applyStaggeredTransition(
+        from: EmotionalState,
+        to: EmotionalState,
+        transitionType: TransitionMatrix.TransitionType,
+        duration: TimeInterval
+    ) {
+        // Select appropriate easing curve based on transition type
+        let curve: Animation
+        switch transitionType {
+        case .direct, .escalation, .glitchIn:
+            curve = GrumpEasingCurve.snap(duration: duration)
+        case .gradualSettle, .coolDown, .gentle:
+            curve = GrumpEasingCurve.settle(duration: duration)
+        case .crossfade:
+            curve = GrumpEasingCurve.float(duration: duration)
+        case .glitchOut:
+            curve = GrumpEasingCurve.mechanical(duration: duration)
+        case .progressive, .startle:
+            curve = GrumpEasingCurve.settle(duration: duration)
+        }
         
-        updateStateForEmotion(newState, previousState: previousState)
+        // Get target state configuration
+        let targetComponents = ExpressionConfig.getComponentStates(for: to)
+        let fromComponents = ExpressionConfig.getComponentStates(for: from)
+        
+        // Apply component transitions with stagger (v2.1)
+        // Eyebrows lead (0ms delay - immediate)
+        withAnimation(curve) {
+            state.leftEyebrowRotation = targetComponents.leftEyebrowRotation
+            state.rightEyebrowRotation = targetComponents.rightEyebrowRotation
+            state.leftEyebrowY = targetComponents.leftEyebrowY
+            state.rightEyebrowY = targetComponents.rightEyebrowY
+            state.leftEyebrowX = targetComponents.leftEyebrowX
+            state.rightEyebrowX = targetComponents.rightEyebrowX
+        }
+        
+        // Eyelids (30ms delay)
+        DispatchQueue.main.asyncAfter(deadline: .now() + AnimationConstants.transitionEyelidDelay) {
+            withAnimation(curve) {
+                self.state.leftEyelidTopY = targetComponents.leftEyelidTopY
+                self.state.rightEyelidTopY = targetComponents.rightEyelidTopY
+                self.state.leftEyelidBottomY = targetComponents.leftEyelidBottomY
+                self.state.rightEyelidBottomY = targetComponents.rightEyelidBottomY
+            }
+        }
+        
+        // Eye whites (50ms delay)
+        DispatchQueue.main.asyncAfter(deadline: .now() + AnimationConstants.transitionEyeWhiteDelay) {
+            withAnimation(curve) {
+                self.state.leftEyeScaleX = targetComponents.leftEyeScaleX
+                self.state.leftEyeScaleY = targetComponents.leftEyeScaleY
+                self.state.rightEyeScaleX = targetComponents.rightEyeScaleX
+                self.state.rightEyeScaleY = targetComponents.rightEyeScaleY
+            }
+        }
+        
+        // Pupils (60ms delay)
+        DispatchQueue.main.asyncAfter(deadline: .now() + AnimationConstants.transitionPupilDelay) {
+            withAnimation(curve) {
+                self.state.leftPupilSize = targetComponents.leftPupilSize
+                self.state.rightPupilSize = targetComponents.rightPupilSize
+            }
+        }
+        
+        // Mouth (80ms delay)
+        DispatchQueue.main.asyncAfter(deadline: .now() + AnimationConstants.transitionMouthDelay) {
+            withAnimation(curve) {
+                self.state.mouthState = targetComponents.mouthState
+                self.state.mouthWidth = targetComponents.mouthWidth
+                self.state.mouthHeight = targetComponents.mouthHeight
+                self.state.mouthCurveDepth = targetComponents.mouthCurveDepth
+                // v2.1: Add mouth elasticity overshoot (8% overshoot, settle over 80ms)
+                let overshootWidth = targetComponents.mouthWidth * 1.08
+                withAnimation(GrumpEasingCurve.settle(duration: 0.08)) {
+                    self.state.mouthWidth = targetComponents.mouthWidth
+                }
+                self.state.mouthWidth = overshootWidth // Start with overshoot
+            }
+        }
+        
+        // Mood glow (100ms delay - most delayed)
+        DispatchQueue.main.asyncAfter(deadline: .now() + AnimationConstants.transitionGlowDelay) {
+            withAnimation(curve) {
+                self.state.glowIntensity = targetComponents.glowIntensity
+                self.state.glowPulseRate = targetComponents.glowPulseRate
+                self.state.glowColor = targetComponents.glowColor
+            }
+        }
+        
+        // Call updateStateForEmotion for special behaviors (after main transition)
+        updateStateForEmotion(to, previousState: from)
     }
     
     func updateEyeTracking(position: CGFloat) {
-        withAnimation(.easeOut(duration: AnimationConstants.eyeTrackingSpeed)) {
+        // v2.1: Use grumpFloat curve with velocity constraints and stagger
+        let currentLeft = state.leftPupilX
+        let currentRight = state.rightPupilX
+        let target = Double(position)
+        
+        // Apply maximum velocity constraint (40pt/sec)
+        let maxChange = AnimationConstants.pupilMaxVelocity * AnimationConstants.eyeTrackingSpeed
+        let leftChange = min(abs(target - currentLeft), maxChange) * (target > currentLeft ? 1 : -1)
+        let rightChange = min(abs(target - currentRight), maxChange) * (target > currentRight ? 1 : -1)
+        
+        // Left pupil leads slightly (20ms stagger)
+        withAnimation(GrumpEasingCurve.float(duration: AnimationConstants.eyeTrackingSpeed)) {
             eyeTrackingPosition = position
-            state.leftPupilX = Double(position)
-            state.rightPupilX = Double(position)
+            state.leftPupilX = currentLeft + leftChange
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + AnimationConstants.pupilStaggerDelay) {
+            withAnimation(GrumpEasingCurve.float(duration: AnimationConstants.eyeTrackingSpeed)) {
+                self.state.rightPupilX = currentRight + rightChange
+            }
         }
     }
     
@@ -46,7 +191,14 @@ class AnimationService: ObservableObject {
         let blink = type ?? determineBlinkTypeForState()
         blinkType = blink
         
-        let duration = blink.duration
+        // v2.1: Refined blink timing - 180ms total with hold
+        let baseDuration = AnimationConstants.blinkDuration
+        let variance = baseDuration * AnimationConstants.blinkSpeedVariance * (Double.random(in: -1...1))
+        let duration = baseDuration + variance
+        
+        // Determine lead eye (randomize for asymmetry)
+        let leftLeads = Bool.random()
+        let asymmetry = Double.random(in: 0.95...1.0) // 5% chance of uneven blink
         
         if blink == .quickDouble {
             // Double blink
@@ -79,13 +231,25 @@ class AnimationService: ObservableObject {
                 }
             }
         } else {
-            // Standard blink
-            withAnimation(.easeInOut(duration: duration)) {
-                isBlinking = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                withAnimation(.easeInOut(duration: duration)) {
-                    self.isBlinking = false
+            // v2.1: Standard blink with refined timing
+            // Blink down: grumpSnap * 0.8, Blink up: grumpSettle * 1.2
+            let downDuration = AnimationConstants.blinkDownDuration
+            let holdDuration = AnimationConstants.blinkHoldTime
+            let upDuration = AnimationConstants.blinkUpDuration
+            
+            // Anticipation: Eyebrows micro-lift (30ms before)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
+                // Eyelids begin descent (grumpSnap)
+                withAnimation(GrumpEasingCurve.snap(duration: downDuration)) {
+                    self.isBlinking = true
+                }
+                
+                // Hold at closed (prevents flutter)
+                DispatchQueue.main.asyncAfter(deadline: .now() + downDuration + holdDuration) {
+                    // Eyelids open (grumpSettle)
+                    withAnimation(GrumpEasingCurve.settle(duration: upDuration)) {
+                        self.isBlinking = false
+                    }
                 }
             }
         }
@@ -148,12 +312,36 @@ class AnimationService: ObservableObject {
     }
     
     private func startBreathingAnimation() {
+        // v2.1: Layered breathing system (primary Y, secondary X, component offsets)
         breathingTimer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             let (range, duration) = self.getBreathingParamsForState()
             let time = Date().timeIntervalSince1970
-            let breathingCycle = sin(time * Double.pi / duration)
-            self.state.breathingScale = 1.0 + (breathingCycle * range)
+            
+            // Primary breath: Face scale Y (0.99-1.01)
+            let primaryCycle = sin(time * (2 * Double.pi / duration))
+            self.state.breathingScale = AnimationConstants.breathingScaleY.lowerBound + 
+                (primaryCycle * (AnimationConstants.breathingScaleY.upperBound - AnimationConstants.breathingScaleY.lowerBound) / 2.0) + 
+                ((AnimationConstants.breathingScaleY.upperBound + AnimationConstants.breathingScaleY.lowerBound) / 2.0)
+            
+            // Secondary breath: Face scale X (inverse, 1.001-0.999)
+            let secondaryCycle = sin(time * (2 * Double.pi / duration) + Double.pi) // Inverse phase
+            // Note: Secondary breathing would need a separate property if we want to use it
+            
+            // Eye whites: Scale 0.995-1.005, synced to primary
+            let eyeBreathing = AnimationConstants.eyeBreathingScale.lowerBound + 
+                (primaryCycle * (AnimationConstants.eyeBreathingScale.upperBound - AnimationConstants.eyeBreathingScale.lowerBound) / 2.0) + 
+                ((AnimationConstants.eyeBreathingScale.upperBound + AnimationConstants.eyeBreathingScale.lowerBound) / 2.0)
+            // Note: Eye breathing scale would need to be applied to eye components
+            
+            // Eyebrows: Y position +0.5pt at inhale peak
+            let eyebrowOffset = primaryCycle * AnimationConstants.eyebrowBreathingOffset
+            self.state.leftEyebrowY += eyebrowOffset * 0.5 // Apply 50% to avoid too much movement
+            self.state.rightEyebrowY += eyebrowOffset * 0.5
+            
+            // Mouth: Height +0.3pt at exhale
+            let mouthOffset = -primaryCycle * AnimationConstants.mouthBreathingHeight // Negative for exhale
+            self.state.mouthHeight += mouthOffset * 0.3
         }
     }
     
