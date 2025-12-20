@@ -141,12 +141,13 @@ class AnimationService: ObservableObject {
                 self.state.mouthWidth = targetComponents.mouthWidth
                 self.state.mouthHeight = targetComponents.mouthHeight
                 self.state.mouthCurveDepth = targetComponents.mouthCurveDepth
-                // v2.1: Add mouth elasticity overshoot (8% overshoot, settle over 80ms)
-                let overshootWidth = targetComponents.mouthWidth * 1.08
-                withAnimation(GrumpEasingCurve.settle(duration: 0.08)) {
-                    self.state.mouthWidth = targetComponents.mouthWidth
+                // v2.1: Mouth elasticity - overshoot then settle
+                self.state.mouthWidth = targetComponents.mouthWidth * 1.08 // Start with 8% overshoot
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                    withAnimation(GrumpEasingCurve.settle(duration: 0.08)) {
+                        self.state.mouthWidth = targetComponents.mouthWidth // Settle to target
+                    }
                 }
-                self.state.mouthWidth = overshootWidth // Start with overshoot
             }
         }
         
