@@ -78,7 +78,7 @@ export function useCharacterStreaming(
     setDisplayedText('')
     setIsComplete(false)
     let currentIndex = 0
-    let stream: NodeJS.Timeout | null = null
+    let stream: ReturnType<typeof setInterval> | null = null
 
     const addNextChar = () => {
       if (currentIndex >= text.length) {

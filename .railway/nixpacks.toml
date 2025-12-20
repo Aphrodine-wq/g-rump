@@ -1,0 +1,13 @@
+# Railway Nixpacks Configuration for G-RUMP Backend
+# This file tells Railway how to build and run the Node.js backend
+
+[build]
+# Node.js version
+nixPackages = ["nodejs_18"]
+
+# Build command (Railway detects package.json automatically, but explicit is better)
+cmds = ["npm install"]
+
+[start]
+# Start command for the backend
+cmd = "npm start"

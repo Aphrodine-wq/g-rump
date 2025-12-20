@@ -58,6 +58,32 @@ Grump Platform consists of three main components:
 
 ---
 
+## 🌐 Production Deployment
+
+**Ready to deploy to g-rump.com?** We have comprehensive guides for Vercel (frontend) + Railway (backend):
+
+**Quick Links:**
+- **[Railway Quick Start](RAILWAY_QUICK_START.md)** - 5-minute deployment guide ⚡
+- **[Railway Full Guide](RAILWAY_DEPLOYMENT.md)** - Complete Railway setup
+- **[Vercel + Railway Setup](DEPLOYMENT.md)** - Full deployment guide
+- **[Deployment Checklist](DEPLOYMENT_CHECKLIST.md)** - Step-by-step checklist
+
+**Quick Deploy:**
+```bash
+# 1. Push code to GitHub
+git push origin main
+
+# 2. Create Railway account at https://railway.app
+# 3. Connect GitHub repo
+# 4. Set environment variables (see RAILWAY_QUICK_START.md)
+# 5. Get Railway URL and update Vercel
+# 6. Done! Auto-deploys on future git push
+
+./scripts/deploy-to-railway.sh  # Helper script
+```
+
+---
+
 ## 📚 Documentation
 
 **All documentation is organized in the [`docs/`](docs/) directory:**
