@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftUI
 
 @MainActor
 class AnimationService: ObservableObject {
@@ -319,30 +320,35 @@ class AnimationService: ObservableObject {
             let (range, duration) = self.getBreathingParamsForState()
             let time = Date().timeIntervalSince1970
             
-            // Primary breath: Face scale Y (0.99-1.01)
+            // v2.1: Layered breathing - use sine for organic feel
+            // Primary breath: Face scale Y (0.99-1.01) - sine easing, not linear
             let primaryCycle = sin(time * (2 * Double.pi / duration))
-            self.state.breathingScale = AnimationConstants.breathingScaleY.lowerBound + 
-                (primaryCycle * (AnimationConstants.breathingScaleY.upperBound - AnimationConstants.breathingScaleY.lowerBound) / 2.0) + 
-                ((AnimationConstants.breathingScaleY.upperBound + AnimationConstants.breathingScaleY.lowerBound) / 2.0)
+            let breathingMin = AnimationConstants.breathingScaleY.lowerBound
+            let breathingMax = AnimationConstants.breathingScaleY.upperBound
+            let breathingRange = breathingMax - breathingMin
+            let breathingCenter = (breathingMax + breathingMin) / 2.0
+            // Map sine (-1 to 1) to breathing range
+            self.state.breathingScale = breathingCenter + (primaryCycle * breathingRange / 2.0)
             
-            // Secondary breath: Face scale X (inverse, 1.001-0.999)
-            let secondaryCycle = sin(time * (2 * Double.pi / duration) + Double.pi) // Inverse phase
-            // Note: Secondary breathing would need a separate property if we want to use it
+            // Eye whites: Scale 0.995-1.005, synced to primary (view-level implementation needed)
+            // Note: Eye breathing scale would need to be applied to eye components in view layer
             
-            // Eye whites: Scale 0.995-1.005, synced to primary
-            let eyeBreathing = AnimationConstants.eyeBreathingScale.lowerBound + 
-                (primaryCycle * (AnimationConstants.eyeBreathingScale.upperBound - AnimationConstants.eyeBreathingScale.lowerBound) / 2.0) + 
-                ((AnimationConstants.eyeBreathingScale.upperBound + AnimationConstants.eyeBreathingScale.lowerBound) / 2.0)
-            // Note: Eye breathing scale would need to be applied to eye components
+            // Eyebrows: Y position +0.5pt at inhale peak (subtle lift)
+            // Applied as subtle offset during idle states only
+            if self.state.currentState == .idle {
+                let eyebrowOffset = primaryCycle * AnimationConstants.eyebrowBreathingOffset
+                // Store base Y and apply offset (simplified for now)
+                let baseComponents = ExpressionConfig.getComponentStates(for: .idle)
+                self.state.leftEyebrowY = baseComponents.leftEyebrowY + (eyebrowOffset * 0.3)
+                self.state.rightEyebrowY = baseComponents.rightEyebrowY + (eyebrowOffset * 0.3)
+            }
             
-            // Eyebrows: Y position +0.5pt at inhale peak
-            let eyebrowOffset = primaryCycle * AnimationConstants.eyebrowBreathingOffset
-            self.state.leftEyebrowY += eyebrowOffset * 0.5 // Apply 50% to avoid too much movement
-            self.state.rightEyebrowY += eyebrowOffset * 0.5
-            
-            // Mouth: Height +0.3pt at exhale
-            let mouthOffset = -primaryCycle * AnimationConstants.mouthBreathingHeight // Negative for exhale
-            self.state.mouthHeight += mouthOffset * 0.3
+            // Mouth: Height +0.3pt at exhale (slight part)
+            if self.state.currentState == .idle {
+                let baseComponents = ExpressionConfig.getComponentStates(for: .idle)
+                let mouthOffset = -primaryCycle * AnimationConstants.mouthBreathingHeight // Negative for exhale
+                self.state.mouthHeight = max(2.0, baseComponents.mouthHeight + (mouthOffset * 0.2))
+            }
         }
     }
     
@@ -372,12 +378,39 @@ class AnimationService: ObservableObject {
             guard let self = self else { return }
             self.state.idleTime += 0.1
             
-            // After 10 seconds of idle, start getting bored
-            if self.state.idleTime > 10 && self.state.currentState == .idle {
-                // Eyes start to close
-                withAnimation(.easeInOut(duration: 2.0)) {
-                    self.state.leftEyeScaleY = 0.3
-                    self.state.rightEyeScaleY = 0.3
+            // v2.1: Idle variation by context
+            if self.state.currentState == .idle {
+                let idleMinutes = self.state.idleTime / 60.0
+                
+                // Extended session idle (15+ min): Less alert
+                if idleMinutes > 15 {
+                    // Eyelids 12% closed (sleepier)
+                    withAnimation(GrumpEasingCurve.settle(duration: 1.0)) {
+                        self.state.leftEyelidTopY = -20 // More closed
+                        self.state.rightEyelidTopY = -20
+                    }
+                    
+                    // Occasional deeper sigh (every 60s)
+                    if Int(self.state.idleTime) % 60 == 0 && Int.random(in: 0..<100) < 10 {
+                        // Trigger subtle sigh animation
+                    }
+                } else {
+                    // Fresh session idle: More alert
+                    // Eyelids 5% closed (less sleepy)
+                    withAnimation(GrumpEasingCurve.settle(duration: 1.0)) {
+                        self.state.leftEyelidTopY = -23
+                        self.state.rightEyelidTopY = -23
+                    }
+                }
+                
+                // After 10 seconds of idle, subtle changes
+                if self.state.idleTime > 10 {
+                    // Very subtle eye closing (not dramatic)
+                    let closeAmount = min(0.95, 1.0 - (self.state.idleTime / 600.0) * 0.05) // Max 5% over 600s
+                    withAnimation(GrumpEasingCurve.settle(duration: 2.0)) {
+                        self.state.leftEyeScaleY = closeAmount
+                        self.state.rightEyeScaleY = closeAmount
+                    }
                 }
             }
         }
@@ -568,13 +601,45 @@ class AnimationService: ObservableObject {
             }
             
             let progress = elapsed / duration
-            let angle = progress * 2 * Double.pi
-            let radius: Double = 6.0
             
-            self.state.leftPupilX = cos(angle) * radius
-            self.state.leftPupilY = sin(angle) * radius
-            self.state.rightPupilX = cos(angle) * radius
-            self.state.rightPupilY = sin(angle) * radius
+            // v2.1: Figure-8 path (not circle)
+            let radius: Double = 6.0
+            let verticalScale: Double = 0.7 // Squash the 8 vertically
+            
+            var pupilX: Double = 0
+            var pupilY: Double = 0
+            
+            if progress < 0.45 {
+                // Phase 1: Arc up and out
+                let phase1Progress = progress / 0.45
+                let angle = phase1Progress * Double.pi * 1.2
+                pupilX = sin(angle) * radius
+                pupilY = -cos(angle) * radius * verticalScale
+                
+                // Eyes converge slightly
+                let convergence = 0.3
+                pupilX *= (1.0 + convergence * phase1Progress)
+            } else if progress < 0.85 {
+                // Phase 2: Arc down and in, return
+                let phase2Progress = (progress - 0.45) / 0.4
+                let angle = Double.pi * 1.2 + (phase2Progress * Double.pi * 0.8)
+                pupilX = sin(angle) * radius
+                pupilY = -cos(angle) * radius * verticalScale
+                
+                // Continue convergence then diverge
+                let convergencePhase = phase2Progress < 0.5 ? phase2Progress : 1.0 - phase2Progress
+                pupilX *= (1.0 + 0.3 * (1.0 - convergencePhase * 2.0))
+            } else {
+                // Phase 3: Settle forward
+                let phase3Progress = (progress - 0.85) / 0.15
+                pupilX = 0.0 * (1.0 - phase3Progress)
+                pupilY = 0.0 * (1.0 - phase3Progress)
+            }
+            
+            // Apply with slight stagger between eyes
+            self.state.leftPupilX = pupilX
+            self.state.leftPupilY = pupilY
+            // Right eye follows with slight delay (handled via stagger delay constant)
             
             // Eyelid behavior
             if progress < 0.25 {
@@ -611,38 +676,114 @@ class AnimationService: ObservableObject {
         }
     }
 }
-
-enum EyeRollVariation {
-    case full
-    case half
-    case double
-    case slow
-    case quick
-}
     
     private func startMicroMovements() {
         // Skip if reduced motion enabled
         guard !ReducedMotion.isEnabled else { return }
         
         var time: Double = 0
+        var lastMicroSaccadeTime: Double = 0
+        var lastRefocusTime: Double = 0
+        var lastAttentionDriftTime: Double = 0
         
         microMovementTimer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             
             // Only apply micro-movements when idle or in neutral states
-            guard self.state.currentState == .idle || self.state.currentState == .neutral else {
+            guard self.state.currentState == .idle else {
                 return
             }
             
             time += 0.016
             
-            // Pupil drift: ±2pt, 5s cycle
-            let pupilX = self.pupilNoise.noise1D(time / 5.0) * 2.0
-            let pupilY = self.pupilNoise.noise1D(time / 5.0 + 100) * 2.0
-            self.state.leftPupilX = pupilX
-            self.state.rightPupilX = pupilX + 0.5 // Slight offset for depth
-            self.state.leftPupilY = pupilY
-            self.state.rightPupilY = pupilY
+            // v2.1: Layer 2 - Micro-Saccades (subtle eye life)
+            // Small saccades: ±0.8pt, every 200-600ms (random), instant movement
+            let microSaccadeInterval = Double.random(in: 0.2...0.6)
+            if time - lastMicroSaccadeTime >= microSaccadeInterval {
+                lastMicroSaccadeTime = time
+                let saccadeX = Double.random(in: -AnimationConstants.microSaccadeRange.lowerBound...AnimationConstants.microSaccadeRange.upperBound)
+                let saccadeY = Double.random(in: -AnimationConstants.microSaccadeRange.lowerBound...AnimationConstants.microSaccadeRange.upperBound)
+                
+                // Instant micro-movement (no animation, feels natural)
+                self.state.leftPupilX += saccadeX
+                self.state.rightPupilX += saccadeX
+                self.state.leftPupilY += saccadeY
+                self.state.rightPupilY += saccadeY
+            }
+            
+            // Drift: ±1.5pt, 8-12s cycle, Perlin noise
+            let driftCycle = Double.random(in: 8.0...12.0)
+            let driftX = self.pupilNoise.noise1D(time / driftCycle) * AnimationConstants.pupilDriftRange.upperBound
+            let driftY = self.pupilNoise.noise1D(time / driftCycle + 100) * AnimationConstants.pupilDriftRange.upperBound
+            self.state.leftPupilX += driftX * 0.1 // Apply slowly
+            self.state.rightPupilX += driftX * 0.1
+            self.state.leftPupilY += driftY * 0.1
+            self.state.rightPupilY += driftY * 0.1
+            
+            // Refocus: Every 15-30s, both pupils shift 2-3pt, hold, return
+            let refocusInterval = Double.random(in: 15.0...30.0)
+            if time - lastRefocusTime >= refocusInterval {
+                lastRefocusTime = time
+                let refocusX = Double.random(in: 2.0...3.0) * (Bool.random() ? 1 : -1)
+                let refocusY = Double.random(in: 1.0...2.0) * (Bool.random() ? 1 : -1)
+                
+                withAnimation(GrumpEasingCurve.float(duration: 0.3)) {
+                    self.state.leftPupilX += refocusX
+                    self.state.rightPupilX += refocusX
+                    self.state.leftPupilY += refocusY
+                    self.state.rightPupilY += refocusY
+                }
+                
+                // Hold then return
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 0.5...1.5)) {
+                    withAnimation(GrumpEasingCurve.float(duration: 0.5)) {
+                        self.state.leftPupilX -= refocusX
+                        self.state.rightPupilX -= refocusX
+                        self.state.leftPupilY -= refocusY
+                        self.state.rightPupilY -= refocusY
+                    }
+                }
+            }
+            
+            // v2.1: Layer 3 - Attention Simulation
+            // Every 4-8s: Pupils briefly drift toward a "point of interest"
+            let attentionInterval = Double.random(in: 4.0...8.0)
+            if time - lastAttentionDriftTime >= attentionInterval {
+                lastAttentionDriftTime = time
+                
+                // Random spot (10% chance), otherwise subtle drift
+                if Double.random(in: 0...1) < 0.1 {
+                    // Suspicious scan
+                    let scanX = Double.random(in: -3.0...3.0)
+                    let scanY = Double.random(in: -2.0...2.0)
+                    
+                    withAnimation(GrumpEasingCurve.float(duration: 0.8)) {
+                        self.state.leftPupilX += scanX
+                        self.state.rightPupilX += scanX
+                        self.state.leftPupilY += scanY
+                        self.state.rightPupilY += scanY
+                    }
+                    
+                    // Return after hold
+                    DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 0.5...1.5)) {
+                        withAnimation(GrumpEasingCurve.float(duration: 0.8)) {
+                            self.state.leftPupilX -= scanX
+                            self.state.rightPupilX -= scanX
+                            self.state.leftPupilY -= scanY
+                            self.state.rightPupilY -= scanY
+                        }
+                    }
+                }
+            }
+            
+            // v2.1: Pupil size continuous drift (always subtly changing)
+            let pupilSizeDrift = Double.random(in: AnimationConstants.pupilContinuousDrift.lowerBound...AnimationConstants.pupilContinuousDrift.upperBound)
+            self.state.leftPupilSize += pupilSizeDrift * 0.01
+            self.state.rightPupilSize += pupilSizeDrift * 0.01
+            
+            // Clamp pupil size to reasonable range
+            self.state.leftPupilSize = max(8.0, min(18.0, self.state.leftPupilSize))
+            self.state.rightPupilSize = max(8.0, min(18.0, self.state.rightPupilSize))
             
             // Eyebrow micro-adjust: ±1° rotation, ±1pt Y, 8s cycle
             let eyebrowRotL = self.eyebrowNoise.noise1D(time / 8.0) * 1.0
@@ -650,21 +791,12 @@ enum EyeRollVariation {
             let eyebrowYL = self.eyebrowNoise.noise1D(time / 8.0 + 25) * 1.0
             let eyebrowYR = self.eyebrowNoise.noise1D(time / 8.0 + 75) * 1.0
             
-            // Apply as offsets to base state
-            if self.state.currentState == .idle {
-                self.state.leftEyebrowX = eyebrowRotL
-                self.state.rightEyebrowX = eyebrowRotR
-                // Y is already set by expression, so we add micro-adjustment
-                // (In practice, we'd store base Y and apply offset)
-            }
-            
-            // Head micro-tilt: ±0.5°, 10s cycle (applied via face rotation in view)
-            // This would be handled in the view layer
-            
-            // Mouth micro-movement: ±1pt width, ±0.5pt depth, 6s cycle
-            let mouthWidthOffset = self.mouthNoise.noise1D(time / 6.0) * 1.0
-            let mouthDepthOffset = self.mouthNoise.noise1D(time / 6.0 + 30) * 0.5
-            // Applied as offsets to base mouth state
+            // Apply as offsets to base state (5-10% variance for asymmetry)
+            let variance = Double.random(in: 0.05...0.10)
+            self.state.leftEyebrowX = eyebrowRotL * variance
+            self.state.rightEyebrowX = eyebrowRotR * variance * (1.0 + variance) // Asymmetry
+            self.state.leftEyebrowY += eyebrowYL * variance * 0.1
+            self.state.rightEyebrowY += eyebrowYR * variance * 0.1
         }
     }
     
