@@ -8,7 +8,8 @@
 
 ```env
 AI_PROVIDER=groq
-GROQ_API_KEY=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
+# Get your API key from: https://console.groq.com/
+GROQ_API_KEY=your_groq_api_key_here
 GROQ_MODEL=llama-3.1-70b-versatile
 PORT=3000
 ```

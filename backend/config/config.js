@@ -17,7 +17,7 @@ export const config = {
       top_p: parseFloat(process.env.GROQ_TOP_P || '0.95'), // Nucleus sampling for more natural responses
       max_tokens: parseInt(process.env.GROQ_MAX_TOKENS || '256'), // Fully optimized: reduced to 256 tokens to save output costs
     },
-  // Use Groq by default if configured, otherwise fall back to Anthropic
+  // Use AI_PROVIDER env var if set, otherwise default to Groq if key exists, else Anthropic
   aiProvider: process.env.AI_PROVIDER || (process.env.GROQ_API_KEY ? 'groq' : 'anthropic'),
   cors: {
     origin: process.env.CORS_ORIGIN || '*',

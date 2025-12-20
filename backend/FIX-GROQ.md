@@ -33,15 +33,17 @@ curl http://localhost:3000/api/chat -X POST -H "Content-Type: application/json" 
 
 Or test in the web client at http://localhost:5173
 
-## 📝 Your .env File Contains:
+## 📝 Your .env File Should Contain:
 ```
 AI_PROVIDER=groq
-GROQ_API_KEY=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
+GROQ_API_KEY=your_groq_api_key_here
 GROQ_MODEL=llama-3.1-70b-versatile
 PORT=3000
 NODE_ENV=development
 CORS_ORIGIN=*
 ```
+
+⚠️ **Important:** Replace `your_groq_api_key_here` with your actual API key from https://console.groq.com/
 
 ---
 

@@ -9,7 +9,7 @@
 
 ## 🔑 Where to Place Your Groq API Key
 
-**Your Groq API Key:** `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`
+**Your Groq API Key:** 
 
 ### Step 1: Create/Edit `backend/.env` file
 
@@ -22,7 +22,8 @@ Add these lines:
 AI_PROVIDER=groq
 
 # Groq API Configuration
-GROQ_API_KEY=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
+# Get your API key from: https://console.groq.com/
+GROQ_API_KEY=your_groq_api_key_here
 GROQ_MODEL=llama-3.1-70b-versatile
 
 # Server Configuration
