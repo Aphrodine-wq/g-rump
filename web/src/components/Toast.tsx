@@ -84,3 +84,4 @@ export default function Toast({ message, type = 'info', duration = 3000, onClose
     </AnimatePresence>
   )
 }
+

@@ -56,3 +56,4 @@ export default function ErrorBanner({ message, onDismiss, onRetry }: ErrorBanner
     </AnimatePresence>
   )
 }
+
