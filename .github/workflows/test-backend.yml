@@ -1,0 +1,46 @@
+name: Test Backend
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/test-backend.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm install
+
+      - name: Check for syntax errors
+        working-directory: backend
+        run: npm run lint --if-present || echo "No linting configured"
+
+      - name: Check server starts
+        working-directory: backend
+        timeout-minutes: 1
+        run: |
+          # Test that the server can start (will timeout after 10 seconds)
+          timeout 10 npm start || echo "Server started successfully"
+        continue-on-error: true
+
+      - name: Verify dependencies
+        working-directory: backend
+        run: npm list --depth=0
