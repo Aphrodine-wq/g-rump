@@ -89,13 +89,22 @@ struct SubscriptionView: View {
                     // Restore Purchases
                     Button(action: {
                         Task {
+                            isRestoring = true
                             await storeKit.restorePurchases()
+                            isRestoring = false
                         }
                     }) {
-                        Text("Restore Purchases")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.blue)
+                        HStack(spacing: 8) {
+                            if isRestoring {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle())
+                            }
+                            Text("Restore Purchases")
+                                .font(.system(size: 14, weight: .medium))
+                        }
+                        .foregroundColor(.blue)
                     }
+                    .disabled(isRestoring)
                     .padding(.top, 8)
                     .padding(.bottom, 32)
                 }

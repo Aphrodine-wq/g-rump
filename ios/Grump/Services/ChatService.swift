@@ -31,7 +31,14 @@ class ChatService: ObservableObject {
         let monthKey = getCurrentMonthKey()
         let usedKey = "messagesUsed_\(monthKey)"
         let used = UserDefaults.standard.integer(forKey: usedKey)
-        remainingMessages = max(0, messagesPerMonth - used)
+        
+        // -1 represents unlimited (for future premium tier with unlimited)
+        // For now, premium has 1000 messages, so we calculate normally
+        if messagesPerMonth == 0 {
+            remainingMessages = -1 // Unlimited
+        } else {
+            remainingMessages = max(0, messagesPerMonth - used)
+        }
     }
     
     private func getCurrentMonthKey() -> String {
@@ -41,9 +48,8 @@ class ChatService: ObservableObject {
     }
     
     private func canSendMessage() -> Bool {
-        let messagesPerMonth = storeKitService.getMessagesPerMonth()
-        if messagesPerMonth == 0 { return true } // Unlimited (premium)
-        return remainingMessages > 0
+        // -1 means unlimited, > 0 means messages remaining, 0 means limit reached
+        return remainingMessages != 0
     }
     
     private func incrementMessageCount() {
@@ -203,7 +209,10 @@ class ChatService: ObservableObject {
     
     private func getMessageLimitErrorMessage() -> String {
         let tier = storeKitService.subscriptionStatus.tierId.capitalized
-        return "You've reached your \(tier) plan message limit. Upgrade to send more messages."
+        if tier.lowercased() == "free" {
+            return "That's it. You've used all your free messages. Want more? Upgrade. (I'm not going to beg.)"
+        }
+        return "You've hit your \(tier) plan limit. Upgrade if you want to keep talking. (I'm fine either way.)"
     }
 }
 

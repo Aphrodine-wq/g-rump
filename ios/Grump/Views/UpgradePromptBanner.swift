@@ -12,11 +12,11 @@ struct UpgradePromptBanner: View {
                 .font(.caption)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("Message limit reached")
+                Text("That's it. You're done.")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.grumpTextPrimary)
                 
-                Text("Upgrade to send more messages")
+                Text("Upgrade if you want to keep talking")
                     .font(.system(size: 12, weight: .regular))
                     .foregroundColor(.grumpTextSecondary)
             }

@@ -92,28 +92,59 @@ struct ChatView: View {
                     }
                 }
                 
-                // Error message
+                // Error message with retry button
                 if let errorMessage = chatService.errorMessage {
-                    HStack(spacing: 12) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.grumpAccent)
-                            .font(.caption)
-                        Text(errorMessage)
-                            .font(.caption)
-                            .foregroundColor(.grumpTextPrimary)
-                        Spacer()
-                        Button(action: {
-                            chatService.errorMessage = nil
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.grumpTextSecondary)
+                    VStack(spacing: 8) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.grumpAccent)
                                 .font(.caption)
+                            Text(errorMessage)
+                                .font(.caption)
+                                .foregroundColor(.grumpTextPrimary)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer()
+                            Button(action: {
+                                chatService.errorMessage = nil
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.grumpTextSecondary)
+                                    .font(.caption)
+                            }
+                        }
+                        
+                        // Retry button for network errors
+                        if errorMessage.contains("Network") || errorMessage.contains("connection") || errorMessage.contains("Server") {
+                            Button(action: {
+                                // Retry last message if available
+                                if let lastUserMessage = chatService.messages.last(where: { $0.sender == .user }) {
+                                    Task {
+                                        await chatService.sendMessage(lastUserMessage.content)
+                                    }
+                                }
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "arrow.clockwise")
+                                        .font(.system(size: 11))
+                                    Text("Try Again")
+                                        .font(.system(size: 12, weight: .medium))
+                                }
+                                .foregroundColor(.grumpAccent)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.grumpAccent.opacity(0.1))
+                                .cornerRadius(6)
+                            }
                         }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
                     .background(Color.grumpSurface)
                     .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.grumpAccent.opacity(0.3), lineWidth: 1)
+                    )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
                 }
@@ -133,20 +164,50 @@ struct ChatView: View {
                     .padding(.bottom, 8)
                 }
                 
-                // Remaining messages indicator (show if limited and not unlimited)
-                if chatService.remainingMessages >= 0 && chatService.remainingMessages <= 100 {
-                    HStack {
-                        Spacer()
-                        Text("\(chatService.remainingMessages) messages left")
-                            .font(.system(size: 11, weight: .light))
-                            .foregroundColor(chatService.remainingMessages <= 5 ? .grumpAccent : .grumpTextSecondary)
+                // Remaining messages indicator with warnings
+                if chatService.remainingMessages >= 0 {
+                    let isLow = chatService.remainingMessages <= 5
+                    let isVeryLow = chatService.remainingMessages <= 2
+                    
+                    VStack(spacing: 4) {
+                        // Warning banner when very low
+                        if isVeryLow {
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.grumpAccent)
+                                    .font(.system(size: 10))
+                                Text("Almost out of messages!")
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.grumpAccent)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.grumpAccent.opacity(0.15))
+                            .cornerRadius(6)
+                            .padding(.horizontal, 16)
+                        }
+                        
+                        // Remaining count
+                        HStack {
+                            Spacer()
+                            HStack(spacing: 6) {
+                                if isLow {
+                                    Image(systemName: "exclamationmark.circle.fill")
+                                        .font(.system(size: 9))
+                                }
+                                Text("\(chatService.remainingMessages) message\(chatService.remainingMessages == 1 ? "" : "s") left")
+                                    .font(.system(size: 11, weight: isLow ? .medium : .light))
+                                    .foregroundColor(isLow ? .grumpAccent : .grumpTextSecondary)
+                            }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 4)
                             .background(Color.grumpSurface)
                             .cornerRadius(8)
-                        Spacer()
+                            Spacer()
+                        }
+                        .padding(.horizontal, 16)
                     }
-                    .padding(.horizontal, 16)
                     .padding(.bottom, 4)
                 }
                 
@@ -218,13 +279,12 @@ struct ChatView: View {
         }
     }
     
-    private func canSendMessage(chatService: ChatService) -> Bool {
-        return chatService.remainingMessages > 0 || chatService.remainingMessages < 0
-    }
-    
     private func canSendMessage() -> Bool {
         // Check if user can send message based on subscription limits
-        return chatService.remainingMessages > 0 || chatService.remainingMessages < 0
+        // -1 means unlimited (premium tier)
+        // 0 means limit reached
+        // > 0 means messages remaining
+        return chatService.remainingMessages != 0
     }
     
     private func updateEyeTracking(for text: String) {

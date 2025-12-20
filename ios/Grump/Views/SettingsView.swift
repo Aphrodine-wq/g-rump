@@ -8,6 +8,7 @@ struct SettingsView: View {
     @State private var grumpMood: String = "Cranky"
     @State private var sarcasmLevel: String = "Maximum"
     @State private var showSubscriptionView = false
+    @State private var remainingMessages: Int = 0
     
     var body: some View {
         NavigationStack {
@@ -19,26 +20,55 @@ struct SettingsView: View {
                     VStack(spacing: 0) {
                         // Subscription Section
                         SettingsSection(title: "Subscription & Pricing") {
-                            SettingsRow(
-                                title: "Current Plan",
-                                trailing: {
-                                    HStack(spacing: 8) {
-                                        VStack(alignment: .trailing, spacing: 4) {
-                                            Text(storeKit.subscriptionStatus.tierId.capitalized)
-                                                .font(.subheadline)
-                                                .foregroundColor(.grumpTextPrimary)
-                                            Text("\(storeKit.getMessagesPerMonth()) messages/month")
+                            if storeKit.isLoading {
+                                SettingsRow(
+                                    title: "Loading...",
+                                    trailing: {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle())
+                                    }
+                                )
+                            } else {
+                                SettingsRow(
+                                    title: "Current Plan",
+                                    trailing: {
+                                        HStack(spacing: 8) {
+                                            VStack(alignment: .trailing, spacing: 4) {
+                                                Text(storeKit.subscriptionStatus.tierId.capitalized)
+                                                    .font(.subheadline)
+                                                    .foregroundColor(.grumpTextPrimary)
+                                                Text("\(storeKit.getMessagesPerMonth()) messages/month")
+                                                    .font(.caption)
+                                                    .foregroundColor(.grumpTextSecondary)
+                                            }
+                                            Image(systemName: "chevron.right")
                                                 .font(.caption)
                                                 .foregroundColor(.grumpTextSecondary)
                                         }
-                                        Image(systemName: "chevron.right")
-                                            .font(.caption)
-                                            .foregroundColor(.grumpTextSecondary)
                                     }
+                                )
+                                .onTapGesture {
+                                    showSubscriptionView = true
                                 }
-                            )
-                            .onTapGesture {
-                                showSubscriptionView = true
+                                
+                                // Remaining messages this month
+                                if remainingMessages >= 0 {
+                                    SettingsRow(
+                                        title: "Messages Remaining",
+                                        trailing: {
+                                            HStack(spacing: 6) {
+                                                if remainingMessages <= 5 {
+                                                    Image(systemName: "exclamationmark.circle.fill")
+                                                        .font(.system(size: 10))
+                                                        .foregroundColor(.grumpAccent)
+                                                }
+                                                Text(remainingMessages == -1 ? "Unlimited" : "\(remainingMessages)")
+                                                    .font(.subheadline)
+                                                    .foregroundColor(remainingMessages <= 5 ? .grumpAccent : .grumpTextPrimary)
+                                            }
+                                        }
+                                    )
+                                }
                             }
                         }
                         
@@ -133,8 +163,31 @@ struct SettingsView: View {
         .onAppear {
             Task {
                 await storeKit.updateSubscriptionStatus()
+                updateRemainingMessages()
             }
         }
+        .onChange(of: storeKit.subscriptionStatus) { _, _ in
+            updateRemainingMessages()
+        }
+    
+    private func updateRemainingMessages() {
+        let messagesPerMonth = storeKit.getMessagesPerMonth()
+        let monthKey = getCurrentMonthKey()
+        let usedKey = "messagesUsed_\(monthKey)"
+        let used = UserDefaults.standard.integer(forKey: usedKey)
+        
+        if messagesPerMonth == 0 {
+            remainingMessages = -1 // Unlimited
+        } else {
+            remainingMessages = max(0, messagesPerMonth - used)
+        }
+    }
+    
+    private func getCurrentMonthKey() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM"
+        return formatter.string(from: Date())
+    }
     }
 }
 
