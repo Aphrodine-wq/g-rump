@@ -87,6 +87,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setLastFailedMessage(trimmedContent) // Store for retry
 
     try {
+      logger.log('[DEBUG] Sending message to API:', { API_BASE_URL, content: content.trim() })
       // Include the user message we just added since React state updates are async
       // and messagesRef.current might not be updated yet
       const allMessagesForAPI = [...messagesRef.current, userMessage]
@@ -103,11 +104,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         },
         timeout: 30000 // 30 second timeout
       })
-      
+
+      logger.log('[DEBUG] API response received:', { data: response.data })
+
       if (!response.data || !response.data.response) {
         logger.error('Invalid response format:', response.data)
         throw new Error('Invalid response from server')
       }
+
+      logger.log('[DEBUG] Adding Grump message:', { response: response.data.response })
 
       // Increment message count only after successful API response
       incrementMessageCount()
@@ -119,14 +124,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         timestamp: new Date(response.data.timestamp)
       }
 
+      logger.log('[DEBUG] Setting messages, new grumpMessage:', grumpMessage)
       setMessages(prev => {
+        logger.log('[DEBUG] Inside setMessages, current messages count:', prev.length)
         // Create a completely new array to ensure React detects the change
         const updated = Array.from(prev)
         updated.push(grumpMessage)
+        logger.log('[DEBUG] After push, updated messages count:', updated.length)
         // Save to localStorage for history
         saveSessionToHistory(updated)
         return updated
       })
+      logger.log('[DEBUG] setMessages completed')
     } catch (error: any) {
       logger.error('Error sending message:', error)
       logger.error('Error details:', {
