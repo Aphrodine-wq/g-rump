@@ -1,0 +1,66 @@
+.particle-effects-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Sleep Z */
+.particle.sleep-z {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--fg);
+  opacity: 0.6;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Confetti */
+.particle.confetti {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+/* Coffee Steam */
+.particle.coffee-steam {
+  width: 12px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(var(--fg-rgb, 255, 255, 255), 0.3);
+  backdrop-filter: blur(2px);
+}
+
+/* Anger Particle */
+.particle.anger {
+  width: 2px;
+  height: 20px;
+  background: var(--error);
+  transform-origin: center bottom;
+}
+
+/* Sparkle */
+.particle.sparkle {
+  font-size: 16px;
+  color: var(--accent);
+  text-shadow: 0 0 4px currentColor;
+}
+
+/* Glitch Rectangle */
+.particle.glitch-rectangle {
+  width: 20px;
+  height: 20px;
+  background: var(--error);
+  opacity: 0.8;
+  border: 1px solid var(--fg);
+}
+

@@ -1,0 +1,38 @@
+export default {
+  expo: {
+    name: 'Grump',
+    slug: 'grump',
+    version: '1.0.0',
+    orientation: 'portrait',
+    icon: './assets/icon.png',
+    userInterfaceStyle: 'dark',
+    splash: {
+      image: './assets/splash.png',
+      resizeMode: 'contain',
+      backgroundColor: '#000000',
+    },
+    assetBundlePatterns: ['**/*'],
+    ios: {
+      supportsTablet: true,
+      bundleIdentifier: 'com.grump.app',
+    },
+    android: {
+      adaptiveIcon: {
+        foregroundImage: './assets/adaptive-icon.png',
+        backgroundColor: '#000000',
+      },
+      package: 'com.grump.app',
+    },
+    web: {
+      favicon: './assets/favicon.png',
+    },
+    plugins: ['expo-router'],
+    scheme: 'grump',
+    extra: {
+      eas: {
+        projectId: 'fe938db1-c61c-4e4d-91f0-febccb90831d',
+      },
+    },
+  },
+};
+

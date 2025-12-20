@@ -1,0 +1,78 @@
+.input-bar {
+  display: flex;
+  gap: 12px;
+  padding: 24px 32px 40px;
+  flex-shrink: 0;
+}
+
+.input-container {
+  display: flex;
+  gap: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.input-field {
+  flex: 1;
+  height: 52px;
+  padding: 0 24px;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 400;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  color: var(--fg);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-field::placeholder {
+  color: var(--muted);
+}
+
+.input-field:focus {
+  border-color: var(--fg);
+}
+
+.input-field:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.send-button {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--fg);
+  color: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.send-button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.send-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.send-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .input-bar {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}

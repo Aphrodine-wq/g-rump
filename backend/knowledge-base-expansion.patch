@@ -1,0 +1,33 @@
+--- a/backend/services/knowledgeBase.js
++++ b/backend/services/knowledgeBase.js
+@@ -66,9 +66,11 @@ export async function loadKnowledgeBase() {
+ 
+     console.log(`Loading knowledge base from ${pdfs.length} PDF(s)...`);
+     
+     const allKnowledge = [];
+-    const MAX_TOTAL_CHARS = 150000; // Limit total knowledge to ~150k chars
++    // Expanded for 27 PDFs - configurable via environment variable
++    const MAX_TOTAL_CHARS = parseInt(process.env.KNOWLEDGE_BASE_MAX_TOTAL_CHARS || '500000'); // ~500k chars (enough for all 27 PDFs)
+     let currentTotal = 0;
+     let processed = 0;
+     let skipped = 0;
+@@ -85,8 +87,10 @@ export async function loadKnowledgeBase() {
+         
+         if (content && content.trim()) {
+           // Calculate how much space we have left
+           const remainingSpace = MAX_TOTAL_CHARS - currentTotal;
+-          const maxPerPDF = Math.min(5000, remainingSpace); // Max 5k chars per PDF
++          // More space per PDF - configurable via environment variable
++          const MAX_CHARS_PER_PDF = parseInt(process.env.KNOWLEDGE_BASE_MAX_CHARS_PER_PDF || '20000'); // ~20k chars per PDF
++          const maxPerPDF = Math.min(MAX_CHARS_PER_PDF, remainingSpace);
+           const limitedContent = content.substring(0, maxPerPDF);
+           
+           const pdfKnowledge = `\n\n[Knowledge from "${pdf}":\n${limitedContent}${content.length > maxPerPDF ? '\n\n[Content truncated for size...]' : ''}\n]`;
+@@ -105,7 +109,7 @@ export async function loadKnowledgeBase() {
+     
+     learnedKnowledge = allKnowledge.join('\n\n');
+     const totalChars = learnedKnowledge.length;
+-    console.log(`\n✅ Knowledge base loaded: ${processed} PDF(s) processed, ${skipped} skipped, ${totalChars} total characters`);
++    console.log(`\n✅ Knowledge base loaded: ${processed} PDF(s) processed, ${skipped} skipped, ${totalChars} total characters (${Math.round(totalChars/1024)}KB)`);
+     
+     return learnedKnowledge;

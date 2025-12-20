@@ -1,0 +1,74 @@
+.error-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: calc(100% - 32px);
+  max-width: 500px;
+}
+
+.error-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--grump-surface);
+  border: 1px solid var(--grump-accent);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.error-banner-icon {
+  flex-shrink: 0;
+  color: var(--grump-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-banner-message {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+  color: var(--grump-text-primary);
+  line-height: 1.4;
+}
+
+.error-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-banner-retry {
+  padding: 6px 12px;
+  background: var(--grump-accent);
+  color: var(--grump-background);
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.error-banner-retry:hover {
+  opacity: 0.9;
+}
+
+.error-banner-dismiss {
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: var(--grump-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.error-banner-dismiss:hover {
+  color: var(--grump-text-primary);
+}

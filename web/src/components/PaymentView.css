@@ -1,0 +1,338 @@
+.payment-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: var(--bg);
+  overflow-y: auto;
+}
+
+.payment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.payment-back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.payment-back-btn:hover {
+  background: var(--subtle);
+}
+
+.payment-header h1 {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0;
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+.payment-content {
+  padding: 24px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Order Summary */
+.order-summary {
+  background: var(--subtle);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.order-summary h2 {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0 0 20px 0;
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.summary-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-tier-name {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--fg);
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+.summary-billing {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+.summary-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.price-amount {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--fg);
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+.price-savings {
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.summary-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--fg);
+}
+
+.feature-item svg {
+  flex-shrink: 0;
+  color: var(--fg);
+  opacity: 0.7;
+}
+
+/* Payment Sections */
+.payment-section {
+  margin-bottom: 24px;
+}
+
+.payment-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+
+.payment-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--fg);
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.payment-input:focus {
+  outline: none;
+  border-color: var(--fg);
+  background: var(--subtle);
+}
+
+.payment-input.error {
+  border-color: var(--error);
+}
+
+.error-message {
+  display: block;
+  font-size: 12px;
+  color: var(--error);
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+/* Payment Methods */
+.payment-methods {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.payment-method-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  color: var(--fg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.payment-method-btn:hover {
+  border-color: var(--fg);
+  background: var(--subtle);
+}
+
+.payment-method-btn.active {
+  border-color: var(--fg);
+  background: var(--subtle);
+  transform: scale(1.02);
+}
+
+.payment-method-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Card Row */
+.card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Primary Button */
+.payment-primary-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--fg);
+  color: var(--bg);
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.payment-primary-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.payment-primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.payment-primary-btn .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+[data-theme="dark"] .payment-primary-btn {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+/* Confirmation Box */
+.confirmation-box {
+  text-align: center;
+  padding: 32px 24px;
+  background: var(--subtle);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.confirmation-box svg {
+  margin-bottom: 16px;
+  color: var(--fg);
+  opacity: 0.8;
+}
+
+.confirmation-box h3 {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0 0 12px 0;
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+.confirmation-text {
+  font-size: 16px;
+  color: var(--fg);
+  margin: 0 0 8px 0;
+  line-height: 1.6;
+}
+
+.confirmation-text strong {
+  font-weight: 600;
+}
+
+.confirmation-subtext {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+  font-weight: 300;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payment-content {
+    padding: 20px 16px;
+  }
+
+  .payment-methods {
+    grid-template-columns: 1fr;
+  }
+
+  .card-row {
+    grid-template-columns: 1fr;
+  }
+}

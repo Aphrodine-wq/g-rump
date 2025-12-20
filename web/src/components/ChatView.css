@@ -1,0 +1,181 @@
+.chat-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 29px; /* Increased by 45% from 20px */
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.message-count-badge {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+  padding: 4px 12px;
+  background: var(--subtle);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+.icon-btn:hover {
+  background: var(--subtle);
+  transform: scale(1.05);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+/* Avatar Section */
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 32px 30px;
+  flex-shrink: 0;
+}
+
+.avatar-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove old avatar-ring since we're using glass morphism now */
+.avatar-ring {
+  display: none;
+}
+
+.avatar-face {
+  position: relative;
+  z-index: 1;
+  color: var(--fg);
+  transition: transform 0.3s ease;
+}
+
+.status-text {
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+
+/* Messages */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 32px;
+}
+
+.messages-container::-webkit-scrollbar {
+  width: 0;
+}
+
+.messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 300;
+  gap: 8px;
+}
+
+.empty-state span {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 18px;
+  font-style: italic;
+  color: var(--fg);
+  opacity: 0.4;
+}
+
+.error-message {
+  padding: 8px 16px;
+  background: var(--subtle);
+  color: var(--fg);
+  font-size: 12px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .header, .avatar-section {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  .messages-container {
+    padding: 0 20px;
+  }
+  
+  /* Glass morphism avatar scales down on mobile */
+  .grump-avatar-container {
+    width: 140px !important;
+    height: 140px !important;
+  }
+  
+  .avatar-section {
+    padding: 15px 20px 20px;
+  }
+}
+
