@@ -1060,8 +1060,9 @@ backend/
 web/
 ├── src/
 │   ├── components/
-│   │   ├── GrumpAvatar200fps.tsx    # 200fps animated character
+│   │   ├── Grump2.tsx               # Grump 2.0 (800+ animations, emotional states)
 │   │   ├── ChatInterface.tsx        # Main chat UI
+│   │   ├── GameDevWorkspace.tsx     # Game development IDE
 │   │   ├── AnimationPreview.tsx     # Animation preview panel
 │   │   ├── ExportModal.tsx          # Export dialog
 │   │   ├── UserDashboard.tsx         # User dashboard
@@ -1071,7 +1072,7 @@ web/
 │   │   └── OnboardingFlow.tsx       # Onboarding
 │   ├── store/
 │   │   ├── ChatStore.tsx            # Chat state
-│   │   └── AnimationStore.tsx       # Animation state
+│   │   └── WorkspaceStore.tsx       # Workspace state
 │   ├── services/
 │   │   └── animationApi.ts         # Animation API client
 │   └── App.tsx                      # Root component
@@ -1424,7 +1425,7 @@ ANTHROPIC_MAX_TOKENS=256
 #### Services
 - **animationApi.ts** - Animation API client
 - **ChatStore.tsx** - Chat state management
-- **AnimationStore.tsx** - Animation state management
+- **WorkspaceStore.tsx** - Workspace state management
 
 ### iOS Components
 
