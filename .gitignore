@@ -86,3 +86,5 @@ docs/pdfs/*.pdf
 !docs/pdfs/.gitkeep
 !docs/pdfs/README.md
 !docs/pdfs/*.md
+.vercel
+.env*.local
