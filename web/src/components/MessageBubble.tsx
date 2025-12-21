@@ -18,7 +18,9 @@ interface MessageBubbleProps {
 export default function MessageBubble({ message, index = 0 }: MessageBubbleProps) {
   const isGrump = message.sender === 'grump'
   const { triggerScreenShake } = useAnimation()
-  
+
+  console.log('[DEBUG MessageBubble] Rendering message:', { id: message.id, sender: message.sender, content: message.content.substring(0, 50) })
+
   // Character-by-character streaming for Grump messages
   const { displayedText, isComplete } = useCharacterStreaming(
     isGrump ? message.content : '',
