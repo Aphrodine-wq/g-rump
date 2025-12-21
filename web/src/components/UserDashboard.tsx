@@ -84,7 +84,7 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
       <div className="welcome-section">
         <div className="welcome-content">
           <h1>Welcome back, Alex</h1>
-          <button className="upgrade-btn">Upgrade to Pro</button>
+          <button className="upgrade-btn" onClick={() => onNavigate?.('pricing')}>Upgrade to Pro</button>
         </div>
         <div className="welcome-grump">
           <GrumpAvatarWrapper size="medium" />
@@ -122,7 +122,7 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
               />
             </div>
             <p className="plan-percentage">{Math.round(usagePercentage)}%</p>
-            <button className="plan-upgrade">Need more? Go Pro →</button>
+            <button className="plan-upgrade" onClick={() => onNavigate?.('pricing')}>Need more? Go Pro →</button>
           </div>
         </div>
       </div>

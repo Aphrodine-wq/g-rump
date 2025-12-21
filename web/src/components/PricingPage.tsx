@@ -152,7 +152,16 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
                   <li key={fIdx}>✓ {feature}</li>
                 ))}
               </ul>
-              <button className={`plan-cta ${plan.highlight ? 'primary' : ''}`}>
+              <button 
+                className={`plan-cta ${plan.highlight ? 'primary' : ''}`}
+                onClick={() => {
+                  if (plan.name === 'FREE') {
+                    onNavigate?.('chat')
+                  } else {
+                    onNavigate?.('pricing')
+                  }
+                }}
+              >
                 {plan.cta}
               </button>
               {plan.trial && (
