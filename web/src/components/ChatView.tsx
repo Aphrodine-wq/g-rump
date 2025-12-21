@@ -48,7 +48,6 @@ export default function ChatView() {
   }, [darkMode])
 
   useEffect(() => {
-    console.log('[DEBUG ChatView] Messages updated:', messages.length, messages)
     scrollToBottom()
   }, [messages, isTyping])
 
