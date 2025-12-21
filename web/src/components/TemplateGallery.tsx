@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import GrumpAvatarWrapper from './GrumpAvatarWrapper'
 import { useAnimation } from '../store/AnimationStore'
 import { useChat } from '../store/ChatStore'
+import { gameTemplates, GameTemplate } from '../data/gameTemplates'
 import './TemplateGallery.css'
 
 interface Template {
@@ -43,18 +44,21 @@ const categories = [
   { id: 'streaming', name: 'Streaming' },
   { id: 'text', name: 'Text' },
   { id: 'shapes', name: 'Shapes' },
+  { id: 'games', name: 'Games' },
 ]
 
 interface TemplateGalleryProps {
   onNavigateToChat?: (templatePrompt?: string) => void
-  onNavigate?: (view: 'chat' | 'dashboard' | 'settings' | 'pricing') => void
+  onNavigate?: (view: 'chat' | 'dashboard' | 'settings' | 'pricing' | 'gamedev') => void
+  onNavigateToGameDev?: (templateCode?: string) => void
 }
 
-export default function TemplateGallery({ onNavigateToChat, onNavigate }: TemplateGalleryProps) {
+export default function TemplateGallery({ onNavigateToChat, onNavigate, onNavigateToGameDev }: TemplateGalleryProps) {
   const { transitionToState } = useAnimation()
   const { createNewSession, sendMessage } = useChat()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [showGameTemplates, setShowGameTemplates] = useState(false)
 
   useEffect(() => {
     transitionToState('idle')
@@ -62,6 +66,12 @@ export default function TemplateGallery({ onNavigateToChat, onNavigate }: Templa
 
   const filteredTemplates = templates.filter(template => {
     const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory
+    const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesCategory && matchesSearch
+  })
+
+  const filteredGameTemplates = gameTemplates.filter(template => {
+    const matchesCategory = selectedCategory === 'all' || selectedCategory === 'games' || template.category === selectedCategory
     const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
@@ -80,6 +90,15 @@ export default function TemplateGallery({ onNavigateToChat, onNavigate }: Templa
       setTimeout(() => {
         sendMessage(templatePrompt)
       }, 100)
+    }
+  }
+
+  const handleUseGameTemplate = (template: GameTemplate) => {
+    if (onNavigateToGameDev) {
+      onNavigateToGameDev(template.code)
+      onNavigate?.('gamedev')
+    } else if (onNavigate) {
+      onNavigate('gamedev')
     }
   }
 
@@ -119,16 +138,51 @@ export default function TemplateGallery({ onNavigateToChat, onNavigate }: Templa
             <button
               key={cat.id}
               className={`category-tab ${selectedCategory === cat.id ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(cat.id)}
+              onClick={() => {
+                setSelectedCategory(cat.id)
+                setShowGameTemplates(cat.id === 'games' || cat.id === 'all')
+              }}
             >
               {cat.name}
             </button>
           ))}
         </div>
 
-        {/* Templates Grid */}
+        {/* Game Templates Section */}
+        {(showGameTemplates || selectedCategory === 'games') && (
+          <div className="templates-section">
+            <h2 className="section-title">Game Templates</h2>
+            <div className="templates-grid">
+              {filteredGameTemplates.map(template => (
+                <div key={template.id} className="template-card game-template-card">
+                  <div className="template-preview">
+                    <div className="template-icon">{template.icon}</div>
+                    <div className="template-difficulty-badge">{template.difficulty}</div>
+                  </div>
+                  <div className="template-info">
+                    <h3>{template.name}</h3>
+                    <p className="template-description">{template.description}</p>
+                    <div className="template-tags">
+                      {template.tags.slice(0, 3).map((tag, idx) => (
+                        <span key={idx} className="template-tag">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <button 
+                    className="use-template-btn"
+                    onClick={() => handleUseGameTemplate(template)}
+                  >
+                    Start Game
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Animation Templates Grid */}
         <div className="templates-section">
-          <h2 className="section-title">Popular</h2>
+          <h2 className="section-title">Animation Templates</h2>
           <div className="templates-grid">
             {filteredTemplates.map(template => (
               <div key={template.id} className="template-card">

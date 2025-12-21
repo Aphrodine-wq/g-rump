@@ -1,0 +1,711 @@
+/* Game Development Workspace - Premium Design */
+
+.game-dev-workspace {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  color: #1a1a1a;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Header */
+.gamedev-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e5e5e5;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.gamedev-window-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.window-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.window-dot.red {
+  background: linear-gradient(to bottom right, #f87171, #ef4444);
+}
+
+.window-dot.yellow {
+  background: linear-gradient(to bottom right, #fbbf24, #f59e0b);
+}
+
+.window-dot.green {
+  background: linear-gradient(to bottom right, #4ade80, #22c55e);
+}
+
+.gamedev-title-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  margin: 0 20px;
+}
+
+.gamedev-project-name {
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #1a1a1a;
+  min-width: 120px;
+}
+
+.gamedev-project-name:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.gamedev-badge {
+  padding: 4px 10px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+}
+
+.gamedev-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gamedev-platform-select {
+  padding: 6px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gamedev-platform-select:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.gamedev-platform-select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.gamedev-btn {
+  padding: 8px 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gamedev-btn.primary {
+  background: #1a1a1a;
+  color: white;
+  border-color: #1a1a1a;
+}
+
+.gamedev-btn.primary:hover:not(:disabled) {
+  background: #2d2d2d;
+}
+
+.gamedev-btn.secondary {
+  background: white;
+  color: #1a1a1a;
+}
+
+.gamedev-btn.secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.gamedev-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Toolbar */
+.gamedev-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fafafa;
+}
+
+.gamedev-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gamedev-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gamedev-tab:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
+}
+
+.gamedev-tab.active {
+  background: white;
+  color: #1a1a1a;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.gamedev-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gamedev-control-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  background: white;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gamedev-control-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.gamedev-control-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.gamedev-divider {
+  width: 1px;
+  height: 24px;
+  background: #e5e5e5;
+  margin: 0 4px;
+}
+
+.gamedev-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.gamedev-checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.gamedev-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+}
+
+.gamedev-zoom-controls button {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.gamedev-zoom-controls button:hover {
+  background: #f3f4f6;
+}
+
+.gamedev-zoom-controls span {
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 40px;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+/* Content */
+.gamedev-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Code Section */
+.gamedev-code-section {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.gamedev-code-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e5e5e5;
+}
+
+.gamedev-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fafafa;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.gamedev-editor-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.gamedev-editor-actions button {
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.gamedev-editor-actions button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
+}
+
+.gamedev-code-textarea {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  background: #ffffff;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  resize: none;
+  outline: none;
+  tab-size: 2;
+  overflow-y: auto;
+}
+
+.gamedev-code-textarea::placeholder {
+  color: #9ca3af;
+}
+
+.gamedev-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border-top: 1px solid #fee2e2;
+  color: #dc2626;
+  font-size: 12px;
+}
+
+.gamedev-split-divider {
+  width: 4px;
+  background: #e5e5e5;
+  cursor: col-resize;
+  transition: background 0.2s;
+}
+
+.gamedev-split-divider:hover {
+  background: #d1d5db;
+}
+
+.gamedev-preview-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a;
+}
+
+.gamedev-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.gamedev-preview-header button {
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-size: 11px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gamedev-preview-header button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.gamedev-canvas-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  transform-origin: center;
+}
+
+.gamedev-preview-canvas {
+  background: #1a1a1a;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.gamedev-preview-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+}
+
+.gamedev-preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #9ca3af;
+}
+
+.gamedev-preview-placeholder p {
+  font-size: 14px;
+}
+
+.gamedev-preview-full {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  overflow: auto;
+}
+
+/* Entities Section */
+.gamedev-entities-section {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.gamedev-entities-sidebar {
+  width: 280px;
+  border-right: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+}
+
+.gamedev-entities-sidebar h3 {
+  padding: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.gamedev-entities-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.gamedev-entity-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+}
+
+.gamedev-entity-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.gamedev-entity-item.active {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.gamedev-entity-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 6px;
+  color: #6b7280;
+}
+
+.gamedev-entity-item.active .gamedev-entity-icon {
+  background: #3b82f6;
+  color: white;
+}
+
+.gamedev-entity-info {
+  flex: 1;
+}
+
+.gamedev-entity-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+.gamedev-entity-meta {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.gamedev-entity-details {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.gamedev-entity-details h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.gamedev-detail-section {
+  margin-bottom: 24px;
+}
+
+.gamedev-detail-section h4 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.gamedev-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gamedev-tag {
+  padding: 6px 12px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+/* Assets Section */
+.gamedev-assets-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.gamedev-assets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.gamedev-assets-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.gamedev-assets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.gamedev-asset-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  border: 2px dashed #e5e5e5;
+  border-radius: 12px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.gamedev-asset-placeholder p {
+  font-size: 13px;
+}
+
+/* Empty State */
+.gamedev-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* Modal */
+.gamedev-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.gamedev-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 400px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.gamedev-modal h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.gamedev-modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.gamedev-modal-input:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-color: #3b82f6;
+}
+
+.gamedev-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Scrollbar */
+.gamedev-code-textarea::-webkit-scrollbar,
+.gamedev-entities-list::-webkit-scrollbar,
+.gamedev-entity-details::-webkit-scrollbar,
+.gamedev-assets-section::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.gamedev-code-textarea::-webkit-scrollbar-track,
+.gamedev-entities-list::-webkit-scrollbar-track,
+.gamedev-entity-details::-webkit-scrollbar-track,
+.gamedev-assets-section::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.gamedev-code-textarea::-webkit-scrollbar-thumb,
+.gamedev-entities-list::-webkit-scrollbar-thumb,
+.gamedev-entity-details::-webkit-scrollbar-thumb,
+.gamedev-assets-section::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.gamedev-code-textarea::-webkit-scrollbar-thumb:hover,
+.gamedev-entities-list::-webkit-scrollbar-thumb:hover,
+.gamedev-entity-details::-webkit-scrollbar-thumb:hover,
+.gamedev-assets-section::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+

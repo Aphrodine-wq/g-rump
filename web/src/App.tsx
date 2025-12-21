@@ -12,9 +12,10 @@ import UserDashboard from './components/UserDashboard'
 import SettingsPage from './components/SettingsPage'
 import PricingPage from './components/PricingPage'
 import OnboardingFlow from './components/OnboardingFlow'
+import GameDevWorkspace from './components/GameDevWorkspace'
 import './App.css'
 
-type View = 'landing' | 'chat' | 'templates' | 'dashboard' | 'settings' | 'pricing' | 'onboarding'
+type View = 'landing' | 'chat' | 'templates' | 'dashboard' | 'settings' | 'pricing' | 'onboarding' | 'gamedev'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>(() => {
@@ -23,6 +24,7 @@ function App() {
   })
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   const [pendingTemplatePrompt, setPendingTemplatePrompt] = useState<string | null>(null)
+  const [currentGameTemplate, setCurrentGameTemplate] = useState<string | null>(null)
 
   useEffect(() => {
     const handleResize = () => {
@@ -74,11 +76,25 @@ function App() {
                   setCurrentView('chat')
                 }}
                 onNavigate={(view) => setCurrentView(view)}
+                onNavigateToGameDev={(templateCode) => {
+                  setCurrentGameTemplate(templateCode || null)
+                  setCurrentView('gamedev')
+                }}
               />
             )}
             {currentView === 'dashboard' && <UserDashboard onNavigate={(view) => setCurrentView(view)} />}
             {currentView === 'settings' && <SettingsPage onNavigate={(view) => setCurrentView(view)} />}
             {currentView === 'pricing' && <PricingPage onNavigate={(view) => setCurrentView(view)} />}
+            {currentView === 'gamedev' && (
+              <GameDevWorkspace 
+                templateCode={currentGameTemplate || undefined}
+                onNavigate={(view) => setCurrentView(view as View)}
+                onExport={(code, target) => {
+                  console.log('Export game:', code, target)
+                  // Handle export
+                }}
+              />
+            )}
           </div>
         </WorkspaceProvider>
       </AnimationProvider>

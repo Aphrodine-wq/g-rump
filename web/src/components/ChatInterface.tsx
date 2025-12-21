@@ -13,7 +13,7 @@ import ExportModal from './ExportModal'
 import './ChatInterface.css'
 
 interface ChatInterfaceProps {
-  onNavigate?: (view: 'templates' | 'dashboard' | 'settings' | 'pricing' | 'chat') => void
+  onNavigate?: (view: 'templates' | 'dashboard' | 'settings' | 'pricing' | 'chat' | 'gamedev') => void
 }
 
 export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
@@ -94,6 +94,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
         </div>
         <div className="header-right">
           <button className="header-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
+          <button className="header-btn" onClick={() => onNavigate?.('gamedev')}>Game Dev</button>
           <button className="header-btn" onClick={() => onNavigate?.('dashboard')}>Dashboard</button>
           <button className="header-btn" onClick={() => onNavigate?.('settings')}>Settings</button>
           <button className="header-btn pro" onClick={() => onNavigate?.('pricing')}>Pro ✨</button>

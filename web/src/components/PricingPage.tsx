@@ -6,7 +6,7 @@ import { useAnimation } from '../store/AnimationStore'
 import './PricingPage.css'
 
 interface PricingPageProps {
-  onNavigate?: (view: 'chat' | 'templates' | 'dashboard' | 'settings') => void
+  onNavigate?: (view: 'chat' | 'templates' | 'dashboard' | 'settings' | 'pricing') => void
 }
 
 export default function PricingPage({ onNavigate }: PricingPageProps = {}) {

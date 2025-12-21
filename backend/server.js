@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config } from './config/config.js';
 import chatRoutes from './routes/chat.js';
 import knowledgeRoutes from './routes/knowledge.js';
+import gameRoutes from './routes/game.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -31,6 +32,7 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/chat', chatRoutes);
 app.use('/api/knowledge', knowledgeRoutes);
+app.use('/api/game', gameRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -14,7 +14,7 @@ interface MobileChatViewProps {
   onNavigate?: (view: 'templates' | 'dashboard' | 'settings' | 'pricing' | 'chat') => void
 }
 
-export default function MobileChatView({ onNavigate }: MobileChatViewProps = {}) {
+export default function MobileChatView({ onNavigate: _onNavigate }: MobileChatViewProps = {}) {
   const { messages, isTyping, sendMessage } = useChat()
   const { transitionToState } = useAnimation()
   const [messageText, setMessageText] = useState('')
