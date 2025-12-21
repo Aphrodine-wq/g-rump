@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChatProvider, useChat } from './store/ChatStore'
 import { WorkspaceProvider } from './store/WorkspaceStore'
+import { AnimationProvider } from './store/AnimationStore'
 import LandingPage from './components/LandingPage'
 import ChatInterface from './components/ChatInterface'
 import MobileChatView from './components/MobileChatView'
@@ -49,9 +50,10 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <ChatProvider>
-        <WorkspaceProvider>
-          <div className="app">
+      <AnimationProvider>
+        <ChatProvider>
+          <WorkspaceProvider>
+            <div className="app">
             {currentView === 'onboarding' && (
               <OnboardingFlow onComplete={handleOnboardingComplete} />
             )}
@@ -97,7 +99,8 @@ function App() {
             )}
             </div>
           </WorkspaceProvider>
-      </ChatProvider>
+        </ChatProvider>
+      </AnimationProvider>
     </ErrorBoundary>
   )
 }
