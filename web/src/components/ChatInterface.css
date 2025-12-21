@@ -80,15 +80,20 @@
   flex-direction: column;
   border-right: 1px solid #e5e5e5;
   background: #fafafa;
+  min-height: 0; /* Critical for flex scrolling */
+  overflow: hidden; /* Prevent panel from growing */
 }
 
 .chat-messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-height: 0; /* Critical for flex scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 .welcome-message {
