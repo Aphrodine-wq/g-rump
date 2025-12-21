@@ -1,16 +1,7 @@
 // Game Development Workspace - Full-featured game development environment
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './GameDevWorkspace.css'
-import GrumpAvatarWrapper from './GrumpAvatarWrapper'
-
-interface GameProject {
-  id: string
-  name: string
-  code: string
-  lastModified: Date
-  target: 'web' | 'ios' | 'android' | 'flutter'
-}
 
 interface Entity {
   name: string
@@ -26,9 +17,9 @@ interface GameDevWorkspaceProps {
 }
 
 export default function GameDevWorkspace({ 
-  projectId, 
+  projectId: _projectId, 
   templateCode,
-  onNavigate,
+  onNavigate: _onNavigate,
   onExport 
 }: GameDevWorkspaceProps) {
   const [code, setCode] = useState(templateCode || getDefaultGameCode())
@@ -44,7 +35,7 @@ export default function GameDevWorkspace({
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [zoom, setZoom] = useState(1)
   const [showGrid, setShowGrid] = useState(true)
-  const [fps, setFps] = useState(60)
+  const [fps] = useState(60)
   const [showStats, setShowStats] = useState(true)
   
   const previewCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -603,7 +594,7 @@ function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number) 
   }
 }
 
-function drawPlaceholderGame(ctx: CanvasRenderingContext2D, width: number, height: number, delta: number) {
+function drawPlaceholderGame(ctx: CanvasRenderingContext2D, width: number, height: number, _delta: number) {
   // Draw a simple placeholder game
   const centerX = width / 2
   const centerY = height / 2
