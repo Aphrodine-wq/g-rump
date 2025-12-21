@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react'
 import { motion } from 'framer-motion'
 import MessageSlam, { useCharacterStreaming } from './animations/MessageSlam'
-import { useAnimation } from '../store/AnimationStore'
 import './MessageBubble.css'
 
 interface Message {
@@ -63,7 +62,7 @@ const MessageBubble = React.memo(function MessageBubble({ message, index = 0 }: 
       </motion.div>
     </MessageSlam>
   )
-}
+})
 
 function formatTime(date: Date): string {
   return new Intl.DateTimeFormat('en-US', {
