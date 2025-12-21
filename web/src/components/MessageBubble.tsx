@@ -20,8 +20,6 @@ export default function MessageBubble({ message, index = 0 }: MessageBubbleProps
   const isGrump = message.sender === 'grump'
   const { triggerScreenShake } = useAnimation()
 
-  console.log('[DEBUG MessageBubble] Rendering message:', { id: message.id, sender: message.sender, content: message.content.substring(0, 50) })
-
   // Memoize callback to prevent infinite render loop
   const onCharacterStreamComplete = useCallback(() => {
     // On complete, trigger screen shake for slam effect
@@ -43,7 +41,6 @@ export default function MessageBubble({ message, index = 0 }: MessageBubbleProps
     <MessageSlam isGrumpMessage={isGrump}>
       <motion.div
         className={`message-bubble ${isGrump ? 'grump-message' : 'user-message'}`}
-        style={{ display: 'block', visibility: 'visible' }}
         initial={isGrump ? false : {
           opacity: 0,
           y: 10
@@ -58,7 +55,7 @@ export default function MessageBubble({ message, index = 0 }: MessageBubbleProps
           delay: index * 0.05
         }}
       >
-        <div className="message-content" style={{ display: 'block', visibility: 'visible', color: 'inherit' }}>
+        <div className="message-content">
           {textToDisplay}
           {isGrump && !isComplete && (
             <span className="typing-cursor">|</span>
