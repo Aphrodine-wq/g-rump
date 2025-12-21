@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect } from 'react'
 import GrumpAvatarWrapper from './GrumpAvatarWrapper'
 import { useAnimation } from '../store/AnimationStore'
 import './LandingPage.css'
@@ -10,18 +9,13 @@ interface LandingPageProps {
 }
 
 export default function LandingPage({ onGetStarted, onLogin }: LandingPageProps) {
-  const { transitionToState, updateEyeTracking } = useAnimation()
+  const { transitionToState } = useAnimation()
 
   useEffect(() => {
     // Set G-Rump to idle state
     transitionToState('idle')
-
-    // Eye tracking - will be handled by GrumpAvatarWrapper internally
-    // The wrapper component handles mouse tracking automatically
-
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [transitionToState, updateEyeTracking])
+    // Eye tracking is handled by GrumpAvatarWrapper internally
+  }, [transitionToState])
 
   return (
     <div className="landing-page">

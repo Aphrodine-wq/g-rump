@@ -33,7 +33,7 @@ export default function GrumpAvatar200fps({
 
   // Blinking animation (random intervals, 200fps smooth)
   const [isBlinking, setIsBlinking] = useState(false)
-  const blinkIntervalRef = useRef<NodeJS.Timeout>()
+  const blinkIntervalRef = useRef<number>()
 
   useEffect(() => {
     const scheduleBlink = () => {

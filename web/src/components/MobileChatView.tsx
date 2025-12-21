@@ -12,7 +12,7 @@ import './MobileChatView.css'
 
 export default function MobileChatView() {
   const { messages, isTyping, sendMessage } = useChat()
-  const { state, transitionToState } = useAnimation()
+  const { transitionToState } = useAnimation()
   const [messageText, setMessageText] = useState('')
   const [showPreview, setShowPreview] = useState(false)
   const [showExport, setShowExport] = useState(false)
@@ -22,7 +22,7 @@ export default function MobileChatView() {
     if (!messageText.trim()) return
     const userMessage = messageText.trim()
     setMessageText('')
-    transitionToState('thinking')
+    transitionToState('thinkingDeep')
     await sendMessage(userMessage)
     transitionToState('idle')
   }
@@ -51,9 +51,8 @@ export default function MobileChatView() {
             {messages.map((msg, idx) => (
               <MessageBubble
                 key={idx}
-                message={msg.content}
-                sender={msg.sender}
-                timestamp={msg.timestamp}
+                message={msg}
+                index={idx}
               />
             ))}
 

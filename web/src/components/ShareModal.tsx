@@ -12,7 +12,6 @@ interface ShareModalProps {
 }
 
 export default function ShareModal({ animationId, animationName, onClose }: ShareModalProps) {
-  const { state } = useAnimation()
   const [embedSize, setEmbedSize] = useState<'small' | 'medium' | 'large'>('medium')
   const [showWatermark, setShowWatermark] = useState(true)
   const [autoPlay, setAutoPlay] = useState(true)

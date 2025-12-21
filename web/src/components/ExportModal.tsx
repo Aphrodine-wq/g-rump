@@ -12,7 +12,6 @@ interface ExportModalProps {
 }
 
 export default function ExportModal({ animation, onClose }: ExportModalProps) {
-  const { state } = useAnimation()
   const [selectedFormat, setSelectedFormat] = useState('gif')
   const [resolution, setResolution] = useState('720p')
   const [quality, setQuality] = useState('high')

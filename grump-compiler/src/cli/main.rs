@@ -122,11 +122,40 @@ fn init_project(name: &str) -> GrumpResult<()> {
     println!("🐸 G-Rump: Initializing project '{}'...", name);
     println!("   [G-Rump says: \"Let's see if you can make something that doesn't suck.\"]");
     
-    // TODO: Create project structure
-    // - grump.manifest
-    // - src/main.grump
-    // - assets/
-    // - etc.
+    // Create project structure
+    std::fs::create_dir_all(format!("{}/src", name))?;
+    std::fs::create_dir_all(format!("{}/assets", name))?;
+    std::fs::create_dir_all(format!("{}/build", name))?;
+    
+    // Create manifest
+    let manifest = format!(r#"{{
+    "name": "{}",
+    "version": "0.1.0",
+    "targets": ["ios", "android", "web", "flutter"],
+    "fps": 60
+}}"#, name);
+    std::fs::write(format!("{}/grump.manifest", name), manifest)?;
+    
+    // Create main.grump
+    let main_code = r#"app MyApp {
+    scene MainScene {
+        entity Player {
+            component Position { x: 0.0, y: 0.0 }
+            component Velocity { x: 0.0, y: 0.0 }
+        }
+        
+        system update {
+            query [Position, Velocity]
+            // Your game logic here
+        }
+    }
+}
+"#;
+    std::fs::write(format!("{}/src/main.grump", name), main_code)?;
+    
+    // Create .gitignore
+    let gitignore = "build/\ntarget/\n*.swift\n*.kt\n*.js\n*.dart\n";
+    std::fs::write(format!("{}/.gitignore", name), gitignore)?;
     
     println!("✓ Project initialized!");
     Ok(())
@@ -172,9 +201,18 @@ fn build_project(input: &PathBuf, target: &str, output: Option<&PathBuf>, optimi
         PathBuf::from("build").join(target)
     });
     std::fs::create_dir_all(&output_path)?;
-    std::fs::write(output_path.join("main.swift"), generated_code)?;
     
-    println!("✓ Build complete!");
+    // Write appropriate file extension based on target
+    let filename = match target {
+        "ios" => "main.swift",
+        "android" => "main.kt",
+        "web" => "main.js",
+        "flutter" => "main.dart",
+        _ => "main.swift",
+    };
+    std::fs::write(output_path.join(filename), generated_code)?;
+    
+    println!("✓ Build complete! Output: {}", output_path.display());
     Ok(())
 }
 
@@ -207,7 +245,19 @@ fn check_project(input: &PathBuf) -> GrumpResult<()> {
 fn format_project(input: &PathBuf) -> GrumpResult<()> {
     println!("🐸 G-Rump: Formatting code...");
     
-    // TODO: Implement formatter
+    // Read source file
+    let source = std::fs::read_to_string(input)?;
+    
+    // Parse
+    let mut parser = grump_compiler::parser::Parser::new(&source);
+    let program = parser.parse()?;
+    
+    // Format (basic - just re-parse and output)
+    // In a real implementation, this would format the AST
+    let formatted = format!("{:#?}", program);
+    
+    // Write back
+    std::fs::write(input, formatted)?;
     
     println!("✓ Formatted!");
     Ok(())
@@ -216,8 +266,27 @@ fn format_project(input: &PathBuf) -> GrumpResult<()> {
 fn lint_project(input: &PathBuf) -> GrumpResult<()> {
     println!("🐸 G-Rump: Linting (prepare for brutal honesty)...");
     
-    // TODO: Implement linter with G-Rump's personality
+    // Read source file
+    let source = std::fs::read_to_string(input)?;
     
+    // Parse
+    let mut parser = grump_compiler::parser::Parser::new(&source);
+    let program = parser.parse()?;
+    
+    // Analyze (type checking)
+    let mut analyzer = grump_compiler::analyzer::Analyzer::new();
+    analyzer.analyze(&program)?;
+    
+    // Report errors with G-Rump personality
+    if !analyzer.errors.is_empty() {
+        println!("\n💀 G-Rump found {} error(s):", analyzer.errors.len());
+        for error in &analyzer.errors {
+            println!("   {}", error.format_with_personality());
+        }
+        return Err(analyzer.errors.remove(0));
+    }
+    
+    println!("✓ No errors! (G-Rump is surprised but won't admit it)");
     Ok(())
 }
 

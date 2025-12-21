@@ -14,7 +14,7 @@ export default function GrumpAvatarWrapper({
   size = 'medium',
   customState 
 }: GrumpAvatarWrapperProps) {
-  const { state, breathingScale, updateEyeTracking } = useAnimation()
+  const { state, updateEyeTracking } = useAnimation()
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Eye tracking - smooth at 200fps
@@ -23,7 +23,6 @@ export default function GrumpAvatarWrapper({
       if (!containerRef.current) return
       const rect = containerRef.current.getBoundingClientRect()
       const centerX = rect.left + rect.width / 2
-      const centerY = rect.top + rect.height / 2
       
       const deltaX = (e.clientX - centerX) / rect.width
       
@@ -56,7 +55,7 @@ export default function GrumpAvatarWrapper({
     <div ref={containerRef} style={{ display: 'inline-block' }}>
       <GrumpAvatar200fps
         state={mappedState}
-        breathingScale={breathingScale || 1}
+        breathingScale={state.breathingScale || 1}
         size={size}
       />
     </div>

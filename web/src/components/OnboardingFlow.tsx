@@ -11,7 +11,7 @@ interface OnboardingFlowProps {
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const { transitionToState } = useAnimation()
-  const [currentStep, setCurrentStep] = useState(1)
+  const [currentStep, setCurrentStep] = useState<number>(1)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   useEffect(() => {

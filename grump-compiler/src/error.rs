@@ -48,5 +48,33 @@ impl GrumpError {
         // In the future, we'll add G-Rump's personality to error messages
         self
     }
+    
+    /// Format error with G-Rump personality
+    pub fn format_with_personality(&self) -> String {
+        let base = format!("{}", self);
+        let grump_comment = match self {
+            GrumpError::Type { message } => {
+                if message.contains("Undefined") {
+                    "Ugh. You're using something that doesn't exist. Classic."
+                } else if message.contains("mismatch") || message.contains("wrong type") {
+                    "That's not the right type. I'm disappointed, but not surprised."
+                } else {
+                    "Type error. Fix it."
+                }
+            }
+            GrumpError::Parser { message, .. } => {
+                if message.contains("Unexpected") {
+                    "I didn't expect that. Neither did the parser."
+                } else {
+                    "Parse error. Check your syntax."
+                }
+            }
+            GrumpError::Animation { message } => {
+                "Animation error. Even I can't animate that."
+            }
+            _ => "Error. Fix it.",
+        };
+        format!("{}\n💀 G-Rump: {}", base, grump_comment)
+    }
 }
 

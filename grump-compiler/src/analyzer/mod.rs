@@ -15,10 +15,121 @@ pub struct Analyzer {
 
 impl Analyzer {
     pub fn new() -> Self {
-        Self {
+        let mut analyzer = Self {
             context: TypeContext::new(),
             errors: Vec::new(),
-        }
+        };
+        
+        // Add built-in functions
+        analyzer.add_builtin_functions();
+        
+        analyzer
+    }
+    
+    fn add_builtin_functions(&mut self) {
+        // Math functions
+        self.context.add_function("sin".to_string(), FunctionSignature {
+            params: vec![("x".to_string(), Type::Float)],
+            return_type: Type::Float,
+        });
+        self.context.add_function("cos".to_string(), FunctionSignature {
+            params: vec![("x".to_string(), Type::Float)],
+            return_type: Type::Float,
+        });
+        self.context.add_function("sqrt".to_string(), FunctionSignature {
+            params: vec![("x".to_string(), Type::Float)],
+            return_type: Type::Float,
+        });
+        self.context.add_function("abs".to_string(), FunctionSignature {
+            params: vec![("x".to_string(), Type::Float)],
+            return_type: Type::Float,
+        });
+        
+        // Vector functions
+        self.context.add_function("length".to_string(), FunctionSignature {
+            params: vec![("v".to_string(), Type::Vec2)],
+            return_type: Type::Float,
+        });
+        self.context.add_function("normalize".to_string(), FunctionSignature {
+            params: vec![("v".to_string(), Type::Vec2)],
+            return_type: Type::Vec2,
+        });
+        self.context.add_function("dot".to_string(), FunctionSignature {
+            params: vec![("a".to_string(), Type::Vec2), ("b".to_string(), Type::Vec2)],
+            return_type: Type::Float,
+        });
+        
+        // Animation functions
+        self.context.add_function("lerp".to_string(), FunctionSignature {
+            params: vec![("a".to_string(), Type::Float), ("b".to_string(), Type::Float), ("t".to_string(), Type::Float)],
+            return_type: Type::Float,
+        });
+        self.context.add_function("ease_in_out".to_string(), FunctionSignature {
+            params: vec![("t".to_string(), Type::Float)],
+            return_type: Type::Float,
+        });
+        
+        // Utility functions
+        self.context.add_function("print".to_string(), FunctionSignature {
+            params: vec![("message".to_string(), Type::String)],
+            return_type: Type::Never,
+        });
+        self.context.add_function("random".to_string(), FunctionSignature {
+            params: vec![("min".to_string(), Type::Float), ("max".to_string(), Type::Float)],
+            return_type: Type::Float,
+        });
+        
+        // String functions
+        self.context.add_function("concat".to_string(), FunctionSignature {
+            params: vec![("a".to_string(), Type::String), ("b".to_string(), Type::String)],
+            return_type: Type::String,
+        });
+        self.context.add_function("substring".to_string(), FunctionSignature {
+            params: vec![("s".to_string(), Type::String), ("start".to_string(), Type::Int), ("end".to_string(), Type::Int)],
+            return_type: Type::String,
+        });
+        self.context.add_function("str_length".to_string(), FunctionSignature {
+            params: vec![("s".to_string(), Type::String)],
+            return_type: Type::Int,
+        });
+        
+        // Color functions
+        self.context.add_function("rgb".to_string(), FunctionSignature {
+            params: vec![("r".to_string(), Type::Int), ("g".to_string(), Type::Int), ("b".to_string(), Type::Int)],
+            return_type: Type::Color,
+        });
+        self.context.add_function("rgba".to_string(), FunctionSignature {
+            params: vec![("r".to_string(), Type::Int), ("g".to_string(), Type::Int), ("b".to_string(), Type::Int), ("a".to_string(), Type::Int)],
+            return_type: Type::Color,
+        });
+        self.context.add_function("hsl".to_string(), FunctionSignature {
+            params: vec![("h".to_string(), Type::Float), ("s".to_string(), Type::Float), ("l".to_string(), Type::Float)],
+            return_type: Type::Color,
+        });
+        
+        // Transform functions
+        self.context.add_function("translate".to_string(), FunctionSignature {
+            params: vec![("x".to_string(), Type::Float), ("y".to_string(), Type::Float)],
+            return_type: Type::Transform,
+        });
+        self.context.add_function("rotate".to_string(), FunctionSignature {
+            params: vec![("angle".to_string(), Type::Angle)],
+            return_type: Type::Transform,
+        });
+        self.context.add_function("scale".to_string(), FunctionSignature {
+            params: vec![("x".to_string(), Type::Float), ("y".to_string(), Type::Float)],
+            return_type: Type::Transform,
+        });
+        
+        // Time functions
+        self.context.add_function("now".to_string(), FunctionSignature {
+            params: vec![],
+            return_type: Type::Float,
+        });
+        self.context.add_function("delta_time".to_string(), FunctionSignature {
+            params: vec![],
+            return_type: Type::Float,
+        });
     }
     
     pub fn analyze(&mut self, program: &Program) -> GrumpResult<()> {
@@ -42,10 +153,41 @@ impl Analyzer {
     fn collect_types(&mut self, item: &Item) -> GrumpResult<()> {
         match item {
             Item::Component(comp) => {
-                // TODO: Register component type
+                // Register component type
+                let mut fields = Vec::new();
+                for field in &comp.fields {
+                    let field_type = ast_type_to_type(&field.type_);
+                    fields.push((field.name.clone(), field_type));
+                }
+                let component_type = Type::Named(format!("Component_{}", comp.name));
+                self.context.types.insert(comp.name.clone(), component_type);
             }
             Item::Entity(entity) => {
-                // TODO: Register entity type
+                // Register entity type
+                let entity_type = Type::Named(format!("Entity_{}", entity.name));
+                self.context.types.insert(entity.name.clone(), entity_type);
+            }
+            Item::Function(func) => {
+                // Register function signature
+                let mut params = Vec::new();
+                for param in &func.params {
+                    if let Some(type_) = &param.type_ {
+                        let param_type = ast_type_to_type(type_);
+                        params.push((param.name.clone(), param_type));
+                    } else {
+                        params.push((param.name.clone(), Type::Unknown));
+                    }
+                }
+                let return_type = if let Some(rt) = &func.return_type {
+                    ast_type_to_type(rt)
+                } else {
+                    Type::Never
+                };
+                let sig = FunctionSignature {
+                    params,
+                    return_type,
+                };
+                self.context.add_function(func.name.clone(), sig);
             }
             _ => {}
         }
@@ -259,16 +401,59 @@ impl Analyzer {
                     Ok(Type::Unknown)
                 }
             }
-            Expression::Binary { op: _, left, right } => {
+            Expression::Binary { op, left, right } => {
                 let left_type = self.check_expression(left, ctx)?;
                 let right_type = self.check_expression(right, ctx)?;
                 
-                // TODO: Check operator compatibility
-                // For now, assume same type
-                if left_type == right_type {
-                    Ok(left_type)
-                } else {
-                    Ok(Type::Unknown)
+                // Check operator compatibility
+                match op {
+                    crate::parser::BinaryOp::Add | crate::parser::BinaryOp::Sub | 
+                    crate::parser::BinaryOp::Mul | crate::parser::BinaryOp::Div | 
+                    crate::parser::BinaryOp::Mod => {
+                        // Arithmetic operators require numeric types
+                        match (&left_type, &right_type) {
+                            (Type::Int, Type::Int) => Ok(Type::Int),
+                            (Type::Float, Type::Float) => Ok(Type::Float),
+                            (Type::Int, Type::Float) | (Type::Float, Type::Int) => Ok(Type::Float),
+                            (Type::Vec2, Type::Vec2) => Ok(Type::Vec2),
+                            (Type::Vec3, Type::Vec3) => Ok(Type::Vec3),
+                            _ => {
+                                self.errors.push(GrumpError::Type {
+                                    message: format!("Cannot apply {:?} to {:?} and {:?}", op, left_type, right_type),
+                                });
+                                Ok(Type::Unknown)
+                            }
+                        }
+                    }
+                    crate::parser::BinaryOp::Eq | crate::parser::BinaryOp::Ne |
+                    crate::parser::BinaryOp::Lt | crate::parser::BinaryOp::Gt |
+                    crate::parser::BinaryOp::Le | crate::parser::BinaryOp::Ge => {
+                        // Comparison operators return bool
+                        if left_type.is_compatible_with(&right_type) {
+                            Ok(Type::Bool)
+                        } else {
+                            self.errors.push(GrumpError::Type {
+                                message: format!("Cannot compare {:?} and {:?}", left_type, right_type),
+                            });
+                            Ok(Type::Bool)  // Still return bool for error recovery
+                        }
+                    }
+                    crate::parser::BinaryOp::And | crate::parser::BinaryOp::Or => {
+                        // Logical operators require bool
+                        match (&left_type, &right_type) {
+                            (Type::Bool, Type::Bool) => Ok(Type::Bool),
+                            _ => {
+                                self.errors.push(GrumpError::Type {
+                                    message: format!("Logical operators require bool, got {:?} and {:?}", left_type, right_type),
+                                });
+                                Ok(Type::Bool)
+                            }
+                        }
+                    }
+                    _ => {
+                        // Unknown operator
+                        Ok(Type::Unknown)
+                    }
                 }
             }
             Expression::Call { func, args } => {
@@ -301,9 +486,34 @@ impl Analyzer {
                     Ok(Type::Unknown)
                 }
             }
-            Expression::Member { object, member: _ } => {
-                // TODO: Check member access
-                self.check_expression(object, ctx)
+            Expression::Member { object, member } => {
+                let object_type = self.check_expression(object, ctx)?;
+                // Check if member exists on the type
+                match object_type {
+                    Type::Vec2 | Type::Vec3 | Type::Vec4 => {
+                        // Vector types have x, y, z, w members
+                        match member.as_str() {
+                            "x" | "y" | "z" | "w" => Ok(Type::Float),
+                            _ => {
+                                self.errors.push(GrumpError::Type {
+                                    message: format!("Type {:?} has no member '{}'", object_type, member),
+                                });
+                                Ok(Type::Unknown)
+                            }
+                        }
+                    }
+                    Type::Named(name) => {
+                        // Check if it's a component or entity type
+                        // TODO: Look up actual type definition
+                        Ok(Type::Unknown)
+                    }
+                    _ => {
+                        self.errors.push(GrumpError::Type {
+                            message: format!("Cannot access member '{}' on type {:?}", member, object_type),
+                        });
+                        Ok(Type::Unknown)
+                    }
+                }
             }
             Expression::Await(expr) => {
                 // Check that expression is async
@@ -327,6 +537,52 @@ impl Analyzer {
                 // Macro calls are expanded before type checking
                 // This should not be reached in normal flow
                 Ok(Type::Unknown)
+            }
+            Expression::Array(elements) => {
+                if elements.is_empty() {
+                    Ok(Type::List(Box::new(Type::Unknown)))
+                } else {
+                    let first_type = self.check_expression(&elements[0], ctx)?;
+                    // Check all elements have compatible types
+                    for elem in elements.iter().skip(1) {
+                        let elem_type = self.check_expression(elem, ctx)?;
+                        if !elem_type.is_compatible_with(&first_type) {
+                            self.errors.push(GrumpError::Type {
+                                message: format!("Array elements must have compatible types, got {:?} and {:?}", first_type, elem_type),
+                            });
+                        }
+                    }
+                    Ok(Type::List(Box::new(first_type)))
+                }
+            }
+            Expression::Tuple(elements) => {
+                let mut types = Vec::new();
+                for elem in elements {
+                    types.push(self.check_expression(elem, ctx)?);
+                }
+                Ok(Type::Tuple(types))
+            }
+            Expression::Index { object, index } => {
+                let array_type = self.check_expression(object, ctx)?;
+                let index_type = self.check_expression(index, ctx)?;
+                
+                if index_type != Type::Int {
+                    self.errors.push(GrumpError::Type {
+                        message: format!("Array index must be int, got {:?}", index_type),
+                    });
+                }
+                
+                match array_type {
+                    Type::List(inner) => Ok(*inner),
+                    Type::Array(inner, _) => Ok(*inner),
+                    Type::String => Ok(Type::Char),
+                    _ => {
+                        self.errors.push(GrumpError::Type {
+                            message: format!("Cannot index type {:?}", array_type),
+                        });
+                        Ok(Type::Unknown)
+                    }
+                }
             }
             _ => {
                 // TODO: Check other expression types

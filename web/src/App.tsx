@@ -44,11 +44,6 @@ function App() {
     setCurrentView('landing')
   }
 
-  // Navigation helper
-  const navigate = (view: View) => {
-    setCurrentView(view)
-  }
-
   return (
     <ChatProvider>
       <AnimationProvider>

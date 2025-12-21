@@ -14,7 +14,7 @@ import './ChatInterface.css'
 
 export default function ChatInterface() {
   const { messages, isTyping, sendMessage } = useChat()
-  const { state, transitionToState } = useAnimation()
+  const { transitionToState } = useAnimation()
   const [messageText, setMessageText] = useState('')
   const [showExportModal, setShowExportModal] = useState(false)
   const [currentAnimation, setCurrentAnimation] = useState<Animation | null>(null)
@@ -40,9 +40,9 @@ export default function ChatInterface() {
 
     // Update G-Rump state based on message
     if (isAnimationRequest) {
-      transitionToState('working')
+      transitionToState('processing')
     } else {
-      transitionToState('thinking')
+      transitionToState('thinkingDeep')
     }
 
     // Send chat message
@@ -58,7 +58,7 @@ export default function ChatInterface() {
         })
         
         setCurrentAnimation(animation)
-        transitionToState('proud')
+        transitionToState('impressed')
       } catch (error) {
         console.error('Failed to create animation:', error)
         transitionToState('error')
@@ -107,9 +107,8 @@ export default function ChatInterface() {
             {messages.map((msg, idx) => (
               <MessageBubble
                 key={idx}
-                message={msg.content}
-                sender={msg.sender}
-                timestamp={msg.timestamp}
+                message={msg}
+                index={idx}
               />
             ))}
 

@@ -108,9 +108,10 @@ pub enum Statement {
     Continue,
     Expression(Expression),
     Animate(AnimateStatement),
+    Timeline { name: String, entries: Vec<(Expression, Vec<(Expression, Vec<(String, Expression)>)>)> },
     // NEW: Extended statements
     Await { expr: Box<Expression> },  // await expression
-    Debugger(DebuggerStatement),  // debugger.break(), debugger.watch(), etc.
+    Debugger(DebuggerStatement),  // debugger.break(), debugger.watch(), etc.  
     Network(NetworkStatement),  // network.sync(), network.send(), etc.
 }
 
@@ -522,9 +523,28 @@ impl<'source> Parser<'source> {
         let mut query = Vec::new();
         let mut body = Vec::new();
         
-        // TODO: Parse query and body
+        // Parse query: query: [Component1, Component2]
+        if self.check(Token::Identifier) {
+            let ident = self.expect_identifier()?;
+            if ident == "query" {
+                self.expect(Token::Colon)?;
+                self.expect(Token::LeftBracket)?;
+                while !self.check(Token::RightBracket) {
+                    query.push(self.expect_identifier()?);
+                    if !self.check(Token::RightBracket) {
+                        self.expect(Token::Comma)?;
+                    }
+                }
+                self.expect(Token::RightBracket)?;
+            } else {
+                // Not a query, treat as statement
+                self.current = Some((Token::Identifier(ident), 0, 0));
+            }
+        }
+        
+        // Parse body statements
         while !self.check(Token::RightBrace) {
-            self.advance();
+            body.push(self.parse_statement()?);
         }
         self.expect(Token::RightBrace)?;
         
@@ -814,6 +834,59 @@ impl<'source> Parser<'source> {
                 self.advance();
                 self.expect(Token::Semicolon)?;
                 Ok(Statement::Continue)
+            }
+            Some(Token::Timeline) => {
+                self.advance();
+                let name = self.expect_identifier()?;
+                self.expect(Token::LeftBrace)?;
+                let mut entries = Vec::new();
+                while !self.check(Token::RightBrace) {
+                    let time = self.parse_expression()?;
+                    self.expect(Token::LeftBrace)?;
+                    let mut properties = Vec::new();
+                    while !self.check(Token::RightBrace) {
+                        let target = self.parse_expression()?;
+                        self.expect(Token::LeftBrace)?;
+                        let mut keyframes = Vec::new();
+                        while !self.check(Token::RightBrace) {
+                            let prop = self.expect_identifier()?;
+                            self.expect(Token::Colon)?;
+                            let value = self.parse_expression()?;
+                            keyframes.push((prop, value));
+                        }
+                        self.expect(Token::RightBrace)?;
+                        properties.push((target, keyframes));
+                    }
+                    self.expect(Token::RightBrace)?;
+                    entries.push((time, properties));
+                }
+                self.expect(Token::RightBrace)?;
+                Ok(Statement::Timeline { name, entries })
+            }
+            Some(Token::Match) => {
+                self.advance();
+                let expr = self.parse_expression()?;
+                self.expect(Token::LeftBrace)?;
+                let mut arms = Vec::new();
+                while !self.check(Token::RightBrace) {
+                    let pattern = self.parse_pattern()?;
+                    self.expect(Token::Arrow)?;
+                    let guard = if self.check(Token::If) {
+                        self.advance();
+                        Some(self.parse_expression()?)
+                    } else {
+                        None
+                    };
+                    self.expect(Token::LeftBrace)?;
+                    let mut body = Vec::new();
+                    while !self.check(Token::RightBrace) {
+                        body.push(self.parse_statement()?);
+                    }
+                    self.expect(Token::RightBrace)?;
+                    arms.push(crate::parser::MatchArm { pattern, guard, body });
+                }
+                self.expect(Token::RightBrace)?;
+                Ok(Statement::Match { expr, arms })
             }
             _ => {
                 let expr = self.parse_expression()?;

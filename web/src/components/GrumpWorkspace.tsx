@@ -19,8 +19,7 @@ export default function GrumpWorkspace({
   status = 'idle',
   progress = 0,
   currentTask = '',
-  onExport,
-  onRequestAnimation
+  onExport
 }: GrumpWorkspaceProps) {
   const [currentFrame, setCurrentFrame] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -39,24 +38,25 @@ export default function GrumpWorkspace({
   useEffect(() => {
     if (!animation?.frames?.length || !isPlaying || status !== 'done') return;
     
+    const frames = animation.frames;
     const effectiveFps = (animation.fps || 12) * playbackSpeed;
     
     const interval = setInterval(() => {
       setCurrentFrame(prev => {
         if (loopMode === 'loop') {
-          return (prev + 1) % animation.frames.length;
+          return (prev + 1) % frames.length;
         } else if (loopMode === 'pingpong') {
           const next = prev + direction;
-          if (next >= animation.frames.length - 1) {
+          if (next >= frames.length - 1) {
             setDirection(-1);
-            return animation.frames.length - 1;
+            return frames.length - 1;
           } else if (next <= 0) {
             setDirection(1);
             return 0;
           }
           return next;
         } else { // once
-          if (prev >= animation.frames.length - 1) {
+          if (prev >= frames.length - 1) {
             setIsPlaying(false);
             return prev;
           }
@@ -405,7 +405,7 @@ export default function GrumpWorkspace({
           )}
 
           {/* DONE STATE - Animation display */}
-          {status === 'done' && animation?.frames?.length > 0 && (
+          {status === 'done' && animation?.frames?.length > 0 && animation && (
             <div className="absolute inset-0 flex items-center justify-center">
               {/* Onion skin - previous frames */}
               {showOnionSkin && [...Array(onionSkinFrames)].map((_, i) => {
@@ -477,7 +477,7 @@ export default function GrumpWorkspace({
       </div>
 
       {/* Playback Controls */}
-      {status === 'done' && animation?.frames?.length > 0 && (
+      {status === 'done' && animation?.frames?.length > 0 && animation && (
         <div className="border-t border-white/30 bg-white/20">
           {/* Timeline scrubber with thumbnails */}
           <div className="px-4 py-3 border-b border-white/20">
@@ -529,6 +529,7 @@ export default function GrumpWorkspace({
                 {/* Previous frame */}
                 <button 
                   onClick={() => { 
+                    if (!animation) return;
                     setCurrentFrame(prev => prev === 0 ? animation.frames.length - 1 : prev - 1);
                     setIsPlaying(false);
                   }}
@@ -558,6 +559,7 @@ export default function GrumpWorkspace({
                 {/* Next frame */}
                 <button 
                   onClick={() => {
+                    if (!animation) return;
                     setCurrentFrame(prev => (prev + 1) % animation.frames.length);
                     setIsPlaying(false);
                   }}
@@ -570,7 +572,11 @@ export default function GrumpWorkspace({
 
                 {/* Last frame */}
                 <button 
-                  onClick={() => { setCurrentFrame(animation.frames.length - 1); setIsPlaying(false); }}
+                  onClick={() => { 
+                    if (!animation) return;
+                    setCurrentFrame(animation.frames.length - 1); 
+                    setIsPlaying(false); 
+                  }}
                   className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/40 text-gray-600 hover:bg-white/60 transition-all"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
