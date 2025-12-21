@@ -96,7 +96,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
           <div className="chat-messages" id="chatMessages" ref={chatMessagesRef}>
             {messages.length === 0 && (
               <div className="welcome-message">
-                <Grump2 chatMessagesId="chatMessages" chatInputId="chatInput" />
+                <Grump2 />
                 <p className="welcome-text">"What do you want?"</p>
               </div>
             )}
@@ -113,7 +113,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
               <>
                 <MessageSkeleton />
                 <div className="typing-container">
-                  <Grump2 chatMessagesId="chatMessages" chatInputId="chatInput" />
+                  <Grump2 />
                   <TypingIndicator />
                 </div>
               </>

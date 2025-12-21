@@ -4,12 +4,7 @@
 
 import './Grump2.css'
 
-interface Grump2Props {
-  chatMessagesId?: string
-  chatInputId?: string
-}
-
-export default function Grump2({ chatMessagesId = 'chatMessages', chatInputId = 'chatInput' }: Grump2Props) {
+export default function Grump2() {
   // Script handles its own initialization - just render the DOM structure
   return (
     <div className="grump2-container">
