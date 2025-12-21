@@ -47,9 +47,10 @@ const categories = [
 
 interface TemplateGalleryProps {
   onNavigateToChat?: (templatePrompt?: string) => void
+  onNavigate?: (view: 'chat' | 'dashboard' | 'settings' | 'pricing') => void
 }
 
-export default function TemplateGallery({ onNavigateToChat }: TemplateGalleryProps) {
+export default function TemplateGallery({ onNavigateToChat, onNavigate }: TemplateGalleryProps) {
   const { transitionToState } = useAnimation()
   const { createNewSession, sendMessage } = useChat()
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -154,7 +155,7 @@ export default function TemplateGallery({ onNavigateToChat }: TemplateGalleryPro
           </div>
         </div>
 
-        <button className="load-more-btn">Load More Templates</button>
+        <button className="load-more-btn" onClick={() => console.log('Load more templates - feature coming soon')}>Load More Templates</button>
       </div>
     </div>
   )
