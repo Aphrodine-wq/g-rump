@@ -112,7 +112,7 @@ function ChatViewWithTemplate({
   isMobile: boolean
   templatePrompt: string | null
   onTemplateSent: () => void
-  onNavigate?: (view: 'templates' | 'dashboard' | 'settings' | 'pricing' | 'chat') => void
+  onNavigate?: (view: 'templates' | 'dashboard' | 'settings' | 'pricing' | 'chat' | 'gamedev') => void
 }) {
   const { sendMessage, createNewSession } = useChat()
   
