@@ -39,11 +39,12 @@ export default function MessageBubble({ message, index = 0 }: MessageBubbleProps
     <MessageSlam isGrumpMessage={isGrump}>
       <motion.div
         className={`message-bubble ${isGrump ? 'grump-message' : 'user-message'}`}
-        initial={isGrump ? false : { 
+        style={{ display: 'block', visibility: 'visible' }}
+        initial={isGrump ? false : {
           opacity: 0,
           y: 10
         }}
-        animate={isGrump ? {} : { 
+        animate={isGrump ? {} : {
           opacity: 1,
           y: 0
         }}
@@ -53,7 +54,7 @@ export default function MessageBubble({ message, index = 0 }: MessageBubbleProps
           delay: index * 0.05
         }}
       >
-        <div className="message-content">
+        <div className="message-content" style={{ display: 'block', visibility: 'visible', color: 'inherit' }}>
           {textToDisplay}
           {isGrump && !isComplete && (
             <span className="typing-cursor">|</span>
