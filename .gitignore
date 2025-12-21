@@ -88,3 +88,5 @@ docs/pdfs/*.pdf
 !docs/pdfs/*.md
 .vercel
 .env*.local
+backend.env
+backend/backend.env

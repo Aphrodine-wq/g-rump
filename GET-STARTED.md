@@ -12,10 +12,22 @@ I've already:
 
 ### Step 1: Add Your API Key
 
-Edit `backend/.env` and add:
+Edit `backend/.env` and add your API key:
+
+**Option A: Anthropic Claude**
 ```
+AI_PROVIDER=anthropic
 ANTHROPIC_API_KEY=your_key_here
 ```
+
+**Option B: Groq (recommended - faster & cheaper)**
+```
+AI_PROVIDER=groq
+GROQ_API_KEY=your_groq_key_here
+GROQ_MODEL=llama-3.1-70b-versatile
+```
+
+See [`backend/GROQ-SETUP.md`](backend/GROQ-SETUP.md) for Groq setup details.
 
 ### Step 2: Start Everything
 

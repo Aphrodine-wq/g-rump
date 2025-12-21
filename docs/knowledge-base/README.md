@@ -4,13 +4,33 @@ This folder contains PDF documents that Grump learns from permanently. Place PDF
 
 ## Purpose
 
-PDFs in this folder are used to **train and expand Grump's knowledge base**. Unlike the `pdfs/` folder (which provides context for specific questions), documents here are processed and learned by the AI, making the knowledge available in all future conversations.
+PDFs and Markdown files in this folder are used to **train and expand Grump's knowledge base**. Unlike the `pdfs/` folder (which provides context for specific questions), documents here are processed and learned by the AI, making the knowledge available in all future conversations.
+
+**Supported formats:**
+- ✅ PDF files (`.pdf`)
+- ✅ Markdown files (`.md`) - Excludes README.md and other documentation files
 
 ## How to Use
 
-1. **Place PDFs in this folder**: Simply copy or move your PDF files here
-2. **AI automatically learns**: When the backend starts, Grump processes these PDFs and learns their content
+### Option 1: Local Files (Development)
+
+1. **Place PDFs or Markdown files in this folder**: Simply copy or move your files here
+2. **AI automatically learns**: When the backend starts, Grump processes these files and learns their content
 3. **Knowledge persists**: The learned information is available in all future conversations
+
+**Note:** Markdown files are processed as-is (text content). PDFs are parsed to extract text.
+
+### Option 2: Remote URLs (Production - Recommended)
+
+**Avoid uploading 180MB+ of PDFs with your deployment!**
+
+1. **Host PDFs online**: Upload to GitHub Releases, S3, Cloudflare R2, or any CDN
+2. **Add URLs to environment**: Set `KNOWLEDGE_BASE_URLS` in `backend/.env`
+3. **Auto-download**: Backend downloads and processes PDFs on startup
+
+**See [Remote Hosting Guide](../../backend/KNOWLEDGE-BASE-REMOTE-HOSTING.md) for detailed instructions.**
+
+You can use **both** local PDFs and remote URLs simultaneously!
 
 ## Important Notes
 
@@ -24,7 +44,8 @@ PDFs in this folder are used to **train and expand Grump's knowledge base**. Unl
 ```
 knowledge-base/
 ├── README.md          (this file)
-└── [your-training-pdfs]   (add PDF files here)
+├── [your-training-pdfs]   (add PDF files here)
+└── [your-markdown-files]  (add .md files here, e.g., ANIMATION-KNOWLEDGE-BASE.md)
 ```
 
 ## Usage

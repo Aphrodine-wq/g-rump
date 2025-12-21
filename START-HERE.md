@@ -11,10 +11,22 @@
 
 ### 1. Add API Key (30 seconds)
 
-Open `backend/.env` and replace `your_api_key_here` with your actual Anthropic API key:
+Open `backend/.env` and add your API key:
+
+**Option A: Anthropic Claude**
 ```
+AI_PROVIDER=anthropic
 ANTHROPIC_API_KEY=sk-ant-...
 ```
+
+**Option B: Groq (recommended - faster & cheaper)**
+```
+AI_PROVIDER=groq
+GROQ_API_KEY=gsk_...
+GROQ_MODEL=llama-3.1-70b-versatile
+```
+
+See [`backend/GROQ-SETUP.md`](backend/GROQ-SETUP.md) for Groq setup details.
 
 ### 2. Start Backend
 

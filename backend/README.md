@@ -1,6 +1,6 @@
 # Grump Backend API
 
-Backend server for the Grump iOS app, providing AI chat functionality via Anthropic Claude API.
+Backend server for the Grump platform, providing AI chat functionality via Anthropic Claude or Groq API, with knowledge base integration.
 
 ## Setup
 
@@ -14,10 +14,26 @@ npm install
 cp .env.example .env
 ```
 
-3. Add your Anthropic API key to `.env`:
+3. Add your AI provider API key to `.env`:
+
+**Option A: Anthropic Claude (default)**
 ```
+AI_PROVIDER=anthropic
 ANTHROPIC_API_KEY=your_key_here
+PORT=3000
+NODE_ENV=development
 ```
+
+**Option B: Groq (faster, cheaper - recommended)**
+```
+AI_PROVIDER=groq
+GROQ_API_KEY=your_groq_key_here
+GROQ_MODEL=llama-3.1-70b-versatile
+PORT=3000
+NODE_ENV=development
+```
+
+See [`GROQ-SETUP.md`](./GROQ-SETUP.md) for detailed Groq setup instructions.
 
 4. Start the server:
 ```bash
@@ -62,6 +78,42 @@ Send a message to Grump and receive a response.
 }
 ```
 
+### GET /api/knowledge
+
+Get information about the knowledge base (PDF learning system).
+
+**Response:**
+```json
+{
+  "totalDocuments": 5,
+  "totalPages": 120,
+  "lastLoaded": "2024-01-01T00:00:00.000Z",
+  "documents": [
+    {
+      "filename": "example.pdf",
+      "pages": 24,
+      "size": 1024000
+    }
+  ]
+}
+```
+
+### POST /api/knowledge/reload
+
+Reload the knowledge base (useful after adding/removing PDFs in `docs/knowledge-base/`).
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Knowledge base reloaded successfully. You may need to restart the server for full effect.",
+  "summary": {
+    "totalDocuments": 5,
+    "totalPages": 120
+  }
+}
+```
+
 ### GET /health
 
 Health check endpoint.
@@ -76,10 +128,33 @@ Health check endpoint.
 
 ## Environment Variables
 
-- `ANTHROPIC_API_KEY` (required) - Your Anthropic Claude API key
-- `PORT` (optional) - Server port (default: 3000)
-- `NODE_ENV` (optional) - Environment: development or production (default: development)
-- `CORS_ORIGIN` (optional) - CORS allowed origins, comma-separated, or * for all (default: *)
+**Required (choose one provider):**
+
+- `AI_PROVIDER` (optional) - AI provider: `anthropic` or `groq` (default: `groq` if `GROQ_API_KEY` exists, else `anthropic`)
+- `ANTHROPIC_API_KEY` (required if using Anthropic) - Your Anthropic Claude API key
+- `GROQ_API_KEY` (required if using Groq) - Your Groq API key
+
+**Optional:**
+- `PORT` - Server port (default: 3000)
+- `NODE_ENV` - Environment: development or production (default: development)
+- `CORS_ORIGIN` - CORS allowed origins, comma-separated, or * for all (default: *)
+- `GROQ_MODEL` - Groq model name (default: `llama-3.1-70b-versatile`)
+- `ANTHROPIC_TEMPERATURE` - Claude temperature 0-1 (default: 0.9)
+- `GROQ_TEMPERATURE` - Groq temperature 0-2 (default: 0.9)
+- `ANTHROPIC_MAX_TOKENS` - Max tokens for Claude (default: 256)
+- `GROQ_MAX_TOKENS` - Max tokens for Groq (default: 256)
+- `KNOWLEDGE_BASE_URLS` - Comma-separated list of remote PDF URLs (for hosting PDFs online instead of bundling with deployment)
+- `KNOWLEDGE_BASE_GITHUB_FOLDER` - GitHub folder URL to automatically discover all PDFs (e.g., `https://github.com/user/repo/tree/main/pdfs`)
+- `KNOWLEDGE_BASE_MAX_TOTAL_CHARS` - Max total characters from all PDFs (default: 15000)
+- `KNOWLEDGE_BASE_MAX_CHARS_PER_PDF` - Max characters per PDF (default: 750)
+
+**Provider Switching:**
+
+To switch between providers, set `AI_PROVIDER` in your `.env`:
+- `AI_PROVIDER=anthropic` - Use Anthropic Claude
+- `AI_PROVIDER=groq` - Use Groq
+
+See [`GROQ-SETUP.md`](./GROQ-SETUP.md) for more details.
 
 ## Rate Limiting
 
