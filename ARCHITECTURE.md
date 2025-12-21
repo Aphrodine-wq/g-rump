@@ -122,41 +122,9 @@ App.tsx (Root)
 │   │   ├── WorkspaceProvider (Context)
 │   │   │   └── View Router
 │   │   │       │
-│   │   │       ├── OnboardingFlow
-│   │   │       │
-│   │   │       ├── LandingPage
-│   │   │       │   ├── Header
-│   │   │       │   ├── Hero Section
-│   │   │       │   ├── Features
-│   │   │       │   └── Footer
-│   │   │       │
-│   │   │       ├── ChatInterface (Desktop)
-│   │   │       │   ├── GrumpAvatarWrapper
-│   │   │       │   │   └── GrumpAvatar200fps
-│   │   │       │   ├── MessageBubble[]
-│   │   │       │   ├── TypingIndicator
-│   │   │       │   └── InputBar
-│   │   │       │
-│   │   │       ├── MobileChatView (Mobile)
-│   │   │       │   └── (Same as ChatInterface)
-│   │   │       │
-│   │   │       ├── GameDevWorkspace
-│   │   │       │   ├── Code Editor
-│   │   │       │   ├── Game Preview (iframe)
-│   │   │       │   ├── Entity Browser
-│   │   │       │   └── Asset Manager
-│   │   │       │
-│   │   │       ├── TemplateGallery
-│   │   │       │   └── Template Cards[]
-│   │   │       │
-│   │   │       ├── UserDashboard
-│   │   │       │   ├── Usage Stats
-│   │   │       │   └── Recent Animations
-│   │   │       │
-│   │   │       ├── SettingsPage
-│   │   │       │
-│   │   │       └── PricingPage
-│   │   │           └── Pricing Tiers[]
+│   │   │       ├── 
+
+]
 ```
 
 ## 🔌 API Endpoints

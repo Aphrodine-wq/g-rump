@@ -30,9 +30,10 @@
 - **Multi-Platform** - iOS, Web, and Mobile apps
 
 **Core Experience:**
-- Chat with G-Rump (animated character with 15-layer face rig, 16 expressions)
+- Chat with G-Rump 2.0 (800+ idle animations, 10 emotional states, autonomous chat)
 - Request animations in natural language
 - G-Rump creates animations using his full knowledge base
+- Code games in G-Rump language, compile to Phaser 3
 - Export to GIF, MP4, Lottie, sprite sheets, code
 - Shareable moments (his roasts go viral)
 
@@ -42,12 +43,14 @@
 - Mobile (React Native + Expo)
 
 **Key Features:**
-- 16 core expressions
+- **Grump 2.0** - 800+ idle animations, 10 emotional states, autonomous chat
+- 16 core expressions (legacy, now part of Grump 2.0)
 - 15-layer face rig
 - 120fps/200fps animations
 - Context-aware AI responses
 - Knowledge base integration
 - Animation creation from natural language
+- Game development workspace
 - Multi-platform sync
 
 **Status:** 
