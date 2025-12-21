@@ -66,7 +66,6 @@ export default function UserDashboard() {
       {/* Header */}
       <header className="dashboard-header">
         <div className="header-left">
-          <span className="grump-emoji">🐸</span>
           <span className="header-title">G-RUMP</span>
           <button className="header-btn">New Chat</button>
         </div>

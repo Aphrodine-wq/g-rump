@@ -94,13 +94,11 @@ export default function PricingPage() {
       {/* Navigation */}
       <nav className="pricing-nav">
         <div className="nav-brand">
-          <span className="grump-emoji">🐸</span>
           <span className="brand-name">G-RUMP</span>
         </div>
         <div className="nav-links">
-          <a href="#features">Features</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#examples">Examples</a>
+          <button className="nav-link-btn" onClick={() => window.location.reload()}>Templates</button>
+          <button className="nav-link-btn" onClick={() => window.location.reload()}>Dashboard</button>
           <button className="nav-link-btn">Login</button>
           <button className="nav-link-btn primary">Sign Up</button>
         </div>
@@ -214,7 +212,6 @@ export default function PricingPage() {
       <footer className="pricing-footer">
         <div className="footer-content">
           <div className="footer-brand">
-            <span className="grump-emoji">🐸</span>
             <span>G-RUMP</span>
           </div>
           <div className="footer-links">

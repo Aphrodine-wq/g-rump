@@ -45,25 +45,29 @@ export default function ChatInterface() {
       transitionToState('thinkingDeep')
     }
 
-    // Send chat message
+    // Send chat message and wait for response
     await sendMessage(userMessage)
 
-    // If it's an animation request, also create the animation
+    // If it's an animation request, create the animation after a short delay
+    // This allows the chat response to come through first
     if (isAnimationRequest) {
-      try {
-        const animation = await animationApi.createAnimation({
-          prompt: userMessage,
-          style: 'default',
-          format: 'gif'
-        })
-        
-        setCurrentAnimation(animation)
-        transitionToState('impressed')
-      } catch (error) {
-        console.error('Failed to create animation:', error)
-        transitionToState('error')
-        // Animation creation failed, but chat message was sent
-      }
+      // Wait for chat response, then create animation
+      setTimeout(async () => {
+        try {
+          transitionToState('processing')
+          const animation = await animationApi.createAnimation({
+            prompt: userMessage,
+            style: 'default',
+            format: 'gif'
+          })
+          
+          setCurrentAnimation(animation)
+          transitionToState('impressed')
+        } catch (error) {
+          console.error('Failed to create animation:', error)
+          transitionToState('error')
+        }
+      }, 1500) // Wait 1.5s for chat response
     } else {
       transitionToState('idle')
     }
@@ -81,7 +85,6 @@ export default function ChatInterface() {
       {/* Header */}
       <header className="chat-header">
         <div className="header-left">
-          <span className="grump-emoji">🐸</span>
           <span className="header-title">G-RUMP</span>
           <button className="header-btn">New Chat</button>
         </div>
@@ -166,10 +169,10 @@ export default function ChatInterface() {
                 className="send-button"
                 disabled={!messageText.trim()}
               >
-                <span className="grump-emoji">🐸</span>
+                →
               </button>
             </div>
-            <p className="input-footer">Made with 🐸 G-Rump</p>
+            <p className="input-footer">Made with G-Rump</p>
           </div>
         </div>
 

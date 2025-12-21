@@ -77,7 +77,7 @@ export default function MobileChatView() {
               className="mobile-send"
               disabled={!messageText.trim()}
             >
-              🐸
+              →
             </button>
           </div>
         </div>

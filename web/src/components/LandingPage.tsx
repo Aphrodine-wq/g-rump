@@ -6,9 +6,10 @@ import './LandingPage.css'
 interface LandingPageProps {
   onGetStarted: () => void
   onLogin: () => void
+  onNavigate?: (view: 'pricing' | 'templates' | 'dashboard' | 'settings') => void
 }
 
-export default function LandingPage({ onGetStarted, onLogin }: LandingPageProps) {
+export default function LandingPage({ onGetStarted, onLogin, onNavigate }: LandingPageProps) {
   const { transitionToState } = useAnimation()
 
   useEffect(() => {
@@ -22,13 +23,12 @@ export default function LandingPage({ onGetStarted, onLogin }: LandingPageProps)
       {/* Navigation */}
       <nav className="landing-nav">
         <div className="nav-brand">
-          <span className="grump-emoji">🐸</span>
           <span className="brand-name">G-RUMP</span>
         </div>
         <div className="nav-links">
-          <a href="#features">Features</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#examples">Examples</a>
+          <button className="nav-link-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
+          <button className="nav-link-btn" onClick={() => onNavigate?.('pricing')}>Pricing</button>
+          <button className="nav-link-btn" onClick={() => onNavigate?.('dashboard')}>Dashboard</button>
           <button className="nav-link-btn" onClick={onLogin}>Login</button>
           <button className="nav-link-btn primary" onClick={onGetStarted}>Sign Up</button>
         </div>
@@ -200,16 +200,13 @@ export default function LandingPage({ onGetStarted, onLogin }: LandingPageProps)
       <footer className="landing-footer">
         <div className="footer-content">
           <div className="footer-brand">
-            <span className="grump-emoji">🐸</span>
             <span>G-RUMP</span>
           </div>
           <div className="footer-links">
-            <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#examples">Examples</a>
-            <a href="#blog">Blog</a>
-            <a href="#api">API</a>
-            <a href="#discord">Discord</a>
+            <button className="footer-link-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
+            <button className="footer-link-btn" onClick={() => onNavigate?.('pricing')}>Pricing</button>
+            <button className="footer-link-btn" onClick={() => onNavigate?.('dashboard')}>Dashboard</button>
+            <button className="footer-link-btn" onClick={() => onNavigate?.('settings')}>Settings</button>
           </div>
         </div>
         <p className="footer-copyright">

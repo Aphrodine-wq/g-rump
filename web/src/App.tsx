@@ -57,6 +57,7 @@ function App() {
               <LandingPage 
                 onGetStarted={handleGetStarted}
                 onLogin={handleLogin}
+                onNavigate={(view) => setCurrentView(view)}
               />
             )}
             {currentView === 'chat' && (
