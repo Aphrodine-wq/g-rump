@@ -1515,35 +1515,41 @@ KNOWLEDGE_BASE_GITHUB_FOLDER=https://github.com/user/repo/tree/main/docs/knowled
 #### Free Tier
 - **Price**: $0
 - **Features**:
-  - 10 animations/day
-  - Basic exports (GIF, MP4)
+  - 3 animations/day (90/month)
+  - Preview only (no downloads)
+  - Basic exports (GIF, MP4) - watermarked
   - 720p resolution
-  - Watermark
+  - G-Rump watermark
   - Standard response speed
+  - Community support
 
 #### G-Rump Pro
-- **Price**: $12/month or $99/year
+- **Price**: $49/month or $490/year (save 17%)
 - **Features**:
-  - Unlimited animations
-  - All export formats
+  - 200 animations/day (6,000/month)
+  - All export formats (Lottie, CSS, etc)
   - 4K resolution
   - No watermark
-  - Priority response
+  - Priority rendering
   - Animation history
   - Custom palettes
-  - API access (100 calls/day)
+  - API access (200 calls/day)
+  - Email support
+  - 14-day free trial
 
 #### G-Rump Team
-- **Price**: $29/month per seat
+- **Price**: $199/month per seat
 - **Features**:
   - All Pro features
-  - Shared workspace
-  - Brand kit
-  - Collaboration
+  - 500 animations/day per seat (15,000/month)
+  - Team workspace
+  - Brand kit (colors, fonts, logos)
+  - Collaboration tools
   - Admin controls
+  - SSO integration
   - Priority support
-  - SSO
-  - API access (1000 calls/day)
+  - Invoice billing
+  - Custom integrations
 
 #### G-Rump API
 - **Price**: $0.05 per animation

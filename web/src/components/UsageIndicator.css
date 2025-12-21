@@ -1,0 +1,84 @@
+/* Usage Indicator Styles */
+
+.usage-indicator {
+  padding: 12px 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.usage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.usage-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.usage-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.usage-bar {
+  height: 6px;
+  background: #e5e5e5;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.usage-progress {
+  height: 100%;
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.usage-indicator.near-limit .usage-progress {
+  background: linear-gradient(to right, #f59e0b, #f97316);
+}
+
+.usage-indicator.at-limit .usage-progress {
+  background: linear-gradient(to right, #ef4444, #dc2626);
+}
+
+.usage-upgrade {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.usage-upgrade span {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.usage-upgrade a {
+  color: #3b82f6;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.usage-upgrade a:hover {
+  text-decoration: underline;
+}
+
+.usage-warning {
+  font-size: 12px;
+  color: #f59e0b;
+  font-weight: 500;
+}
+

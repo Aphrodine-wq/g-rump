@@ -30,11 +30,11 @@ class AnimationService {
    * Create animation from natural language prompt
    * Uses AI to generate G-Rump code, then compiles it
    */
-  async createAnimation({ prompt, style, format, userId }) {
+  async createAnimation({ prompt, style, format, userId, tier = 'free' }) {
     const animationId = uuidv4();
     
-    // Step 1: Use AI to generate G-Rump language code
-    const grumpCode = await this.generateGrumpCode(prompt, style);
+    // Step 1: Use AI to generate G-Rump language code (with tier-based model selection)
+    const grumpCode = await this.generateGrumpCode(prompt, style, userId, tier);
     
     // Step 2: Compile G-Rump code using compiler
     const compiledCode = await this.compileGrumpCode(grumpCode);
@@ -65,12 +65,28 @@ class AnimationService {
    * Generate G-Rump language code from natural language
    * Uses existing AI service (Groq/Anthropic) with G-Rump personality
    * AND the existing knowledge base (animation principles, G-Rump language spec, etc.)
+   * Includes caching and tier-based AI model selection
    */
-  async generateGrumpCode(prompt, style) {
+  async generateGrumpCode(prompt, style, userId, tier = 'free') {
     try {
-      // Import existing AI service (uses same knowledge base as chat)
-      const { getGrumpResponse } = await import('../../backend/services/anthropic.js');
-      // Or use Groq: const { getGrumpResponse } = await import('../../backend/services/groq.js');
+      // Check cache first
+      const { getCachedAnimation, cacheAnimation } = await import('../../backend/services/animationCache.js');
+      const cached = getCachedAnimation(prompt, style, 'gif');
+      if (cached) {
+        console.log(`[Cache Hit] Animation for prompt: ${prompt.substring(0, 50)}...`);
+        return cached.code;
+      }
+      
+      // Get tier-specific AI model
+      const { TIERS } = await import('../../backend/services/usageService.js');
+      const tierConfig = TIERS[tier.toUpperCase()] || TIERS.FREE;
+      const aiModel = tierConfig.features?.aiModel || 'gemma-7b-it';
+      
+      // Import AI service - use Groq for cost efficiency
+      const { getGrumpResponse } = await import('../../backend/services/groq.js');
+      
+      // Temporarily override model for this request (if Groq supports it)
+      // Note: This requires updating groq.js to accept model parameter
       
       // The AI service already has:
       // 1. G-Rump personality (from grumpprompt.md)
@@ -98,12 +114,18 @@ Return ONLY valid G-Rump code wrapped in \`\`\`grump code blocks. The code shoul
       const codeMatch = response.match(/```grump\n([\s\S]*?)\n```/) || 
                        response.match(/```\n([\s\S]*?)\n```/);
       
+      let code;
       if (codeMatch) {
-        return codeMatch[1].trim();
+        code = codeMatch[1].trim();
+      } else {
+        // If no code block found, try to extract any code-like content
+        code = response.trim();
       }
       
-      // If no code block found, try to extract any code-like content
-      return response.trim();
+      // Cache the result
+      cacheAnimation(prompt, style, 'gif', { code, timestamp: Date.now() });
+      
+      return code;
     } catch (error) {
       console.error('Error generating G-Rump code:', error);
       // Fallback to example code

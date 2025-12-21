@@ -23,8 +23,8 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
       price: 0,
       period: 'forever',
       features: [
-        '10 animations/day',
-        'Basic exports (GIF, MP4)',
+        '1 animation/day',
+        'Preview only (no downloads)',
         '720p resolution',
         'Community support',
         'G-Rump watermark'
@@ -34,18 +34,19 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
     },
     {
       name: 'PRO',
-      price: billingCycle === 'monthly' ? 12 : 99,
+      price: billingCycle === 'monthly' ? 49 : 490,
       period: billingCycle === 'monthly' ? '/month' : '/year',
-      savings: billingCycle === 'yearly' ? 'Save 31%' : null,
+      savings: billingCycle === 'yearly' ? 'Save 17%' : null,
       features: [
-        'Unlimited animations',
+        '200 animations/day',
         'All export formats (Lottie, CSS, etc)',
         '4K resolution',
         'No watermark',
         'Priority rendering',
         'Animation history',
-        'API access (100 calls/day)',
-        'Email support'
+        'API access (200 calls/day)',
+        'Email support',
+        '14-day free trial'
       ],
       cta: 'Start Free Trial',
       highlight: true,
@@ -53,17 +54,19 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
     },
     {
       name: 'TEAM',
-      price: 29,
-      period: '/seat/month',
+      price: 199,
+      period: '/month',
       features: [
         'Everything in Pro',
+        '500 animations/day per seat',
         'Team workspace',
         'Brand kit (colors, fonts, logos)',
-        'Collaboration',
+        'Collaboration tools',
         'Admin controls',
         'SSO integration',
         'Priority support',
-        'Invoice billing'
+        'Invoice billing',
+        'Custom integrations'
       ],
       cta: 'Contact Sales',
       highlight: false
@@ -78,7 +81,7 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
     },
     {
       question: 'What happens when my free animations run out?',
-      answer: 'You can wait until the next day for your limit to reset, or upgrade to Pro for unlimited animations.',
+      answer: 'You can wait until the next day for your limit to reset (3 animations/day), or upgrade to Pro for 200 animations/day.',
       open: false
     },
     {

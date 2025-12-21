@@ -4,18 +4,32 @@
 
 import express from 'express';
 import animationService from '../services/animationService.js';
-// TODO: Import auth middleware when available
-// import { authenticate } from '../../backend/middleware/auth.js';
-// import rateLimit from '../../backend/middleware/rateLimit.js';
 
 const router = express.Router();
+
+// Usage limiter middleware (loaded dynamically to handle path issues)
+let animationUsageLimiter, incrementAnimationUsage;
+
+async function loadUsageLimiter() {
+  try {
+    const usageLimiter = await import('../../../backend/middleware/usageLimiter.js');
+    animationUsageLimiter = usageLimiter.animationUsageLimiter;
+    incrementAnimationUsage = usageLimiter.incrementAnimationUsage;
+  } catch (error) {
+    console.warn('Usage limiter not available, proceeding without limits');
+    animationUsageLimiter = (req, res, next) => next();
+    incrementAnimationUsage = (req, res, next) => next();
+  }
+}
+
+// Initialize usage limiter
+loadUsageLimiter();
 
 /**
  * POST /api/animation/create
  * Create an animation from natural language description
  */
-// TODO: Add authenticate and rateLimit middleware when available
-router.post('/create', async (req, res) => {
+router.post('/create', animationUsageLimiter, async (req, res) => {
   try {
     const { prompt, style, format } = req.body;
     
@@ -27,15 +41,32 @@ router.post('/create', async (req, res) => {
     }
     
     // TODO: Get userId from auth middleware
-    const userId = req.user?.id || 'anonymous';
+    const userId = req.user?.id || req.userId || 'anonymous';
     
-    // Generate animation using G-Rump compiler
+    // Get user tier from usage service
+    let tier = 'free';
+    try {
+      const { getUserTier } = await import('../../../backend/services/usageService.js');
+      const tierConfig = getUserTier(userId);
+      tier = tierConfig.id;
+    } catch (error) {
+      console.warn('Could not get user tier, defaulting to free');
+    }
+    
+    // Generate animation using G-Rump compiler (with tier-based AI model)
     const animation = await animationService.createAnimation({
       prompt: prompt.trim(),
       style: style || 'default',
       format: format || 'gif',
       userId,
+      tier,
     });
+    
+    // Mark animation as created for usage tracking
+    req.animationCreated = true;
+    
+    // Increment usage counter
+    incrementAnimationUsage(req, res, () => {});
     
     res.json({
       success: true,
@@ -49,6 +80,7 @@ router.post('/create', async (req, res) => {
         format: animation.format,
         createdAt: animation.createdAt,
       },
+      usage: req.usageCheck?.remaining || null,
     });
   } catch (error) {
     console.error('Animation creation error:', error);
