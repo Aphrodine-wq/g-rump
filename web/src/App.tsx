@@ -73,6 +73,7 @@ function App() {
                   setPendingTemplatePrompt(templatePrompt || null)
                   setCurrentView('chat')
                 }}
+                onNavigate={(view) => setCurrentView(view)}
               />
             )}
             {currentView === 'dashboard' && <UserDashboard onNavigate={(view) => setCurrentView(view)} />}
