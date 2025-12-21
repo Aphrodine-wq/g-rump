@@ -1,11 +1,5 @@
 {
   "buildCommand": "npm install --legacy-peer-deps && npm run build --workspace=grump-web",
   "outputDirectory": "web/dist",
-  "framework": "vite",
-  "env": {
-    "VITE_API_URL": {
-      "description": "API endpoint for the backend service",
-      "example": "https://api.g-rump.com"
-    }
-  }
+  "framework": "vite"
 }
