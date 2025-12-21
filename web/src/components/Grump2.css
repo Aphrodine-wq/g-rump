@@ -1,0 +1,102 @@
+/* Grump 2.0 Styles */
+
+.grump2-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+}
+
+.grump2-container .face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--theme-face-bg, #ddd);
+  border-radius: 50%;
+  transform: translate(var(--face-x, 0px), var(--face-y, 0px)) 
+             scale(var(--face-scale, 1)) 
+             rotate(var(--face-rotate, 0deg));
+  transition: transform 0.1s ease-out;
+}
+
+/* Eyes */
+.eyes-container {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 60px;
+}
+
+.eye {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+}
+
+.pupil {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #000;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(calc(-50% + var(--pupil-x, 0px)), calc(-50% + var(--pupil-y, 0px)));
+  transition: transform 0.1s ease-out;
+}
+
+/* Eyebrows */
+.eyebrows-container {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 60px;
+}
+
+.eyebrow {
+  width: 50px;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  transform: rotate(var(--eyebrow-left-rotate, 0deg));
+  transition: transform 0.2s ease-out;
+}
+
+.eyebrow.right-eyebrow {
+  transform: rotate(var(--eyebrow-right-rotate, 0deg));
+}
+
+/* Mouth */
+.mouth {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 30px;
+  border: 4px solid #333;
+  border-top: none;
+  border-radius: 0 0 60px 60px;
+  transform: translateX(-50%) translateY(var(--mouth-open, 0px));
+  transition: transform 0.2s ease-out;
+}
+
+/* Nose */
+.nose {
+  position: absolute;
+  top: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 30px;
+  background: #ccc;
+  border-radius: 50%;
+}
+

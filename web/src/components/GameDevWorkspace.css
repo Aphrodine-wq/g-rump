@@ -341,7 +341,58 @@
   color: #1a1a1a;
 }
 
+.gamedev-code-wrapper {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.gamedev-code-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  color: transparent;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.gamedev-code-preview .code-keyword {
+  color: #0066cc;
+  font-weight: 600;
+}
+
+.gamedev-code-preview .code-string {
+  color: #008800;
+}
+
+.gamedev-code-preview .code-number {
+  color: #ff6600;
+}
+
+.gamedev-code-preview .code-comment {
+  color: #888888;
+  font-style: italic;
+}
+
+.gamedev-code-preview .code-literal {
+  color: #cc0066;
+}
+
 .gamedev-code-textarea {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  color: #1a1a1a;
   flex: 1;
   padding: 15px;
   border: none;
@@ -429,6 +480,13 @@
   background: #1a1a1a;
   border-radius: 8px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.gamedev-preview-iframe {
+  background: #1a1a1a;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  display: block;
 }
 
 .gamedev-preview-overlay {

@@ -7,6 +7,7 @@ import { promisify } from 'util';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
+import { generatePhaserGame } from '../services/phaserCodegen.js';
 
 const execAsync = promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
@@ -62,12 +63,17 @@ router.post('/compile', async (req, res) => {
       });
     }
 
-    // Compile using grump compiler
-    // This is a placeholder - actual compilation would use:
-    // cargo run -- build --target ${target} ${tempFile}
-    
-    // For now, return success with mock compiled code
-    const compiledCode = generateMockCompiledCode(code, target);
+    // Use Phaser codegen for web target
+    let compiledCode;
+    if (target === 'web') {
+      compiledCode = generatePhaserGame(code, {
+        appName: 'G-Rump Game',
+        fps: 60
+      });
+    } else {
+      // For other targets, use mock for now
+      compiledCode = generateMockCompiledCode(code, target);
+    }
 
     // Clean up temp file
     await fs.unlink(tempFile).catch(() => {});

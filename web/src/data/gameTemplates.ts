@@ -978,6 +978,53 @@ scene Defense {
     }
 }
 `
+  },
+  {
+    id: 'pong-classic',
+    name: 'Pong Classic',
+    description: 'Classic Pong game with two paddles and a ball',
+    category: 'arcade',
+    icon: '🏓',
+    difficulty: 'beginner',
+    tags: ['arcade', 'pong', 'classic', 'two-player'],
+    code: `// Classic Pong Game
+@app "Pong"
+@fps 60
+
+state {
+    player1Score: int = 0
+    player2Score: int = 0
+}
+
+entity Ball {
+    sprite: "ball.png"
+    position: screen.center
+    velocity: (300, random(-200, 200))
+    
+    physics {
+        body: circle(10)
+        bounce: 1.0
+    }
+}
+
+entity Paddle {
+    sprite: "paddle.png"
+    position: (0, screen.center.y)
+    size: (20, 100)
+    
+    physics {
+        body: rectangle(20, 100)
+        static: true
+    }
+}
+
+scene Game {
+    background: #000000
+    Paddle { position: (50, screen.center.y) }
+    Paddle { position: (screen.width - 50, screen.center.y) }
+    Ball()
+}
+`
   }
 ]
 

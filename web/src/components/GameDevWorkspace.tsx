@@ -1,6 +1,7 @@
 // Game Development Workspace - Full-featured game development environment
 
 import { useState, useEffect, useRef } from 'react'
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import './GameDevWorkspace.css'
 
 interface Entity {
@@ -37,8 +38,12 @@ export default function GameDevWorkspace({
   const [showGrid, setShowGrid] = useState(true)
   const [fps] = useState(60)
   const [showStats, setShowStats] = useState(true)
+  const [compiledGameHtml, setCompiledGameHtml] = useState<string | null>(null)
+  const [savedProjects, setSavedProjects] = useState<Array<{id: string, name: string, code: string, updatedAt: Date}>>([])
+  const [showLoadDialog, setShowLoadDialog] = useState(false)
   
   const previewCanvasRef = useRef<HTMLCanvasElement>(null)
+  const previewIframeRef = useRef<HTMLIFrameElement>(null)
   const codeEditorRef = useRef<HTMLTextAreaElement>(null)
   const gameLoopRef = useRef<number | null>(null)
   const lastFrameTimeRef = useRef<number>(0)
@@ -49,47 +54,34 @@ export default function GameDevWorkspace({
     setEntities(parsed)
   }, [code])
 
-  // Game loop
+  // Load saved projects on mount
   useEffect(() => {
-    if (!isRunning || !previewCanvasRef.current) return
+    loadSavedProjects()
+  }, [])
 
-    const canvas = previewCanvasRef.current
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const gameLoop = (currentTime: number) => {
-      const delta = (currentTime - lastFrameTimeRef.current) / 1000
-      lastFrameTimeRef.current = currentTime
-
-      // Clear canvas
-      ctx.fillStyle = '#1a1a1a'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-      // Draw grid
-      if (showGrid) {
-        drawGrid(ctx, canvas.width, canvas.height)
+  // Auto-save project every 30 seconds
+  useEffect(() => {
+    const autoSave = setInterval(() => {
+      if (code && projectName) {
+        saveProjectToLocalStorage()
       }
+    }, 30000)
+    return () => clearInterval(autoSave)
+  }, [code, projectName])
 
-      // Draw placeholder game content
-      drawPlaceholderGame(ctx, canvas.width, canvas.height, delta)
-
-      // Draw stats
-      if (showStats) {
-        drawStats(ctx, delta, fps)
-      }
-
-      gameLoopRef.current = requestAnimationFrame(gameLoop)
-    }
-
-    lastFrameTimeRef.current = performance.now()
-    gameLoopRef.current = requestAnimationFrame(gameLoop)
-
-    return () => {
-      if (gameLoopRef.current) {
-        cancelAnimationFrame(gameLoopRef.current)
+  // Load compiled game into iframe
+  useEffect(() => {
+    if (compiledGameHtml && previewIframeRef.current) {
+      const iframe = previewIframeRef.current
+      const blob = new Blob([compiledGameHtml], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      iframe.src = url
+      
+      return () => {
+        URL.revokeObjectURL(url)
       }
     }
-  }, [isRunning, showGrid, showStats, fps])
+  }, [compiledGameHtml])
 
   const handleCompile = async () => {
     setIsCompiling(true)
@@ -104,22 +96,37 @@ export default function GameDevWorkspace({
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.message || 'Compilation failed')
+        throw new Error(error.error?.message || error.message || 'Compilation failed')
       }
 
       const result = await response.json()
       console.log('Compilation successful:', result)
-      setIsRunning(true)
+      
+      if (result.compiled?.code) {
+        setCompiledGameHtml(result.compiled.code)
+        setIsRunning(true)
+      } else {
+        throw new Error('No compiled code received')
+      }
     } catch (error: any) {
-      setCompileError(error.message || 'Compilation failed')
+      const errorMessage = error.message || 'Compilation failed'
+      setCompileError(errorMessage)
+      setIsRunning(false)
+      
+      // Show detailed error if available
+      if (error.response?.data?.error) {
+        const details = error.response.data.error
+        setCompileError(`${errorMessage}: ${details.message || details.details || ''}`)
+      }
     } finally {
       setIsCompiling(false)
     }
   }
 
-  const handleRun = () => {
+  const handleRun = async () => {
     if (!isRunning) {
-      setIsRunning(true)
+      // Compile and run
+      await handleCompile()
     } else {
       setIsRunning(false)
     }
@@ -128,21 +135,130 @@ export default function GameDevWorkspace({
   const handleReset = () => {
     setIsRunning(false)
     setCompileError(null)
-    if (previewCanvasRef.current) {
-      const ctx = previewCanvasRef.current.getContext('2d')
-      if (ctx) {
-        ctx.clearRect(0, 0, previewCanvasRef.current.width, previewCanvasRef.current.height)
-      }
+    setCompiledGameHtml(null)
+    if (previewIframeRef.current) {
+      previewIframeRef.current.src = 'about:blank'
     }
   }
 
-  const handleSave = () => {
-    // Save project logic
-    setShowSaveDialog(false)
-    // In real implementation, save to backend/localStorage
+  const saveProjectToLocalStorage = () => {
+    const project = {
+      id: _projectId || Date.now().toString(),
+      name: projectName,
+      code: code,
+      targetPlatform: targetPlatform,
+      updatedAt: new Date().toISOString()
+    }
+    
+    const projects = JSON.parse(localStorage.getItem('g-rump-projects') || '[]')
+    const existingIndex = projects.findIndex((p: any) => p.id === project.id)
+    
+    if (existingIndex >= 0) {
+      projects[existingIndex] = project
+    } else {
+      projects.push(project)
+    }
+    
+    localStorage.setItem('g-rump-projects', JSON.stringify(projects))
+    loadSavedProjects()
   }
 
-  const handleExport = () => {
+  const loadSavedProjects = () => {
+    const projects = JSON.parse(localStorage.getItem('g-rump-projects') || '[]')
+    setSavedProjects(projects.map((p: any) => ({
+      ...p,
+      updatedAt: new Date(p.updatedAt)
+    })))
+  }
+
+  const loadProject = (projectId: string) => {
+    const projects = JSON.parse(localStorage.getItem('g-rump-projects') || '[]')
+    const project = projects.find((p: any) => p.id === projectId)
+    if (project) {
+      setCode(project.code)
+      setProjectName(project.name)
+      setTargetPlatform(project.targetPlatform || 'web')
+      setShowLoadDialog(false)
+    }
+  }
+
+  const deleteProject = (projectId: string) => {
+    const projects = JSON.parse(localStorage.getItem('g-rump-projects') || '[]')
+    const filtered = projects.filter((p: any) => p.id !== projectId)
+    localStorage.setItem('g-rump-projects', JSON.stringify(filtered))
+    loadSavedProjects()
+  }
+
+  const handleSave = () => {
+    saveProjectToLocalStorage()
+    setShowSaveDialog(false)
+    alert('Project saved!')
+  }
+
+  const shareGame = () => {
+    if (!compiledGameHtml) {
+      alert('Please compile the game first')
+      return
+    }
+    
+    // Encode game code in URL
+    const encoded = btoa(JSON.stringify({
+      name: projectName,
+      code: code,
+      compiled: compiledGameHtml
+    }))
+    
+    const shareUrl = `${window.location.origin}${window.location.pathname}?game=${encoded}`
+    
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('Share link copied to clipboard!')
+    })
+  }
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onSave: () => {
+      if (code && projectName) {
+        saveProjectToLocalStorage()
+        alert('Project saved!')
+      } else {
+        setShowSaveDialog(true)
+      }
+    },
+    onCompile: handleCompile,
+    onRun: handleRun,
+    onExport: handleExport,
+    onNew: () => {
+      if (confirm('Start a new project? Unsaved changes will be lost.')) {
+        setCode(getDefaultGameCode())
+        setProjectName('My Game')
+        setCompiledGameHtml(null)
+      }
+    },
+    enabled: selectedTab === 'code'
+  })
+
+  const handleExport = async () => {
+    if (!compiledGameHtml) {
+      // Compile first if not already compiled
+      await handleCompile()
+      if (!compiledGameHtml) {
+        alert('Please compile the game first')
+        return
+      }
+    }
+
+    // Create download
+    const blob = new Blob([compiledGameHtml], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${projectName || 'game'}.html`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+
     if (onExport) {
       onExport(code, targetPlatform)
     }
@@ -181,8 +297,14 @@ export default function GameDevWorkspace({
             <option value="flutter">Flutter</option>
           </select>
           
+          <button className="gamedev-btn secondary" onClick={() => setShowLoadDialog(true)}>
+            Load
+          </button>
           <button className="gamedev-btn secondary" onClick={() => setShowSaveDialog(true)}>
             Save
+          </button>
+          <button className="gamedev-btn secondary" onClick={shareGame}>
+            Share
           </button>
           <button 
             className="gamedev-btn primary" 
@@ -304,14 +426,90 @@ export default function GameDevWorkspace({
                     <button onClick={() => navigator.clipboard.writeText(code)}>Copy</button>
                   </div>
                 </div>
-                <textarea
-                  ref={codeEditorRef}
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  className="gamedev-code-textarea"
-                  spellCheck={false}
-                  placeholder="// Start coding your game..."
-                />
+                <div className="gamedev-code-wrapper">
+                  <pre className="gamedev-code-preview" dangerouslySetInnerHTML={{ __html: highlightCode(code) }} />
+                  <textarea
+                    ref={codeEditorRef}
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      // Tab indentation
+                      if (e.key === 'Tab') {
+                        e.preventDefault()
+                        const textarea = e.currentTarget
+                        const start = textarea.selectionStart
+                        const end = textarea.selectionEnd
+                        const text = textarea.value
+                        
+                        if (e.shiftKey) {
+                          // Unindent
+                          const before = text.substring(0, start)
+                          const lines = before.split('\n')
+                          const currentLine = lines[lines.length - 1]
+                          if (currentLine.startsWith('  ')) {
+                            const newText = text.substring(0, start - 2) + text.substring(start)
+                            setCode(newText)
+                            setTimeout(() => {
+                              textarea.selectionStart = textarea.selectionEnd = Math.max(0, start - 2)
+                            }, 0)
+                          }
+                        } else {
+                          // Indent
+                          const newText = text.substring(0, start) + '  ' + text.substring(end)
+                          setCode(newText)
+                          setTimeout(() => {
+                            textarea.selectionStart = textarea.selectionEnd = start + 2
+                          }, 0)
+                        }
+                      }
+                      
+                      // Auto-indent on Enter
+                      if (e.key === 'Enter') {
+                        const textarea = e.currentTarget
+                        const start = textarea.selectionStart
+                        const text = textarea.value
+                        const before = text.substring(0, start)
+                        const lines = before.split('\n')
+                        const currentLine = lines[lines.length - 1] || ''
+                        const indent = currentLine.match(/^(\s*)/)?.[1] || ''
+                        
+                        if (currentLine.trim().endsWith('{')) {
+                          const newText = before + '\n' + indent + '  \n' + indent + text.substring(start)
+                          setCode(newText)
+                          setTimeout(() => {
+                            textarea.selectionStart = textarea.selectionEnd = start + indent.length + 3
+                          }, 0)
+                          e.preventDefault()
+                        } else if (indent) {
+                          const newText = before + '\n' + indent + text.substring(start)
+                          setCode(newText)
+                          setTimeout(() => {
+                            textarea.selectionStart = textarea.selectionEnd = start + indent.length + 1
+                          }, 0)
+                          e.preventDefault()
+                        }
+                      }
+                      
+                      // Auto-close brackets
+                      const bracketPairs: Record<string, string> = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" }
+                      if (bracketPairs[e.key] && !e.shiftKey) {
+                        const textarea = e.currentTarget
+                        const start = textarea.selectionStart
+                        const end = textarea.selectionEnd
+                        const text = textarea.value
+                        const newText = text.substring(0, start) + e.key + bracketPairs[e.key] + text.substring(end)
+                        setCode(newText)
+                        setTimeout(() => {
+                          textarea.selectionStart = textarea.selectionEnd = start + 1
+                        }, 0)
+                        e.preventDefault()
+                      }
+                    }}
+                    className="gamedev-code-textarea"
+                    spellCheck={false}
+                    placeholder="// Start coding your game..."
+                  />
+                </div>
                 {compileError && (
                   <div className="gamedev-error">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -331,22 +529,32 @@ export default function GameDevWorkspace({
                 </button>
               </div>
               <div className="gamedev-canvas-container" style={{ transform: `scale(${zoom})` }}>
-                <canvas
-                  ref={previewCanvasRef}
-                  width={800}
-                  height={600}
-                  className="gamedev-preview-canvas"
-                />
-                {!isRunning && (
-                  <div className="gamedev-preview-overlay">
-                    <div className="gamedev-preview-placeholder">
-                      <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path strokeLinecap="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <p>Click Run to start the game</p>
+                {isRunning && compiledGameHtml ? (
+                  <iframe
+                    ref={previewIframeRef}
+                    className="gamedev-preview-iframe"
+                    width={800}
+                    height={600}
+                    style={{ border: 'none', background: '#1a1a1a' }}
+                  />
+                ) : (
+                  <>
+                    <canvas
+                      ref={previewCanvasRef}
+                      width={800}
+                      height={600}
+                      className="gamedev-preview-canvas"
+                    />
+                    <div className="gamedev-preview-overlay">
+                      <div className="gamedev-preview-placeholder">
+                        <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path strokeLinecap="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p>Click Run to compile and start the game</p>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
             </div>
@@ -356,12 +564,22 @@ export default function GameDevWorkspace({
         {selectedTab === 'preview' && (
           <div className="gamedev-preview-full">
             <div className="gamedev-canvas-container" style={{ transform: `scale(${zoom})` }}>
-              <canvas
-                ref={previewCanvasRef}
-                width={800}
-                height={600}
-                className="gamedev-preview-canvas"
-              />
+              {isRunning && compiledGameHtml ? (
+                <iframe
+                  ref={previewIframeRef}
+                  className="gamedev-preview-iframe"
+                  width={800}
+                  height={600}
+                  style={{ border: 'none', background: '#1a1a1a' }}
+                />
+              ) : (
+                <canvas
+                  ref={previewCanvasRef}
+                  width={800}
+                  height={600}
+                  className="gamedev-preview-canvas"
+                />
+              )}
             </div>
           </div>
         )}
@@ -467,6 +685,70 @@ export default function GameDevWorkspace({
               </button>
               <button className="gamedev-btn primary" onClick={handleSave}>
                 Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Load Dialog */}
+      {showLoadDialog && (
+        <div className="gamedev-modal-overlay" onClick={() => setShowLoadDialog(false)}>
+          <div className="gamedev-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', maxHeight: '80vh', overflow: 'auto' }}>
+            <h3>Load Project</h3>
+            {savedProjects.length === 0 ? (
+              <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>No saved projects</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '10px 0' }}>
+                {savedProjects.map((project) => (
+                  <div
+                    key={project.id}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '12px',
+                      border: '1px solid #e5e5e5',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: '600', marginBottom: '4px' }}>{project.name}</div>
+                      <div style={{ fontSize: '12px', color: '#666' }}>
+                        {project.updatedAt.toLocaleDateString()} {project.updatedAt.toLocaleTimeString()}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        className="gamedev-btn primary"
+                        onClick={() => loadProject(project.id)}
+                        style={{ padding: '6px 12px', fontSize: '12px' }}
+                      >
+                        Load
+                      </button>
+                      <button
+                        className="gamedev-btn secondary"
+                        onClick={() => {
+                          if (confirm('Delete this project?')) {
+                            deleteProject(project.id)
+                          }
+                        }}
+                        style={{ padding: '6px 12px', fontSize: '12px' }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="gamedev-modal-actions">
+              <button className="gamedev-btn secondary" onClick={() => setShowLoadDialog(false)}>
+                Close
               </button>
             </div>
           </div>

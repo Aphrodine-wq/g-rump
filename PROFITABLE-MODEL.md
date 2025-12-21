@@ -46,6 +46,12 @@ Even with $0.03/request, we lose money. Need to get costs down to $0.01 or less.
 - All Pro features
 - Uses best AI ($0.0003)
 
+**Game Development (Bundled with Pro/Team):**
+- Pro: Unlimited game compilations (web target)
+- Team: All platforms (web, iOS, Android, Flutter)
+- Same AI costs as animations ($0.0001-$0.0003 per compile)
+- No additional revenue (bundled feature)
+
 ## 1M User Financial Model
 
 ### User Distribution (10% conversion)
@@ -57,6 +63,8 @@ Even with $0.03/request, we lose money. Need to get costs down to $0.01 or less.
 - Pro: 80,000 × $49 = **$3.92M**
 - Team: 20,000 × $199 = **$3.98M**
 - **Total Revenue: $7.9M/month = $94.8M ARR**
+
+**Note:** Game dev is bundled with Pro/Team tiers. No additional revenue, but increases value proposition and conversion rates.
 
 ### Monthly Costs
 
@@ -75,20 +83,43 @@ Even with $0.03/request, we lose money. Need to get costs down to $0.01 or less.
 - Cost: $0.0003 × 60M = $18,000/month
 - With 30% cache: $12,600/month
 
+**Game Dev Usage (Bundled):**
+- 2% of Pro users use game dev = 1,600 users
+- 5% of Team users use game dev = 1,000 seats
+- Pro game compiles: 1,600 × 5/day × 30 = 240K compiles/month
+- Team game compiles: 1,000 × 10/day × 30 = 300K compiles/month
+- Cost: (240K × $0.0002) + (300K × $0.0003) = $48 + $90 = $138/month
+- With 30% cache: $97/month
+
 **Infrastructure:**
 - Hosting: $50K/month
 - Database: $25K/month
 - CDN/Storage: $15K/month
 - Total: $90K/month
 
-**Total Costs: $31.29K/month**
+**Game Dev Costs: $97/month**
+
+**Total Costs: $31.39K/month**
 
 ### Profit
 - Revenue: $7.9M/month
-- Costs: $31.29K/month
+- Costs: $31.39K/month (includes game dev)
 - **Profit: $7.87M/month = $94.4M/year**
 
 ## Profit Margin: 99.6%
+
+## Game Dev Impact
+
+**Value Proposition:**
+- Differentiates from animation-only competitors
+- Attracts game developers (new market segment)
+- Increases Pro/Team conversion rates (estimated +2-5%)
+- No significant cost increase ($97/month at 1M users)
+
+**Future Expansion:**
+- Phase 2: Add "Game Dev Pro" tier at $79/month (when full compiler ready)
+- Additional revenue: 2% of users = 20K × $79 = $1.58M/month
+- Phase 3: Mobile app deployment (iOS/Android) - premium feature
 
 ## Key Optimizations
 

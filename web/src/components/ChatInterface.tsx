@@ -3,13 +3,13 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useChat } from '../store/ChatStore'
-import { useAnimation } from '../store/AnimationStore'
 import { animationApi, type Animation } from '../services/animationApi'
-import GrumpAvatarWrapper from './GrumpAvatarWrapper'
+import Grump2 from './Grump2'
 import MessageBubble from './MessageBubble'
 import TypingIndicator from './TypingIndicator'
 import AnimationPreview from './AnimationPreview'
 import ExportModal from './ExportModal'
+import { MessageSkeleton } from './LoadingSkeleton'
 import './ChatInterface.css'
 
 interface ChatInterfaceProps {
@@ -18,12 +18,12 @@ interface ChatInterfaceProps {
 
 export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
   const { messages, isTyping, sendMessage, createNewSession } = useChat()
-  const { transitionToState } = useAnimation()
   const [messageText, setMessageText] = useState('')
   const [showExportModal, setShowExportModal] = useState(false)
   const [currentAnimation, setCurrentAnimation] = useState<Animation | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const chatMessagesRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     scrollToBottom()
@@ -42,13 +42,6 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
     // Check if this is an animation request
     const isAnimationRequest = animationApi.isAnimationRequest(userMessage)
 
-    // Update G-Rump state based on message
-    if (isAnimationRequest) {
-      transitionToState('processing')
-    } else {
-      transitionToState('thinkingDeep')
-    }
-
     // Send chat message and wait for response
     await sendMessage(userMessage)
 
@@ -58,7 +51,6 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
       // Wait for chat response, then create animation
       setTimeout(async () => {
         try {
-          transitionToState('processing')
           const animation = await animationApi.createAnimation({
             prompt: userMessage,
             style: 'default',
@@ -66,14 +58,10 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
           })
           
           setCurrentAnimation(animation)
-          transitionToState('impressed')
         } catch (error) {
           console.error('Failed to create animation:', error)
-          transitionToState('error')
         }
       }, 1500) // Wait 1.5s for chat response
-    } else {
-      transitionToState('idle')
     }
   }
 
@@ -105,10 +93,10 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
       <div className="chat-main">
         {/* Left: Chat */}
         <div className="chat-panel">
-          <div className="chat-messages">
+          <div className="chat-messages" id="chatMessages" ref={chatMessagesRef}>
             {messages.length === 0 && (
               <div className="welcome-message">
-                <GrumpAvatarWrapper size="medium" />
+                <Grump2 chatMessagesId="chatMessages" chatInputId="chatInput" />
                 <p className="welcome-text">"What do you want?"</p>
               </div>
             )}
@@ -122,16 +110,13 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
             ))}
 
             {isTyping && (
-              <div className="typing-container">
-                <GrumpAvatarWrapper 
-                  size="small"
-                  customState={{
-                    glowColor: 'soft',
-                    glowIntensity: 0.5
-                  }}
-                />
-                <TypingIndicator />
-              </div>
+              <>
+                <MessageSkeleton />
+                <div className="typing-container">
+                  <Grump2 chatMessagesId="chatMessages" chatInputId="chatInput" />
+                  <TypingIndicator />
+                </div>
+              </>
             )}
 
             <div ref={messagesEndRef} />
@@ -163,6 +148,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
             <div className="input-wrapper">
               <textarea
                 ref={inputRef}
+                id="chatInput"
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
                 onKeyPress={handleKeyPress}

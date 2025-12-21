@@ -5,6 +5,9 @@
 use crate::parser::Program;
 use crate::error::{GrumpError, GrumpResult};
 
+mod phaser;
+use phaser::PhaserCodegen;
+
 pub enum Target {
     Ios,      // Swift + Metal
     Android,  // Kotlin + OpenGL
@@ -25,7 +28,7 @@ impl CodeGenerator {
         match self.target {
             Target::Ios => self.generate_swift(program),
             Target::Android => self.generate_kotlin(program),
-            Target::Web => self.generate_javascript(program),
+            Target::Web => PhaserCodegen::generate_game(program), // Use Phaser for web
             Target::Flutter => self.generate_dart(program),
         }
     }

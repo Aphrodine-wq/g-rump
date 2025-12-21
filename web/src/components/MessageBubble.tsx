@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { motion } from 'framer-motion'
 import MessageSlam, { useCharacterStreaming } from './animations/MessageSlam'
 import { useAnimation } from '../store/AnimationStore'
@@ -16,17 +16,13 @@ interface MessageBubbleProps {
   index?: number
 }
 
-export default function MessageBubble({ message, index = 0 }: MessageBubbleProps) {
+const MessageBubble = React.memo(function MessageBubble({ message, index = 0 }: MessageBubbleProps) {
   const isGrump = message.sender === 'grump'
-  const { triggerScreenShake } = useAnimation()
 
   // Memoize callback to prevent infinite render loop
   const onCharacterStreamComplete = useCallback(() => {
-    // On complete, trigger screen shake for slam effect
-    if (isGrump && index === 0) {
-      triggerScreenShake(0.3)
-    }
-  }, [isGrump, index, triggerScreenShake])
+    // Animation handled by Grump 2.0
+  }, [])
 
   // Character-by-character streaming for Grump messages
   const { displayedText, isComplete } = useCharacterStreaming(
@@ -76,4 +72,6 @@ function formatTime(date: Date): string {
     hour12: true
   }).format(date)
 }
+
+export default MessageBubble
 

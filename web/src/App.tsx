@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { ChatProvider, useChat } from './store/ChatStore'
-import { AnimationProvider } from './store/AnimationStore'
 import { WorkspaceProvider } from './store/WorkspaceStore'
 import LandingPage from './components/LandingPage'
 import ChatInterface from './components/ChatInterface'
@@ -13,6 +12,7 @@ import SettingsPage from './components/SettingsPage'
 import PricingPage from './components/PricingPage'
 import OnboardingFlow from './components/OnboardingFlow'
 import GameDevWorkspace from './components/GameDevWorkspace'
+import ErrorBoundary from './components/ErrorBoundary'
 import './App.css'
 
 type View = 'landing' | 'chat' | 'templates' | 'dashboard' | 'settings' | 'pricing' | 'onboarding' | 'gamedev'
@@ -48,8 +48,8 @@ function App() {
   }
 
   return (
-    <ChatProvider>
-      <AnimationProvider>
+    <ErrorBoundary>
+      <ChatProvider>
         <WorkspaceProvider>
           <div className="app">
             {currentView === 'onboarding' && (
@@ -95,10 +95,10 @@ function App() {
                 }}
               />
             )}
-          </div>
-        </WorkspaceProvider>
-      </AnimationProvider>
-    </ChatProvider>
+            </div>
+          </WorkspaceProvider>
+      </ChatProvider>
+    </ErrorBoundary>
   )
 }
 
