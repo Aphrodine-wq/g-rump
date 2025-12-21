@@ -5,30 +5,73 @@
 */
 (function initGrump2() {
   // Wait for required DOM elements to exist
-  const waitForElements = (maxAttempts = 50, interval = 100) => {
+  // Use MutationObserver for better performance and to catch elements added after initial load
+  const waitForElements = () => {
     return new Promise((resolve, reject) => {
-      let attempts = 0;
-      
-      const checkElements = () => {
-        attempts++;
-        const face = document.querySelector('.grump2-container .face');
-        
-        if (face) {
-          // Face found, now check for optional chat elements
-          const chatMessages = document.getElementById('chatMessages');
-          const chatInput = document.getElementById('chatInput');
-          resolve({ face, chatMessages, chatInput });
-        } else if (attempts >= maxAttempts) {
-          // Give up after max attempts
-          console.warn('Grump2: Face element not found after', maxAttempts, 'attempts');
-          reject(new Error('Face element not found'));
-        } else {
-          // Keep trying
-          setTimeout(checkElements, interval);
+      // First, check if element already exists
+      const face = document.querySelector('.grump2-container .face');
+      if (face) {
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        resolve({ face, chatMessages, chatInput });
+        return;
+      }
+
+      // If not found, wait for DOM to be ready, then use MutationObserver
+      const initWhenReady = () => {
+        // Wait for root element to exist (React mounts here)
+        const root = document.getElementById('root');
+        if (!root) {
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWhenReady);
+          } else {
+            // Root doesn't exist yet, wait a bit
+            setTimeout(initWhenReady, 50);
+          }
+          return;
         }
+
+        // Use MutationObserver to watch for element addition in the root
+        let checkInterval;
+        const observer = new MutationObserver((mutations, obs) => {
+          const face = document.querySelector('.grump2-container .face');
+          if (face) {
+            obs.disconnect();
+            if (checkInterval) clearInterval(checkInterval);
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            resolve({ face, chatMessages, chatInput });
+          }
+        });
+
+        // Start observing the root element (where React mounts)
+        observer.observe(root, {
+          childList: true,
+          subtree: true
+        });
+
+        // Also do periodic checks as fallback (in case MutationObserver misses it)
+        let attempts = 0;
+        const maxAttempts = 200; // 20 seconds at 100ms intervals
+        checkInterval = setInterval(() => {
+          attempts++;
+          const face = document.querySelector('.grump2-container .face');
+          if (face) {
+            clearInterval(checkInterval);
+            observer.disconnect();
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            resolve({ face, chatMessages, chatInput });
+          } else if (attempts >= maxAttempts) {
+            clearInterval(checkInterval);
+            observer.disconnect();
+            console.warn('Grump2: Face element not found after', maxAttempts, 'attempts');
+            reject(new Error('Face element not found'));
+          }
+        }, 100);
       };
-      
-      checkElements();
+
+      initWhenReady();
     });
   };
 
