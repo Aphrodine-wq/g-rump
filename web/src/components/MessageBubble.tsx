@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { motion } from 'framer-motion'
 import MessageSlam, { useCharacterStreaming } from './animations/MessageSlam'
 import { useAnimation } from '../store/AnimationStore'
@@ -21,16 +22,19 @@ export default function MessageBubble({ message, index = 0 }: MessageBubbleProps
 
   console.log('[DEBUG MessageBubble] Rendering message:', { id: message.id, sender: message.sender, content: message.content.substring(0, 50) })
 
+  // Memoize callback to prevent infinite render loop
+  const onCharacterStreamComplete = useCallback(() => {
+    // On complete, trigger screen shake for slam effect
+    if (isGrump && index === 0) {
+      triggerScreenShake(0.3)
+    }
+  }, [isGrump, index, triggerScreenShake])
+
   // Character-by-character streaming for Grump messages
   const { displayedText, isComplete } = useCharacterStreaming(
     isGrump ? message.content : '',
     isGrump ? 30 : 0, // 30ms per character for Grump
-    () => {
-      // On complete, trigger screen shake for slam effect
-      if (isGrump && index === 0) {
-        triggerScreenShake(0.3)
-      }
-    }
+    onCharacterStreamComplete
   )
 
   const textToDisplay = isGrump ? displayedText : message.content
