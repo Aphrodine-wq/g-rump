@@ -1,0 +1,37 @@
+# EAS Build ignore file - reduces upload size
+node_modules/
+.git/
+.expo/
+.expo-shared/
+dist/
+build/
+*.log
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+docs/
+
+# Test files
+**/__tests__/
+**/*.test.*
+**/*.spec.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files that aren't needed for build
+*.pdf
+*.zip
+*.tar.gz
+
+
+

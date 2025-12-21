@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs (Vercel will build these)
+dist/
+build/
+**/dist/
+**/build/
+
+# iOS
+ios/
+
+# Android
+android/
+
+# Mobile
+mobile/
+
+# Backend (not needed for web deployment)
+backend/
+
+# Documentation
+docs/
+
+# Scripts
+scripts/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary
+*.tmp
+*.temp
+.cache/
+
+# PDFs
+*.pdf
+
+# Expo
+.expo/
+.expo-shared/
+web-build/
+
+# EAS
+.eas/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Environment files (Vercel handles these)
+.env
+.env.local
+.env.*.local
+
