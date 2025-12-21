@@ -86,11 +86,11 @@ export default function TemplateGallery({ onNavigateToChat }: TemplateGalleryPro
     <div className="template-gallery">
       {/* Header */}
       <header className="gallery-header">
-        <button className="back-btn">← Back to Chat</button>
+        <button className="back-btn" onClick={() => onNavigate?.('chat')}>← Back to Chat</button>
         <div className="header-right">
-          <button>History</button>
-          <button>Settings</button>
-          <button className="pro-btn">Pro ✨</button>
+          <button onClick={() => onNavigate?.('dashboard')}>Dashboard</button>
+          <button onClick={() => onNavigate?.('settings')}>Settings</button>
+          <button className="pro-btn" onClick={() => onNavigate?.('pricing')}>Pro ✨</button>
         </div>
       </header>
 

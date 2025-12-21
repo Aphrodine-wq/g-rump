@@ -6,7 +6,11 @@ import GrumpAvatarWrapper from './GrumpAvatarWrapper'
 import { useAnimation } from '../store/AnimationStore'
 import './UserDashboard.css'
 
-export default function UserDashboard() {
+interface UserDashboardProps {
+  onNavigate?: (view: 'chat' | 'templates' | 'settings' | 'pricing') => void
+}
+
+export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
   const { transitionToState } = useAnimation()
   const [usage] = useState({ created: 7, limit: 10 })
   const [recentAnimations, setRecentAnimations] = useState<any[]>([])
@@ -67,12 +71,12 @@ export default function UserDashboard() {
       <header className="dashboard-header">
         <div className="header-left">
           <span className="header-title">G-RUMP</span>
-          <button className="header-btn">New Chat</button>
+          <button className="header-btn" onClick={() => onNavigate?.('chat')}>New Chat</button>
         </div>
         <div className="header-right">
-          <button className="header-btn">History</button>
-          <button className="header-btn">Settings</button>
-          <button className="header-btn pro">Pro ✨</button>
+          <button className="header-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
+          <button className="header-btn" onClick={() => onNavigate?.('settings')}>Settings</button>
+          <button className="header-btn pro" onClick={() => onNavigate?.('pricing')}>Pro ✨</button>
         </div>
       </header>
 
@@ -152,17 +156,17 @@ export default function UserDashboard() {
       <div className="quick-actions-section">
         <h2>Quick Actions</h2>
         <div className="actions-grid">
-          <div className="action-card">
+          <div className="action-card" onClick={() => onNavigate?.('chat')} style={{ cursor: 'pointer' }}>
             <div className="action-icon">💬</div>
             <h3>New Chat</h3>
             <p>Start creating with G-Rump</p>
           </div>
-          <div className="action-card">
+          <div className="action-card" onClick={() => onNavigate?.('templates')} style={{ cursor: 'pointer' }}>
             <div className="action-icon">📚</div>
             <h3>Browse Templates</h3>
             <p>Find inspiration from pre-made animations</p>
           </div>
-          <div className="action-card">
+          <div className="action-card" onClick={() => onNavigate?.('chat')} style={{ cursor: 'pointer' }}>
             <div className="action-icon">✨</div>
             <h3>Random Idea</h3>
             <p>Let G-Rump surprise you</p>

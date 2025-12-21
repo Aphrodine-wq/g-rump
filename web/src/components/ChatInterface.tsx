@@ -12,8 +12,12 @@ import AnimationPreview from './AnimationPreview'
 import ExportModal from './ExportModal'
 import './ChatInterface.css'
 
-export default function ChatInterface() {
-  const { messages, isTyping, sendMessage } = useChat()
+interface ChatInterfaceProps {
+  onNavigate?: (view: 'templates' | 'dashboard' | 'settings' | 'pricing' | 'chat') => void
+}
+
+export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
+  const { messages, isTyping, sendMessage, createNewSession } = useChat()
   const { transitionToState } = useAnimation()
   const [messageText, setMessageText] = useState('')
   const [showExportModal, setShowExportModal] = useState(false)
@@ -86,12 +90,13 @@ export default function ChatInterface() {
       <header className="chat-header">
         <div className="header-left">
           <span className="header-title">G-RUMP</span>
-          <button className="header-btn">New Chat</button>
+          <button className="header-btn" onClick={() => createNewSession()}>New Chat</button>
         </div>
         <div className="header-right">
-          <button className="header-btn">History</button>
-          <button className="header-btn">Settings</button>
-          <button className="header-btn pro">Pro ✨</button>
+          <button className="header-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
+          <button className="header-btn" onClick={() => onNavigate?.('dashboard')}>Dashboard</button>
+          <button className="header-btn" onClick={() => onNavigate?.('settings')}>Settings</button>
+          <button className="header-btn pro" onClick={() => onNavigate?.('pricing')}>Pro ✨</button>
         </div>
       </header>
 

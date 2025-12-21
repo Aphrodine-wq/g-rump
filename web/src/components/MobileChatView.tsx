@@ -10,7 +10,11 @@ import AnimationPreview from './AnimationPreview'
 import ExportModal from './ExportModal'
 import './MobileChatView.css'
 
-export default function MobileChatView() {
+interface MobileChatViewProps {
+  onNavigate?: (view: 'templates' | 'dashboard' | 'settings' | 'pricing' | 'chat') => void
+}
+
+export default function MobileChatView({ onNavigate }: MobileChatViewProps = {}) {
   const { messages, isTyping, sendMessage } = useChat()
   const { transitionToState } = useAnimation()
   const [messageText, setMessageText] = useState('')

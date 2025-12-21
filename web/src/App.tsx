@@ -75,9 +75,9 @@ function App() {
                 }}
               />
             )}
-            {currentView === 'dashboard' && <UserDashboard />}
-            {currentView === 'settings' && <SettingsPage />}
-            {currentView === 'pricing' && <PricingPage />}
+            {currentView === 'dashboard' && <UserDashboard onNavigate={(view) => setCurrentView(view)} />}
+            {currentView === 'settings' && <SettingsPage onNavigate={(view) => setCurrentView(view)} />}
+            {currentView === 'pricing' && <PricingPage onNavigate={(view) => setCurrentView(view)} />}
           </div>
         </WorkspaceProvider>
       </AnimationProvider>
@@ -89,11 +89,13 @@ function App() {
 function ChatViewWithTemplate({ 
   isMobile, 
   templatePrompt, 
-  onTemplateSent 
+  onTemplateSent,
+  onNavigate
 }: { 
   isMobile: boolean
   templatePrompt: string | null
   onTemplateSent: () => void
+  onNavigate?: (view: 'templates' | 'dashboard' | 'settings' | 'pricing' | 'chat') => void
 }) {
   const { sendMessage, createNewSession } = useChat()
   
@@ -107,7 +109,7 @@ function ChatViewWithTemplate({
     }
   }, [templatePrompt, sendMessage, createNewSession, onTemplateSent])
   
-  return isMobile ? <MobileChatView /> : <ChatInterface />
+  return isMobile ? <MobileChatView onNavigate={onNavigate} /> : <ChatInterface onNavigate={onNavigate} />
 }
 
 export default App

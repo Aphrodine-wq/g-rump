@@ -5,7 +5,11 @@ import GrumpAvatarWrapper from './GrumpAvatarWrapper'
 import { useAnimation } from '../store/AnimationStore'
 import './PricingPage.css'
 
-export default function PricingPage() {
+interface PricingPageProps {
+  onNavigate?: (view: 'chat' | 'templates' | 'dashboard' | 'settings') => void
+}
+
+export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
   const { transitionToState } = useAnimation()
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly')
 
@@ -97,10 +101,10 @@ export default function PricingPage() {
           <span className="brand-name">G-RUMP</span>
         </div>
         <div className="nav-links">
-          <button className="nav-link-btn" onClick={() => window.location.reload()}>Templates</button>
-          <button className="nav-link-btn" onClick={() => window.location.reload()}>Dashboard</button>
-          <button className="nav-link-btn">Login</button>
-          <button className="nav-link-btn primary">Sign Up</button>
+          <button className="nav-link-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
+          <button className="nav-link-btn" onClick={() => onNavigate?.('dashboard')}>Dashboard</button>
+          <button className="nav-link-btn" onClick={() => onNavigate?.('chat')}>Login</button>
+          <button className="nav-link-btn primary" onClick={() => onNavigate?.('chat')}>Sign Up</button>
         </div>
       </nav>
 
@@ -205,7 +209,7 @@ export default function PricingPage() {
       <section className="pricing-cta">
         <GrumpAvatarWrapper size="medium" />
         <p>"Still thinking? The free tier is right there. I'll be waiting. Judgmentally."</p>
-        <button className="cta-button">Start Free →</button>
+        <button className="cta-button" onClick={() => onNavigate?.('chat')}>Start Free →</button>
       </section>
 
       {/* Footer */}

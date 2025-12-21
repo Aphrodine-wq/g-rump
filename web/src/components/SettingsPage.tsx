@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react'
 import { useAnimation } from '../store/AnimationStore'
 import './SettingsPage.css'
 
-export default function SettingsPage() {
+interface SettingsPageProps {
+  onNavigate?: (view: 'chat' | 'templates' | 'dashboard' | 'pricing') => void
+}
+
+export default function SettingsPage({ onNavigate }: SettingsPageProps = {}) {
   const { transitionToState } = useAnimation()
   const [sassLevel, setSassLevel] = useState(5)
   const [responseStyle, setResponseStyle] = useState('standard')
@@ -28,7 +32,7 @@ export default function SettingsPage() {
     <div className="settings-page">
       {/* Header */}
       <header className="settings-header">
-        <button className="back-btn">← Back</button>
+        <button className="back-btn" onClick={() => onNavigate?.('chat')}>← Back</button>
         <h1>Settings</h1>
       </header>
 
@@ -48,7 +52,7 @@ export default function SettingsPage() {
               <div className="account-plan">
                 <p>Plan: <strong>FREE</strong></p>
                 <p>Animations today: 7/10</p>
-                <button className="upgrade-btn">Upgrade to Pro →</button>
+                <button className="upgrade-btn" onClick={() => onNavigate?.('pricing')}>Upgrade to Pro →</button>
               </div>
             </div>
             <div className="account-actions">
