@@ -41,6 +41,11 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
@@ -49,6 +54,8 @@ body {
   background: #ffffff;
   color: #1a1a1a;
   overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
   /* Optimize for 200fps animations */
   transform: translateZ(0);
   will-change: scroll-position;
@@ -56,8 +63,9 @@ body {
 }
 
 #root {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 

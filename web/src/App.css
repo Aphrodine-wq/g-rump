@@ -5,6 +5,8 @@
   min-height: 100vh;
   background: #ffffff;
   color: #1a1a1a;
+  overflow-y: auto;
+  overflow-x: hidden;
   /* Optimize for 200fps */
   transform: translateZ(0);
   will-change: contents;

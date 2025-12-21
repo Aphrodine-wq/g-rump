@@ -3,7 +3,8 @@
 .mobile-chat-view {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
   height: 100dvh; /* Dynamic viewport height for mobile */
   background: #ffffff;
   color: #1a1a1a;
