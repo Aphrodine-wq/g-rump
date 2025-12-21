@@ -35,8 +35,9 @@ export default function GrumpAvatarWrapper({
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [updateEyeTracking])
 
-  // Map existing state to new avatar format
-  const mappedState = {
+  // Map existing state to new avatar format - ensure all required AnimationState fields are present
+  const mappedState: any = {
+    ...state, // Include all existing state properties
     glowColor: customState?.glowColor || state.glowColor || 'soft',
     glowIntensity: customState?.glowIntensity ?? state.glowIntensity ?? 0.3,
     glowPulseRate: state.glowPulseRate || 1,

@@ -30,9 +30,17 @@ class StoreKitService: ObservableObject {
     }
     
     // Product IDs - MUST match what you configure in App Store Connect
-    // TODO: Replace "yourname" with your actual bundle identifier prefix
+    // IMPORTANT: Replace "yourname" with your actual bundle identifier prefix before submitting to App Store
+    // 
+    // Steps to configure:
+    // 1. In Xcode, check your Bundle Identifier (e.g., com.walt.grump)
+    // 2. In App Store Connect, create subscription products with matching IDs
+    // 3. Update these productIds to match your Bundle Identifier prefix
+    // 
     // Example: If your bundle ID is com.walt.grump, use:
     // "com.walt.grump.basic.monthly"
+    // "com.walt.grump.pro.monthly"
+    // "com.walt.grump.premium.monthly"
     private let productIds = [
         "com.yourname.grump.basic.monthly",      // Basic subscription - $9.99/month
         "com.yourname.grump.pro.monthly",        // Pro subscription - $19.99/month

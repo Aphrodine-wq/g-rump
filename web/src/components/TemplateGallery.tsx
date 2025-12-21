@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import GrumpAvatarWrapper from './GrumpAvatarWrapper'
 import { useAnimation } from '../store/AnimationStore'
+import { useChat } from '../store/ChatStore'
 import './TemplateGallery.css'
 
 interface Template {
@@ -44,8 +45,13 @@ const categories = [
   { id: 'shapes', name: 'Shapes' },
 ]
 
-export default function TemplateGallery() {
+interface TemplateGalleryProps {
+  onNavigateToChat?: (templatePrompt?: string) => void
+}
+
+export default function TemplateGallery({ onNavigateToChat }: TemplateGalleryProps) {
   const { transitionToState } = useAnimation()
+  const { createNewSession, sendMessage } = useChat()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -59,9 +65,21 @@ export default function TemplateGallery() {
     return matchesCategory && matchesSearch
   })
 
-  const handleUseTemplate = (template: Template) => {
-    // TODO: Navigate to chat with template pre-loaded
-    console.log('Using template:', template)
+  const handleUseTemplate = async (template: Template) => {
+    // Create a prompt based on the template
+    const templatePrompt = `Create a ${template.name.toLowerCase()} animation`
+    
+    // Navigate to chat and send template prompt
+    if (onNavigateToChat) {
+      onNavigateToChat(templatePrompt)
+    } else {
+      // Fallback: create new session and send message
+      createNewSession()
+      // Small delay to ensure session is created
+      setTimeout(() => {
+        sendMessage(templatePrompt)
+      }, 100)
+    }
   }
 
   return (

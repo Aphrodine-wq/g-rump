@@ -405,7 +405,7 @@ export default function GrumpWorkspace({
           )}
 
           {/* DONE STATE - Animation display */}
-          {status === 'done' && animation?.frames?.length > 0 && animation && (
+          {status === 'done' && animation && animation.frames && animation.frames.length > 0 && (
             <div className="absolute inset-0 flex items-center justify-center">
               {/* Onion skin - previous frames */}
               {showOnionSkin && [...Array(onionSkinFrames)].map((_, i) => {
@@ -477,7 +477,7 @@ export default function GrumpWorkspace({
       </div>
 
       {/* Playback Controls */}
-      {status === 'done' && animation?.frames?.length > 0 && animation && (
+      {status === 'done' && animation && animation.frames && animation.frames.length > 0 && (
         <div className="border-t border-white/30 bg-white/20">
           {/* Timeline scrubber with thumbnails */}
           <div className="px-4 py-3 border-b border-white/20">

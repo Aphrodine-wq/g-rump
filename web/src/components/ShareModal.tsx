@@ -1,8 +1,10 @@
 // Share/Embed Modal - Share animations with others
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import GrumpAvatarWrapper from './GrumpAvatarWrapper'
-import { useAnimation } from '../store/AnimationStore'
+import { useToast } from '../hooks/useToast'
+import { generateQRCode, downloadQRCode } from '../utils/qrCode'
+import Toast from './Toast'
 import './ShareModal.css'
 
 interface ShareModalProps {
@@ -17,9 +19,17 @@ export default function ShareModal({ animationId, animationName, onClose }: Shar
   const [autoPlay, setAutoPlay] = useState(true)
   const [loopAnimation, setLoopAnimation] = useState(true)
   const [showControls, setShowControls] = useState(false)
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('')
+  const { toasts, showToast, removeToast } = useToast()
 
   const previewUrl = `https://grump.ai/a/${animationId}`
   const embedCode = `<iframe src="https://grump.ai/embed/${animationId}" width="${embedSize === 'small' ? '300' : embedSize === 'medium' ? '400' : '600'}" height="${embedSize === 'small' ? '200' : embedSize === 'medium' ? '300' : '400'}" frameborder="0"></iframe>`
+
+  useEffect(() => {
+    // Generate QR code on mount
+    const qrData = generateQRCode(previewUrl, 200)
+    setQrCodeDataUrl(qrData)
+  }, [previewUrl])
 
   const shareLinks = [
     { name: 'Twitter', icon: '𝕏', url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(previewUrl)}&text=${encodeURIComponent(`Check out this animation made with G-Rump: ${animationName}`)}` },
@@ -31,8 +41,14 @@ export default function ShareModal({ animationId, animationName, onClose }: Shar
 
   const handleCopy = (text: string, type: string) => {
     navigator.clipboard.writeText(text)
-    // TODO: Show toast notification
-    console.log(`Copied ${type} to clipboard`)
+    showToast(`${type} copied to clipboard!`, 'success')
+  }
+
+  const handleDownloadQR = () => {
+    if (qrCodeDataUrl) {
+      downloadQRCode(qrCodeDataUrl, `grump-${animationId}-qr.png`)
+      showToast('QR code downloaded!', 'success')
+    }
   }
 
   return (
@@ -180,23 +196,38 @@ export default function ShareModal({ animationId, animationName, onClose }: Shar
         <div className="share-section">
           <h3>QR Code</h3>
           <div className="qr-container">
-            <div className="qr-code-placeholder">
-              {/* TODO: Generate actual QR code */}
-              <div className="qr-pattern">
-                <div className="qr-square"></div>
-                <div className="qr-square"></div>
-                <div className="qr-square"></div>
-                <div className="qr-square"></div>
-                <div className="qr-square"></div>
-                <div className="qr-square"></div>
-                <div className="qr-square"></div>
-                <div className="qr-square"></div>
-                <div className="qr-square"></div>
+            {qrCodeDataUrl ? (
+              <img src={qrCodeDataUrl} alt="QR Code" className="qr-code-image" />
+            ) : (
+              <div className="qr-code-placeholder">
+                <div className="qr-pattern">
+                  <div className="qr-square"></div>
+                  <div className="qr-square"></div>
+                  <div className="qr-square"></div>
+                  <div className="qr-square"></div>
+                  <div className="qr-square"></div>
+                  <div className="qr-square"></div>
+                  <div className="qr-square"></div>
+                  <div className="qr-square"></div>
+                  <div className="qr-square"></div>
+                </div>
               </div>
-            </div>
-            <button className="download-qr-btn">Download QR</button>
+            )}
+            <button className="download-qr-btn" onClick={handleDownloadQR}>Download QR</button>
           </div>
         </div>
+      </div>
+      
+      {/* Toast Notifications */}
+      <div className="toast-container">
+        {toasts.map(toast => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => removeToast(toast.id)}
+          />
+        ))}
       </div>
     </div>
   )

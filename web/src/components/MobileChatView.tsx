@@ -16,7 +16,7 @@ export default function MobileChatView() {
   const [messageText, setMessageText] = useState('')
   const [showPreview, setShowPreview] = useState(false)
   const [showExport, setShowExport] = useState(false)
-  const [currentAnimation, setCurrentAnimation] = useState<any>(null)
+  const [currentAnimation] = useState<any>(null)
 
   const handleSend = async () => {
     if (!messageText.trim()) return

@@ -16,13 +16,36 @@ export default function UserDashboard() {
     const loadHistory = async () => {
       try {
         const history = await animationApi.getHistory(4, 0)
-        setRecentAnimations(history.map(anim => ({
-          id: anim.id,
-          name: anim.prompt.substring(0, 30) + (anim.prompt.length > 30 ? '...' : ''),
-          date: new Date(anim.createdAt).toLocaleDateString(),
-          icon: '◠◡◠', // TODO: Get actual animation preview
-          animation: anim
-        })))
+        setRecentAnimations(history.map(anim => {
+          // Determine icon based on animation type/prompt
+          let icon = '◠◡◠' // default
+          const promptLower = anim.prompt.toLowerCase()
+          if (promptLower.includes('loading') || promptLower.includes('spinner')) {
+            icon = '⟳'
+          } else if (promptLower.includes('button') || promptLower.includes('hover')) {
+            icon = '┌─────┐'
+          } else if (promptLower.includes('logo') || promptLower.includes('reveal')) {
+            icon = '◇'
+          } else if (promptLower.includes('heart') || promptLower.includes('like')) {
+            icon = '♥'
+          } else if (promptLower.includes('star') || promptLower.includes('burst')) {
+            icon = '★'
+          } else if (promptLower.includes('coin') || promptLower.includes('collect')) {
+            icon = '✦'
+          } else if (promptLower.includes('run') || promptLower.includes('walk')) {
+            icon = '🏃'
+          } else if (promptLower.includes('progress') || promptLower.includes('bar')) {
+            icon = '████'
+          }
+          
+          return {
+            id: anim.id,
+            name: anim.prompt.substring(0, 30) + (anim.prompt.length > 30 ? '...' : ''),
+            date: new Date(anim.createdAt).toLocaleDateString(),
+            icon: icon,
+            animation: anim
+          }
+        }))
       } catch (error) {
         console.error('Failed to load animation history:', error)
         // Fallback to empty array

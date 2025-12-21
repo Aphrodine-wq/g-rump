@@ -1,7 +1,7 @@
 // Main App - New White Design with Landing Page and Chat Interface
 
 import { useState, useEffect } from 'react'
-import { ChatProvider } from './store/ChatStore'
+import { ChatProvider, useChat } from './store/ChatStore'
 import { AnimationProvider } from './store/AnimationStore'
 import { WorkspaceProvider } from './store/WorkspaceStore'
 import LandingPage from './components/LandingPage'
@@ -22,6 +22,7 @@ function App() {
     return hasOnboarded ? 'landing' : 'onboarding'
   })
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+  const [pendingTemplatePrompt, setPendingTemplatePrompt] = useState<string | null>(null)
 
   useEffect(() => {
     const handleResize = () => {
@@ -59,9 +60,20 @@ function App() {
               />
             )}
             {currentView === 'chat' && (
-              isMobile ? <MobileChatView /> : <ChatInterface />
+              <ChatViewWithTemplate 
+                isMobile={isMobile}
+                templatePrompt={pendingTemplatePrompt}
+                onTemplateSent={() => setPendingTemplatePrompt(null)}
+              />
             )}
-            {currentView === 'templates' && <TemplateGallery />}
+            {currentView === 'templates' && (
+              <TemplateGallery 
+                onNavigateToChat={(templatePrompt) => {
+                  setPendingTemplatePrompt(templatePrompt || null)
+                  setCurrentView('chat')
+                }}
+              />
+            )}
             {currentView === 'dashboard' && <UserDashboard />}
             {currentView === 'settings' && <SettingsPage />}
             {currentView === 'pricing' && <PricingPage />}
@@ -70,6 +82,31 @@ function App() {
       </AnimationProvider>
     </ChatProvider>
   )
+}
+
+// Helper component to handle template prompts
+function ChatViewWithTemplate({ 
+  isMobile, 
+  templatePrompt, 
+  onTemplateSent 
+}: { 
+  isMobile: boolean
+  templatePrompt: string | null
+  onTemplateSent: () => void
+}) {
+  const { sendMessage, createNewSession } = useChat()
+  
+  useEffect(() => {
+    if (templatePrompt) {
+      createNewSession()
+      setTimeout(() => {
+        sendMessage(templatePrompt)
+        onTemplateSent()
+      }, 200)
+    }
+  }, [templatePrompt, sendMessage, createNewSession, onTemplateSent])
+  
+  return isMobile ? <MobileChatView /> : <ChatInterface />
 }
 
 export default App

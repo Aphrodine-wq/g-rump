@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { animationApi } from '../services/animationApi'
 import GrumpAvatarWrapper from './GrumpAvatarWrapper'
-import { useAnimation } from '../store/AnimationStore'
 import './ExportModal.css'
 
 interface ExportModalProps {

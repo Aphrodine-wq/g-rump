@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useChat } from '../store/ChatStore'
 import './ChatHistoryView.css'
 import { logger } from '../utils/logger'
 
@@ -15,6 +16,7 @@ interface ChatSession {
 
 export default function ChatHistoryView() {
   const [sessions, setSessions] = useState<ChatSession[]>([])
+  const { loadSession } = useChat()
 
   useEffect(() => {
     // Load sessions from localStorage
@@ -66,12 +68,11 @@ export default function ChatHistoryView() {
     return session.messages[session.messages.length - 1].content
   }
 
-  const handleSessionClick = (_session: ChatSession) => {
+  const handleSessionClick = (session: ChatSession) => {
     // Load session messages into chat
-    // This would require updating the ChatStore to accept a session
-    // For now, we'll show a message and the user can manually switch to chat tab
-    // In a full implementation, you'd dispatch an action to load this session
-    // TODO: Implement session loading functionality
+    loadSession(session.messages)
+    // Optionally navigate to chat view (if using routing)
+    // For now, the parent component should handle navigation
   }
 
   if (sessions.length === 0) {

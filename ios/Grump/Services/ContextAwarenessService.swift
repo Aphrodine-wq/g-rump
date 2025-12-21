@@ -40,7 +40,7 @@ class ContextAwarenessService: ObservableObject {
         }
         
         if lowerMessage.contains("but") && conversationHistory.count > 0 {
-            // User is dismissing advice
+            // User is dismissing advice - increment counter and trigger annoyed state
             adviceIgnored += 1
             if adviceIgnored > 0 {
                 return .annoyed

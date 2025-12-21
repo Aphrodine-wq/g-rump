@@ -18,6 +18,7 @@ interface ChatContextType {
   errorMessage: string | null
   sendMessage: (content: string) => Promise<void>
   createNewSession: () => void
+  loadSession: (sessionMessages: Message[]) => void
   retryLastMessage: () => Promise<void>
   clearError: () => void
 }
@@ -165,6 +166,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     setErrorMessage(null)
   }, [])
 
+  const loadSession = useCallback((sessionMessages: Message[]) => {
+    setMessages(sessionMessages)
+    setErrorMessage(null)
+  }, [])
+
   const retryLastMessage = useCallback(async () => {
     if (lastFailedMessage) {
       await sendMessage(lastFailedMessage)
@@ -210,9 +216,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     errorMessage,
     sendMessage,
     createNewSession,
+    loadSession,
     retryLastMessage,
     clearError
-  }), [messages, isTyping, errorMessage, sendMessage, createNewSession, retryLastMessage, clearError])
+  }), [messages, isTyping, errorMessage, sendMessage, createNewSession, loadSession, retryLastMessage, clearError])
   
   return (
     <ChatContext.Provider value={contextValue}>

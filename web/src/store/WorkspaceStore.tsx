@@ -58,9 +58,31 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const exportAnimation = useCallback(() => {
-    // TODO: Implement export functionality
-    console.log('Export animation:', state.animation)
-    // Could trigger download, copy to clipboard, etc.
+    if (!state.animation) {
+      console.warn('No animation to export')
+      return
+    }
+    
+    // Export animation data as JSON
+    const animationData = {
+      name: state.animation.name || 'Untitled Animation',
+      frames: state.animation.frames.length,
+      fps: state.animation.fps || 60,
+      data: state.animation
+    }
+    
+    const dataStr = JSON.stringify(animationData, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${animationData.name.replace(/\s+/g, '-').toLowerCase()}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    
+    console.log('Animation exported:', animationData.name)
   }, [state.animation])
 
   const contextValue = useMemo(() => ({

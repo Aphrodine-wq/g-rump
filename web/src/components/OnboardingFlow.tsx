@@ -63,9 +63,9 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
             <div className="step-footer">
               <div className="step-indicators">
-                <span className={`indicator ${currentStep === 1 ? 'active' : ''}`} />
-                <span className={`indicator ${currentStep === 2 ? 'active' : ''}`} />
-                <span className={`indicator ${currentStep === 3 ? 'active' : ''}`} />
+                <span className={`indicator ${currentStep === 1 as number ? 'active' : ''}`} />
+                <span className={`indicator ${currentStep === 2 as number ? 'active' : ''}`} />
+                <span className={`indicator ${currentStep === 3 as number ? 'active' : ''}`} />
               </div>
               <button className="step-button" onClick={handleNext}>
                 Next →
@@ -115,9 +115,9 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
             <div className="step-footer">
               <div className="step-indicators">
-                <span className={`indicator ${currentStep === 1 ? 'active' : ''}`} />
-                <span className={`indicator ${currentStep === 2 ? 'active' : ''}`} />
-                <span className={`indicator ${currentStep === 3 ? 'active' : ''}`} />
+                <span className={`indicator ${currentStep === 1 as number ? 'active' : ''}`} />
+                <span className={`indicator ${currentStep === 2 as number ? 'active' : ''}`} />
+                <span className={`indicator ${currentStep === 3 as number ? 'active' : ''}`} />
               </div>
               <button className="step-button" onClick={handleNext}>
                 Let's Go →
@@ -155,9 +155,9 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
             <div className="step-footer">
               <div className="step-indicators">
-                <span className={`indicator ${currentStep === 1 ? 'active' : ''}`} />
-                <span className={`indicator ${currentStep === 2 ? 'active' : ''}`} />
-                <span className={`indicator ${currentStep === 3 ? 'active' : ''}`} />
+                <span className={`indicator ${currentStep === 1 as number ? 'active' : ''}`} />
+                <span className={`indicator ${currentStep === 2 as number ? 'active' : ''}`} />
+                <span className={`indicator ${currentStep === 3 as number ? 'active' : ''}`} />
               </div>
               <div className="step-actions">
                 <button className="step-button secondary" onClick={handleSkip}>
