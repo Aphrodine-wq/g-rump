@@ -36,7 +36,6 @@ export default function GameDevWorkspace({
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [zoom, setZoom] = useState(1)
   const [showGrid, setShowGrid] = useState(true)
-  const [fps] = useState(60)
   const [showStats, setShowStats] = useState(true)
   const [compiledGameHtml, setCompiledGameHtml] = useState<string | null>(null)
   const [savedProjects, setSavedProjects] = useState<Array<{id: string, name: string, code: string, updatedAt: Date}>>([])
@@ -45,8 +44,6 @@ export default function GameDevWorkspace({
   const previewCanvasRef = useRef<HTMLCanvasElement>(null)
   const previewIframeRef = useRef<HTMLIFrameElement>(null)
   const codeEditorRef = useRef<HTMLTextAreaElement>(null)
-  const gameLoopRef = useRef<number | null>(null)
-  const lastFrameTimeRef = useRef<number>(0)
 
   // Parse entities from code
   useEffect(() => {
@@ -215,29 +212,6 @@ export default function GameDevWorkspace({
     })
   }
 
-  // Keyboard shortcuts
-  useKeyboardShortcuts({
-    onSave: () => {
-      if (code && projectName) {
-        saveProjectToLocalStorage()
-        alert('Project saved!')
-      } else {
-        setShowSaveDialog(true)
-      }
-    },
-    onCompile: handleCompile,
-    onRun: handleRun,
-    onExport: handleExport,
-    onNew: () => {
-      if (confirm('Start a new project? Unsaved changes will be lost.')) {
-        setCode(getDefaultGameCode())
-        setProjectName('My Game')
-        setCompiledGameHtml(null)
-      }
-    },
-    enabled: selectedTab === 'code'
-  })
-
   const handleExport = async () => {
     if (!compiledGameHtml) {
       // Compile first if not already compiled
@@ -263,6 +237,29 @@ export default function GameDevWorkspace({
       onExport(code, targetPlatform)
     }
   }
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onSave: () => {
+      if (code && projectName) {
+        saveProjectToLocalStorage()
+        alert('Project saved!')
+      } else {
+        setShowSaveDialog(true)
+      }
+    },
+    onCompile: handleCompile,
+    onRun: handleRun,
+    onExport: handleExport,
+    onNew: () => {
+      if (confirm('Start a new project? Unsaved changes will be lost.')) {
+        setCode(getDefaultGameCode())
+        setProjectName('My Game')
+        setCompiledGameHtml(null)
+      }
+    },
+    enabled: selectedTab === 'code'
+  })
 
   return (
     <div className="game-dev-workspace">
@@ -427,7 +424,7 @@ export default function GameDevWorkspace({
                   </div>
                 </div>
                 <div className="gamedev-code-wrapper">
-                  <pre className="gamedev-code-preview" dangerouslySetInnerHTML={{ __html: highlightCode(code) }} />
+                  <pre className="gamedev-code-preview">{code}</pre>
                   <textarea
                     ref={codeEditorRef}
                     value={code}
@@ -854,66 +851,5 @@ function parseEntities(code: string): Entity[] {
   }
 
   return entities
-}
-
-function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-  ctx.lineWidth = 1
-
-  const gridSize = 20
-  for (let x = 0; x <= width; x += gridSize) {
-    ctx.beginPath()
-    ctx.moveTo(x, 0)
-    ctx.lineTo(x, height)
-    ctx.stroke()
-  }
-
-  for (let y = 0; y <= height; y += gridSize) {
-    ctx.beginPath()
-    ctx.moveTo(0, y)
-    ctx.lineTo(width, y)
-    ctx.stroke()
-  }
-}
-
-function drawPlaceholderGame(ctx: CanvasRenderingContext2D, width: number, height: number, _delta: number) {
-  // Draw a simple placeholder game
-  const centerX = width / 2
-  const centerY = height / 2
-  const time = Date.now() / 1000
-
-  // Draw player circle
-  ctx.fillStyle = '#4ade80'
-  ctx.beginPath()
-  ctx.arc(centerX, centerY + Math.sin(time * 2) * 20, 20, 0, Math.PI * 2)
-  ctx.fill()
-
-  // Draw some particles
-  for (let i = 0; i < 10; i++) {
-    const angle = (time + i) * 0.5
-    const radius = 100 + Math.sin(time + i) * 20
-    const x = centerX + Math.cos(angle) * radius
-    const y = centerY + Math.sin(angle) * radius
-    
-    ctx.fillStyle = `rgba(96, 165, 250, ${0.5 + Math.sin(time + i) * 0.3})`
-    ctx.beginPath()
-    ctx.arc(x, y, 4, 0, Math.PI * 2)
-    ctx.fill()
-  }
-}
-
-function drawStats(ctx: CanvasRenderingContext2D, delta: number, targetFps: number) {
-  const actualFps = Math.round(1 / delta)
-  const x = 10
-  let y = 20
-
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
-  ctx.fillRect(x - 5, y - 15, 150, 50)
-
-  ctx.fillStyle = '#ffffff'
-  ctx.font = '12px monospace'
-  ctx.fillText(`FPS: ${actualFps} / ${targetFps}`, x, y)
-  ctx.fillText(`Delta: ${(delta * 1000).toFixed(2)}ms`, x, y + 15)
-  ctx.fillText(`Entities: 0`, x, y + 30)
 }
 

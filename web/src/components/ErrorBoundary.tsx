@@ -1,7 +1,7 @@
 // Error Boundary Component
 // Catches React errors and displays fallback UI
 
-import React, { Component, ErrorInfo, ReactNode } from 'react'
+import { Component, ErrorInfo, ReactNode } from 'react'
 import './ErrorBoundary.css'
 
 interface Props {
@@ -67,7 +67,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             </div>
             <h2>Something went wrong</h2>
             <p>Grump is having technical difficulties. Don't worry, it's not your fault.</p>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.MODE === 'development' && this.state.error && (
               <details className="error-boundary-details">
                 <summary>Error Details (Development Only)</summary>
                 <pre>{this.state.error.toString()}</pre>
