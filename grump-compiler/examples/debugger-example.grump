@@ -1,0 +1,45 @@
+// Example: Debugger Integration in G-Rump
+
+entity Player {
+    health: int = 100
+    score: int = 0
+    position: vec2 = (0, 0)
+    
+    fn take_damage(amount: int) {
+        debugger.watch(health)
+        debugger.log("Player taking damage: {amount}")
+        
+        health -= amount
+        
+        debugger.assert(health >= 0, "Health should never be negative")
+        
+        if health <= 0 {
+            debugger.break()
+            // Game over logic
+        }
+    }
+    
+    fn update() {
+        debugger.trace(update)
+        
+        // Update logic
+        position.x += velocity.x * delta
+        position.y += velocity.y * delta
+        
+        debugger.watch(position)
+    }
+}
+
+scene Game {
+    on enter {
+        debugger.log("Game started")
+    }
+    
+    on update {
+        if score > 1000 {
+            debugger.break()
+            // Achievement unlocked
+        }
+    }
+}
+

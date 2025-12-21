@@ -1,0 +1,48 @@
+// Example: Plugin System in G-Rump
+
+plugin physics_2d {
+    version: "1.0.0"
+    path: "./plugins/physics-2d"
+    dependencies: ["grump-core"]
+    exports: ["PhysicsBody", "Collision", "World"]
+}
+
+plugin ui_kit {
+    version: "2.1.0"
+    url: "https://plugins.grump.dev/ui-kit"
+    dependencies: ["grump-core"]
+    exports: ["Button", "Slider", "Dialog"]
+}
+
+// Use plugins
+use physics_2d::{PhysicsBody, Collision, World}
+use ui_kit::{Button, Slider}
+
+entity Player {
+    physics: PhysicsBody {
+        mass: 1.0
+        shape: circle(16)
+    }
+    
+    on collision(other: Entity) {
+        if other.has_component(Collision) {
+            // Handle collision
+        }
+    }
+}
+
+scene Menu {
+    button: Button {
+        text: "Start Game"
+        on tap {
+            transition(GameScene)
+        }
+    }
+    
+    volume_slider: Slider {
+        min: 0.0
+        max: 1.0
+        value: 0.7
+    }
+}
+

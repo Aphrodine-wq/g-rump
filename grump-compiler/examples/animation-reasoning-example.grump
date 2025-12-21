@@ -1,0 +1,194 @@
+// Example: Animation Reasoning in G-Rump
+// 
+// This demonstrates the six-layer animation reasoning system
+// that produces human-trusted animation.
+
+entity GrumpCharacter {
+    // Layer 1: Narrative Intent
+    intent "Communicate annoyance without hostility" {
+        primary: "Show mild frustration with user's question"
+        secondary: [
+            "Maintain likability",
+            "Avoid aggression",
+            "Stay in character"
+        ]
+        forbidden: [
+            "Anger",
+            "Hostility",
+            "Sarcasm",
+            "Playfulness"
+        ]
+        emotion: annoyed
+        intensity: 0.6
+    }
+    
+    // Layer 2: Attention Hierarchy
+    hierarchy {
+        leader: eyes
+        secondary: [brows, head]
+        tertiary: [body]
+        still: [limbs, accessories]
+    }
+    
+    // Layer 3: Beat Structure
+    beats {
+        // Beat 1: Anticipation (stillness creates contrast)
+        beat "anticipation" {
+            duration: 0.08s
+            stillness: true
+            priority: 10
+        }
+        
+        // Beat 2: Eye roll (leader moves first)
+        beat "eye_roll" {
+            driver: eyes
+            duration: 0.12s
+            ease: fast_out
+            priority: 10
+        }
+        
+        // Beat 3: Brows follow (secondary, with delay)
+        beat "brow_follow" {
+            driver: brows
+            delay: 0.02s
+            duration: 0.15s
+            ease: heavy
+            priority: 7
+        }
+        
+        // Beat 4: Head acknowledgment
+        beat "head_tilt" {
+            driver: head
+            delay: 0.06s
+            duration: 0.22s
+            ease: heavy
+            priority: 7
+        }
+        
+        // Beat 5: Recovery (slower than action)
+        beat "recovery" {
+            duration: 0.6s
+            ease: smooth
+            priority: 5
+        }
+    }
+    
+    // Layer 4: Causal Chains
+    causality {
+        // Eye roll causes brow movement
+        eye_roll → brows {
+            delay: 0.02s
+            strength: 0.6
+        }
+        
+        // Head tilt causes subtle body shift
+        head_tilt → body {
+            delay: 0.05s
+            strength: 0.3
+        }
+        
+        // Emotion change drives brows
+        emotion_change → brows {
+            delay: 0.08s
+            strength: 0.8
+        }
+    }
+    
+    // Layer 5: Temporal Relationships
+    timing {
+        eye_movement: 120ms
+        head_lag: 60ms
+        body_lag: 120ms
+        emotion_start_speed: 1.5x
+        recovery_speed: 0.6x
+    }
+    
+    // Layer 6: Settling & Residue
+    settling {
+        overshoot: 0.05
+        asymmetry: 0.15
+        delayed_stop: 30ms
+        micro_settles: [
+            {
+                target: head
+                delay: 50ms
+                duration: 200ms
+                amount: 0.1
+            }
+        ]
+    }
+}
+
+// The compiler reasons through all layers and generates:
+// - Proper timing
+// - Causal relationships
+// - Beat structure
+// - Validation against heuristics
+// - Final animation code
+
+// Example: Thinking animation
+entity GrumpCharacter {
+    intent "Show deep thought process" {
+        primary: "Indicate active thinking"
+        emotion: thinking
+        intensity: 0.4
+    }
+    
+    hierarchy {
+        leader: eyes
+        secondary: [head]
+        still: [body, limbs]
+    }
+    
+    beats {
+        beat "pause" {
+            duration: 0.15s
+            stillness: true
+        }
+        beat "eye_movement" {
+            driver: eyes
+            duration: 0.3s
+            ease: smooth
+        }
+        beat "head_nod" {
+            driver: head
+            delay: 0.1s
+            duration: 0.2s
+            ease: smooth
+        }
+    }
+}
+
+// Example: Happy animation
+entity GrumpCharacter {
+    intent "Show genuine happiness" {
+        primary: "Express joy"
+        forbidden: ["Sarcasm", "Mockery"]
+        emotion: happy
+        intensity: 0.8
+    }
+    
+    hierarchy {
+        leader: eyes
+        secondary: [brows, head, body]
+        still: []
+    }
+    
+    beats {
+        beat "anticipation" {
+            duration: 0.06s
+        }
+        beat "eye_brighten" {
+            driver: eyes
+            duration: 0.2s
+            ease: bounce
+        }
+        beat "smile" {
+            driver: brows
+            delay: 0.05s
+            duration: 0.3s
+            ease: light
+        }
+    }
+}
+

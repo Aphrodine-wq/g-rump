@@ -1,17 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Instrument+Serif:ital,wght@0,400;1,400&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  /* Light theme (default) */
+  /* White theme (default) */
   --bg: #ffffff;
   --bg-rgb: 255, 255, 255;
-  --fg: #000000;
-  --fg-rgb: 0, 0, 0;
-  --subtle: #f5f5f5;
-  --muted: #999999;
+  --fg: #1a1a1a;
+  --fg-rgb: 26, 26, 26;
+  --subtle: #fafafa;
+  --muted: #9ca3af;
   --border: #e5e5e5;
-  --accent: #000000;
-  --accent-rgb: 0, 0, 0;
-  --error: #ff4444;
+  --accent: #3b82f6;
+  --accent-rgb: 59, 130, 246;
+  --error: #ef4444;
+  
+  /* 200fps animation settings */
+  --animation-frame-time: 5ms; /* 200fps = 5ms per frame */
 }
 
 [data-theme="dark"] {
@@ -36,13 +43,16 @@
 
 body {
   margin: 0;
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--bg);
-  color: var(--fg);
-  overflow: hidden;
-  transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+  color: #1a1a1a;
+  overflow-x: hidden;
+  /* Optimize for 200fps animations */
+  transform: translateZ(0);
+  will-change: scroll-position;
+  backface-visibility: hidden;
 }
 
 #root {

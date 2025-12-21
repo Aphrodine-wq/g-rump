@@ -68,6 +68,16 @@ async function startServer() {
     console.warn('⚠️  Could not initialize knowledge base:', error.message);
   }
   
+  // Register animation routes (G-Rump AI)
+  try {
+    const animationRoutes = await import('../grump-ai/backend/routes/animation.js');
+    app.use('/api/animation', animationRoutes.default);
+    console.log('✓ Animation routes registered at /api/animation');
+  } catch (error) {
+    console.warn('⚠️  Could not load animation routes:', error.message);
+    console.warn('   Animation features will be limited');
+  }
+  
   app.listen(PORT, () => {
     console.log(`\n🚀 Grump backend server running on port ${PORT}`);
     console.log(`Environment: ${config.nodeEnv}`);

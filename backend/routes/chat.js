@@ -2,6 +2,7 @@ import express from 'express';
 import { getGrumpResponse } from '../services/anthropic.js';
 import { chatRateLimiter } from '../middleware/rateLimit.js';
 import { getRelevantPDFContent, createPDFContextMessage, listPDFs } from '../services/pdfService.js';
+import { detectLanguage, getLanguageName, isLanguageSupported } from '../utils/languageDetector.js';
 
 const router = express.Router();
 
@@ -48,6 +49,17 @@ router.post('/', chatRateLimiter, async (req, res, next) => {
     const pdfContent = await getRelevantPDFContent(message);
     if (pdfContent) {
       enhancedMessage = message + createPDFContextMessage(pdfContent);
+    }
+
+    // Detect programming language if user is asking for code
+    // This helps Grump provide language-specific context
+    const detectedLanguage = detectLanguage(message);
+    if (detectedLanguage && isLanguageSupported(detectedLanguage)) {
+      // Add subtle language context hint (Grump will use this naturally)
+      // Don't be too explicit - let Grump's knowledge base handle it
+      const languageName = getLanguageName(detectedLanguage);
+      // The knowledge base already contains language info, so we just log it for debugging
+      console.log(`[Language Detection] Detected: ${languageName} (${detectedLanguage})`);
     }
 
     // Fully optimized: Limit conversation history to last 5 messages to maximize cost savings (~40-50% reduction)

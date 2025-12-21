@@ -1,0 +1,10 @@
+{
+  "name": "grump-ai-backend",
+  "version": "1.0.0",
+  "description": "G-Rump AI animation service backend",
+  "type": "module",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}
+

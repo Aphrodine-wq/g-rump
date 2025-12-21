@@ -1,0 +1,45 @@
+// Example: Behavior Tree AI in G-Rump
+
+behavior_tree enemy_ai {
+    selector {
+        // Priority 1: Attack if player is in range
+        sequence {
+            condition: distance(player, self) < 100
+            condition: has_ammo()
+            action: attack(player)
+        }
+        
+        // Priority 2: Flee if health is low
+        sequence {
+            condition: health < 30%
+            action: find_cover()
+            action: flee()
+        }
+        
+        // Priority 3: Patrol
+        sequence {
+            condition: not is_patrolling()
+            action: start_patrol()
+        }
+        
+        // Default: Idle
+        action: idle()
+    }
+}
+
+entity Enemy {
+    ai: enemy_ai
+    
+    fn attack(target: Entity) {
+        // Attack logic
+    }
+    
+    fn flee() {
+        // Flee logic
+    }
+    
+    fn patrol() {
+        // Patrol logic
+    }
+}
+

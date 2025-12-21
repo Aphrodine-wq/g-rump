@@ -1,0 +1,32 @@
+// Example: Custom Shader in G-Rump
+
+shader dissolve {
+    uniforms {
+        progress: float = 0.0
+        noise_texture: texture
+        color: color = #ffffff
+    }
+    
+    vertex {
+        // Vertex shader code
+        position = transform * vertex_position
+        uv = vertex_uv
+    }
+    
+    fragment {
+        // Fragment shader code
+        let noise = sample(noise_texture, uv)
+        let alpha = step(progress, noise.r)
+        output = color * alpha
+    }
+}
+
+entity DissolvingSprite {
+    sprite: "hero.png"
+    shader: dissolve {
+        progress: 0.0 -> 1.0
+        duration: 2s
+        ease: smooth
+    }
+}
+

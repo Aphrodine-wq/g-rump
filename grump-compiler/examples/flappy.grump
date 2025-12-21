@@ -1,0 +1,169 @@
+// Flappy Bird Clone in G-Rump
+// Example game demonstrating G-Rump's animation-first syntax
+
+@app "Flappy Clone"
+@version "1.0.0"
+@target [ios, android, web]
+@fps 60
+
+state {
+    score: int = 0
+    highScore: int = save.highScore
+    gameState: enum(ready, playing, dead) = ready
+}
+
+world {
+    gravity: (0, 1200)
+}
+
+entity Bird {
+    sprite: "bird.png"
+    position: (100, screen.center.y)
+    
+    physics {
+        body: circle(12)
+        gravity: true
+    }
+    
+    state machine {
+        state ready {
+            animate(loop) {
+                y: -5 -> 5 -> -5
+            } duration: 1s, ease: sine
+            
+            on input.tap -> flying
+        }
+        
+        state flying {
+            animate(loop) {
+                rotation: -20 -> 30
+            } sync: velocity.y
+            
+            on input.tap {
+                velocity.y = -400
+                play sound(flap)
+            }
+            
+            on collision(pipe) -> dead
+            on collision(ground) -> dead
+            on exit(screen.top) -> dead
+        }
+        
+        state dead {
+            on enter {
+                gameState = dead
+                if score > highScore {
+                    save.highScore = score
+                    highScore = score
+                }
+                animate {
+                    rotation: 90
+                } duration: 0.5s
+                play sound(hit)
+            }
+        }
+    }
+}
+
+entity Pipe {
+    group: pipes
+    
+    spawn {
+        gapY: random(150, screen.height - 150)
+        gapSize: 150
+        
+        Sprite("pipe_top.png") {
+            position: (screen.width, gapY - gapSize/2)
+            anchor: bottom
+        }
+        
+        Sprite("pipe_bottom.png") {
+            position: (screen.width, gapY + gapSize/2)
+            anchor: top
+        }
+        
+        ScoreZone {
+            position: (screen.width + 30, gapY)
+            size: (10, gapSize)
+            on collision(bird) once {
+                score += 1
+                play sound(point)
+            }
+        }
+    }
+    
+    physics {
+        body: static
+    }
+    
+    update {
+        x -= 200 * delta
+        if x < -100 {
+            destroy(self)
+        }
+    }
+}
+
+scene Game {
+    background: #70c5ce
+    
+    // Ground
+    Sprite("ground.png") as ground {
+        position: (0, screen.bottom)
+        tile: horizontal
+        animate(loop, when: gameState != dead) {
+            x: 0 -> -48
+        } duration: 0.2s, ease: linear
+    }
+    
+    // Bird instance
+    Bird()
+    
+    // Pipe spawner
+    when gameState == playing {
+        every 1.5s {
+            spawn(Pipe)
+        }
+    }
+    
+    // UI Layer
+    layer ui {
+        // Score
+        Text("{score}") {
+            position: (screen.center.x, 50)
+            font: "PressStart"
+            size: 48
+            shadow: (2, 2, #000000)
+        }
+        
+        // Ready prompt
+        visible(when: gameState == ready) {
+            Text("TAP TO START") {
+                position: screen.center
+                animate(loop) {
+                    opacity: 1 -> 0.5 -> 1
+                } duration: 1s
+            }
+        }
+        
+        // Game over
+        visible(when: gameState == dead) {
+            Column(center) {
+                Text("GAME OVER") {
+                    animate(on appear) {
+                        scale: 2 -> 1
+                        opacity: 0 -> 1
+                    } duration: 0.5s, ease: elastic
+                }
+                Text("Score: {score}")
+                Text("Best: {highScore}")
+                Button("RETRY") {
+                    on tap {
+                        restart(scene)
+                    }
+                }
+            }
+        }
+    }
+}
+

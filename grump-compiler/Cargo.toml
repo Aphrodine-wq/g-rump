@@ -1,0 +1,38 @@
+[package]
+name = "grump-compiler"
+version = "0.1.0"
+edition = "2021"
+authors = ["G-Rump Team"]
+description = "The Animation-First Game Programming Language Compiler"
+license = "MIT"
+
+[dependencies]
+# Lexer & Parser
+logos = "0.14"              # Fast lexer generator
+lalrpop = "0.21"            # LR parser generator
+lalrpop-util = "0.21"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Utilities
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+clap = { version = "4.0", features = ["derive"] }
+colored = "2.0"
+walkdir = "2.0"
+
+# For unit parsing
+regex = "1.10"
+
+# Random for CLI personality
+rand = "0.8"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bin]]
+name = "grump"
+path = "src/cli/main.rs"
+

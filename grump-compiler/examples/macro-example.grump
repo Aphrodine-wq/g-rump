@@ -1,0 +1,44 @@
+// Example: Macros in G-Rump
+
+macro repeat(count: int, body: block) {
+    for i in 0..count {
+        body(i)
+    }
+}
+
+macro spawn_enemies(count: int, x_start: float, spacing: float) {
+    for i in 0..count {
+        let x = x_start + (i * spacing)
+        spawn(Enemy) at (x, 0)
+    }
+}
+
+macro animate_sequence(target: Entity, animations: list<Animation>) {
+    for anim in animations {
+        animate target {
+            keyframes: anim.keyframes
+            duration: anim.duration
+        }
+        await wait(anim.duration)
+    }
+}
+
+scene Game {
+    on enter {
+        // Use repeat macro
+        repeat(5) { |i|
+            spawn(Coin) at (i * 100, 0)
+        }
+        
+        // Use spawn_enemies macro
+        spawn_enemies(10, 0, 100)
+        
+        // Use animate_sequence macro
+        let animations = [
+            Animation { keyframes: [...], duration: 1s },
+            Animation { keyframes: [...], duration: 0.5s },
+        ]
+        animate_sequence(player, animations)
+    }
+}
+

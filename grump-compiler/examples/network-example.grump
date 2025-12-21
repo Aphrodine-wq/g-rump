@@ -1,0 +1,44 @@
+// Example: Multiplayer Networking in G-Rump
+
+network Player {
+    sync position: vec2
+    sync rotation: angle
+    sync health: int
+    sync score: int
+    
+    rpc take_damage(amount: int) -> void: server
+    rpc heal(amount: int) -> void: all
+    rpc shoot(direction: vec2) -> void: server
+    rpc chat(message: string) -> void: all
+}
+
+entity MultiplayerPlayer {
+    network: Player
+    
+    on update {
+        // Sync position to server
+        network.sync(position, self.position)
+        network.sync(health, self.health)
+    }
+    
+    on hit(damage: int) {
+        // Send damage to server
+        network.send(server, take_damage, [damage])
+    }
+    
+    on heal_pickup(amount: int) {
+        // Broadcast heal to all clients
+        network.send(all, heal, [amount])
+    }
+}
+
+scene MultiplayerGame {
+    on enter {
+        network.connect("ws://game-server.com:8080")
+    }
+    
+    on exit {
+        network.disconnect()
+    }
+}
+

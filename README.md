@@ -27,7 +27,9 @@ A living, breathing, grumpy AI assistant who exists in your phone, reacts to eve
 
 | 🎨 **Animation System** | 🤖 **AI Personality** | 📚 **Knowledge Base** | 🚀 **Multi-Platform** |
 |:---:|:---:|:---:|:---:|
-| 16 core expressions<br>15-layer face rig<br>120fps animations | Context-aware responses<br>Time-based behaviors<br>Theatrical personality | PDF learning system<br>GitHub folder support<br>Auto-discovery | iOS • Web • Mobile<br>Shared backend<br>Sync across devices |
+| 16 core expressions<br>15-layer face rig<br>200fps animations<br>Three-layer reasoning | Context-aware responses<br>Time-based behaviors<br>Theatrical personality | PDF learning system<br>GitHub folder support<br>Auto-discovery | iOS • Web • Mobile<br>Shared backend<br>Sync across devices |
+| 💻 **G-Rump Language** | 🎬 **Animation Creation** | 🧠 **Animation AI** | 📦 **Export Formats** |
+| Animation-first syntax<br>10 advanced features<br>Multi-platform compile | Natural language prompts<br>Human-trusted output<br>Personality-driven | Perceptual engineering<br>Meta-engineering layer<br>ML feedback | GIF • MP4 • Lottie<br>Sprite sheets • Code<br>After Effects • Rive |
 
 </div>
 
@@ -36,6 +38,24 @@ A living, breathing, grumpy AI assistant who exists in your phone, reacts to eve
 ## 🎯 Overview
 
 Grump Platform is a **multi-platform AI assistant** with a unique personality-driven interface. Built with a sophisticated animation system, context-aware AI, and comprehensive knowledge base integration.
+
+### 🆕 G-Rump AI: Animation Creation + Language
+
+**G-Rump AI** is the same animated G-Rump character you already have, now with:
+- ✅ **Animation Creation** - Generate animations (GIF, MP4, Lottie, sprite sheets) from natural language
+- ✅ **G-Rump Language** - Animation-first programming language with 10 advanced features
+- ✅ **Animation Reasoning** - Three-layer system that produces human-trusted animation
+- ✅ **Full Knowledge Base** - Uses all existing knowledge base content
+- ✅ **Same Personality** - Same grumpy but helpful G-Rump
+
+**Key Innovation**: G-Rump uses a **three-layer animation reasoning system**:
+1. **Structure** - Six-layer reasoning (intent, hierarchy, beats, causality, timing, settling)
+2. **Cognition** - Perceptual engineering (signals, temporal expectations, social semantics)
+3. **Meta-Engineering** - Production-ready (personality encoding, cross-platform, ML feedback)
+
+**Result**: Animation that humans **trust**, not just tolerate.
+
+See [PRODUCT-VISION.md](PRODUCT-VISION.md) for details and [GRUMP-COMPLETE-MASTER-DOCUMENT.md](GRUMP-COMPLETE-MASTER-DOCUMENT.md) for complete documentation.
 
 ### Architecture
 

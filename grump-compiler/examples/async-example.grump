@@ -1,0 +1,30 @@
+// Example: Async/Await in G-Rump
+
+async fn load_texture(path: string) -> result<Texture, LoadError> {
+    let data = await fetch(path)
+    if data.is_err() {
+        return err(LoadError::NotFound(path))
+    }
+    let texture = decode_image(data.unwrap())
+    ok(texture)
+}
+
+async fn load_all_assets() -> result<AssetPack, Error> {
+    let hero = await load_texture("hero.png")
+    let enemy = await load_texture("enemy.png")
+    let background = await load_texture("bg.png")
+    
+    ok(AssetPack {
+        hero: hero.unwrap(),
+        enemy: enemy.unwrap(),
+        background: background.unwrap(),
+    })
+}
+
+scene Game {
+    on enter {
+        let assets = await load_all_assets()
+        // Use assets...
+    }
+}
+

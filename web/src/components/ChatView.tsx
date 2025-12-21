@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { useChat } from '../store/ChatStore'
 import { useAnimation } from '../store/AnimationStore'
+import { useWorkspace } from '../store/WorkspaceStore'
 import GrumpFaceRig from './GrumpFaceRig'
 import MessageBubble from './MessageBubble'
 import InputBar from './InputBar'
 import TypingIndicator from './TypingIndicator'
 import ScreenShake from './animations/ScreenShake'
 import ErrorBanner from './ErrorBanner'
+import GrumpWorkspace from './GrumpWorkspace'
 import { useMicroMovements } from '../hooks/useMicroMovements'
 import { contextAwarenessService } from '../services/ContextAwareness'
 import { easterEggsService } from '../services/EasterEggs'
@@ -30,6 +32,7 @@ export default function ChatView() {
     updateContext,
     updateEyeTracking
   } = useAnimation()
+  const { state: workspaceState, exportAnimation } = useWorkspace()
   const [messageText, setMessageText] = useState('')
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('darkMode') !== 'false'
@@ -284,6 +287,19 @@ export default function ChatView() {
         />
       )}
       <div className="chat-view">
+        {/* Workspace - Left Side */}
+        <div className="workspace-container">
+          <GrumpWorkspace
+            animation={workspaceState.animation}
+            status={workspaceState.status}
+            progress={workspaceState.progress}
+            currentTask={workspaceState.currentTask}
+            onExport={exportAnimation}
+          />
+        </div>
+
+        {/* Main Chat Area */}
+        <div className="chat-main-area">
         {/* Header */}
         <header className="header">
           <div className="header-left">
@@ -370,6 +386,7 @@ export default function ChatView() {
           onSend={handleSend}
           disabled={isTyping}
         />
+        </div>
       </div>
     </ScreenShake>
   )
