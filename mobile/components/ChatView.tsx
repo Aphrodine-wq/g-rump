@@ -11,14 +11,14 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useChat } from '../store/ChatStore';
-import MinimalGrumpFace from './MinimalGrumpFace';
+import Grump2 from './Grump2';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 
 export default function ChatView() {
   const { messages, isTyping, errorMessage, sendMessage, createNewSession } = useChat();
   const [messageText, setMessageText] = useState('');
-  const [mood, setMood] = useState<'neutral' | 'typing' | 'annoyed'>('annoyed');
+  const [mood, setMood] = useState<'neutral' | 'typing' | 'annoyed' | 'angry' | 'happy' | 'surprised'>('annoyed');
   const [statusText, setStatusText] = useState('what do you want');
   const [darkMode] = useState(true); // Always dark for now
   const messagesEndRef = useRef<ScrollView>(null);
@@ -47,7 +47,7 @@ export default function ChatView() {
 
   useEffect(() => {
     if (errorMessage) {
-      setMood('annoyed');
+      setMood('angry');
       setStatusText('something went wrong. great.');
     }
   }, [errorMessage]);
@@ -105,9 +105,9 @@ export default function ChatView() {
       {/* Avatar Section */}
       <View style={styles.avatarSection}>
         <View style={styles.avatarContainer}>
-          <View style={styles.avatarRing} />
+          {/* <View style={styles.avatarRing} /> Ring removed for new design */}
           <View style={styles.avatarFace}>
-            <MinimalGrumpFace mood={mood} size={80} />
+            <Grump2 mood={mood} size={250} />
           </View>
         </View>
         <Text style={styles.statusText}>{statusText}</Text>

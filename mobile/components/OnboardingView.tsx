@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import MinimalGrumpFace from './MinimalGrumpFace';
+import Grump2 from './Grump2';
 
 interface OnboardingViewProps {
   onComplete: () => void;
@@ -52,7 +52,7 @@ export default function OnboardingView({ onComplete }: OnboardingViewProps) {
       <View style={styles.content}>
         {pages[currentPage].showAvatar && (
           <View style={styles.avatarContainer}>
-            <MinimalGrumpFace mood="annoyed" size={120} />
+            <Grump2 mood="annoyed" size={250} />
           </View>
         )}
 

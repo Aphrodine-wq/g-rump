@@ -85,6 +85,39 @@ export default function GameDevWorkspace({
     setCompileError(null)
 
     try {
+      // Check if we're in a real environment or need to mock
+      // Since the Rust backend might not be running on Vercel yet, we'll gracefully fallback
+      const useMockCompilation = true; // Temporary flag until WASM is ready
+
+      if (useMockCompilation) {
+        // Simulate compilation delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Return a mock compiled game
+        const mockResult = {
+          compiled: {
+            code: `
+              <!DOCTYPE html>
+              <html>
+                <body style="margin:0;overflow:hidden;background:#111;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:monospace;">
+                  <div style="text-align:center;">
+                    <h1>Game Preview</h1>
+                    <p>Compiled from: ${projectName}</p>
+                    <p style="color:#666;">(Backend compilation unavailable - WASM target coming soon)</p>
+                    <div style="width:50px;height:50px;background:#ff4444;margin:20px auto;border-radius:50%;"></div>
+                  </div>
+                </body>
+              </html>
+            `
+          }
+        };
+        
+        setCompiledGameHtml(mockResult.compiled.code)
+        setIsRunning(true)
+        console.log('Mock compilation successful');
+        return;
+      }
+
       const response = await fetch('/api/game/compile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
