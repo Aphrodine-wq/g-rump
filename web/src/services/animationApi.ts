@@ -1,6 +1,7 @@
 // Animation API Service - Connects frontend to backend animation endpoints
 
 import axios from 'axios'
+import { createProceduralAnimation } from './proceduralEngine'
 
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3000'
 
@@ -86,11 +87,14 @@ class AnimationApi {
       const response = await axios.post(`${this.baseUrl}/create`, request)
       return response.data.animation
     } catch (error: any) {
-      console.warn('Backend unavailable, using mock response for createAnimation')
+      console.warn('Backend unavailable, using procedural response for createAnimation')
+      
+      const procedural = createProceduralAnimation(request.prompt)
+      
       return {
-        id: `mock-${Date.now()}`,
-        preview: { url: 'https://via.placeholder.com/300x200?text=Generated+Animation', format: 'gif' },
-        code: `/* Generated from: ${request.prompt} */\n.element { animation: custom 1s infinite; }`,
+        id: `gen-${Date.now()}`,
+        preview: { url: '', format: 'css-live' }, // Special format for live rendering
+        code: procedural.css,
         status: 'completed',
         prompt: request.prompt,
         style: request.style || 'default',

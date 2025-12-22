@@ -12,6 +12,12 @@ interface Grump2Props {
   isCoding?: boolean
 }
 
+declare global {
+  interface Window {
+    GrumpEngine: any;
+  }
+}
+
 export default function Grump2({ size = 'medium', className = '', style = {}, isRageMode = false, isCoding = false }: Grump2Props) {
   const BASE_SIZE = 300
   
@@ -25,8 +31,11 @@ export default function Grump2({ size = 'medium', className = '', style = {}, is
     }
   }
 
-  const targetSize = getSizeInPixels()
-  const scale = targetSize / BASE_SIZE
+  const handleInteraction = (type: string) => {
+    if (window.GrumpEngine && window.GrumpEngine.trigger) {
+      window.GrumpEngine.trigger(type);
+    }
+  };
 
   return (
     <div 
@@ -37,6 +46,8 @@ export default function Grump2({ size = 'medium', className = '', style = {}, is
         position: 'relative',
         ...style 
       }}
+      onClick={() => handleInteraction('jump')}
+      onMouseEnter={() => handleInteraction('squash')}
     >
       <div 
         className="grump2-container" 

@@ -78,6 +78,15 @@ export default function AnimationPreview({ animation, onExport }: AnimationPrevi
                   objectFit: 'contain'
                 }}
               />
+            ) : animation.format === 'css-live' ? (
+              <>
+                <style>{animation.code}</style>
+                <div className="flex items-center justify-center w-full h-full bg-gray-50 rounded-xl overflow-hidden">
+                   <div className="animated-element shadow-lg">
+                      Preview
+                   </div>
+                </div>
+              </>
             ) : (
               <div className="animation-placeholder">
                 {animation.status === 'processing' ? (
