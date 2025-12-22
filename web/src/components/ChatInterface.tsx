@@ -93,10 +93,14 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
       <div className="chat-main">
         {/* Left: Chat */}
         <div className="chat-panel">
+          {/* Grump2 - Always visible */}
+          <div className="grump2-fixed-container">
+            <Grump2 />
+          </div>
+          
           <div className="chat-messages" id="chatMessages" ref={chatMessagesRef}>
             {messages.length === 0 && (
               <div className="welcome-message">
-                <Grump2 />
                 <p className="welcome-text">"What do you want?"</p>
               </div>
             )}
@@ -113,7 +117,6 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
               <>
                 <MessageSkeleton />
                 <div className="typing-container">
-                  <Grump2 />
                   <TypingIndicator />
                 </div>
               </>

@@ -88,6 +88,30 @@
   background: #fafafa;
   min-height: 0; /* Critical for flex scrolling */
   overflow: hidden; /* Prevent panel from growing */
+  position: relative;
+}
+
+/* Grump2 - Always visible, positioned in chat panel */
+.grump2-fixed-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none; /* Allow clicks to pass through */
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .grump2-fixed-container {
+    top: 30%;
+    width: 150px;
+    height: 150px;
+  }
 }
 
 .chat-messages {

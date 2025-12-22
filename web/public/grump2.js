@@ -51,10 +51,8 @@
         });
 
         // Also do periodic checks as fallback (in case MutationObserver misses it)
-        let attempts = 0;
-        const maxAttempts = 200; // 20 seconds at 100ms intervals
+        // Keep checking indefinitely - element might be added/removed dynamically
         checkInterval = setInterval(() => {
-          attempts++;
           const face = document.querySelector('.grump2-container .face');
           if (face) {
             clearInterval(checkInterval);
@@ -62,11 +60,6 @@
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
             resolve({ face, chatMessages, chatInput });
-          } else if (attempts >= maxAttempts) {
-            clearInterval(checkInterval);
-            observer.disconnect();
-            console.warn('Grump2: Face element not found after', maxAttempts, 'attempts');
-            reject(new Error('Face element not found'));
           }
         }, 100);
       };
@@ -78,6 +71,7 @@
   // Initialize Grump2 once elements are ready
   waitForElements().then(({ face, chatMessages, chatInput }) => {
     try {
+      console.log('Grump2: Elements found, initializing...');
       const root = document.documentElement;
       const eyes = face ? face.querySelectorAll('.eye') : [];
       const mouth = face ? face.querySelector('.mouth') : null;
@@ -328,6 +322,8 @@
       console.error('Grump2 initialization error:', error);
     }
   }).catch((error) => {
-    console.warn('Grump2: Failed to initialize', error);
+    // Don't log as error - element might not be on current page
+    // Script will keep checking in the background via MutationObserver
+    console.log('Grump2: Waiting for face element to appear...');
   });
 })();
