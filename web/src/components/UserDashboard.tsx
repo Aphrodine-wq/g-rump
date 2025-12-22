@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { animationApi } from '../services/animationApi'
 import { useAnimation } from '../store/AnimationStore'
+import Grump2 from './Grump2'
 import './UserDashboard.css'
 
 interface UserDashboardProps {
@@ -86,7 +87,7 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
           <button className="upgrade-btn" onClick={() => onNavigate?.('pricing')}>Upgrade to Pro</button>
         </div>
         <div className="welcome-grump">
-          <Grump size="medium" />
+          <Grump2 size="medium" />
           <p>"Oh, you're back. I was just starting to enjoy the quiet."</p>
         </div>
       </div>

@@ -1,6 +1,6 @@
 // Onboarding Flow - 3-step introduction to G-Rump
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Grump2 from './Grump2'
 import './OnboardingFlow.css'
 

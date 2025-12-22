@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import Grump2 from './Grump2'
 import './LandingPage.css'
 
