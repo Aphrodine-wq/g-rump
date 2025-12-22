@@ -10,7 +10,7 @@ export default function AngerMeter() {
     switch (state) {
       case 'idle': return 0
       case 'softMode': return 0
-      case 'happy': return 0
+      case 'ecstatic': return 0
       case 'impressed': return 10
       case 'thinkingDeep': return 20
       case 'skeptical': return 30

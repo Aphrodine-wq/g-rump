@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, ReactNode } from 'react'
 import { MessageAnalysis } from '../services/ContextAwareness'
-import { useGrumpEngine } from '../hooks/useGrumpEngine'
+import { useAnimation } from './AnimationStore'
 
 type UnlockId =
   | 'eyeRoll_full'
@@ -65,7 +65,7 @@ const Ctx = createContext<AchievementsContext | undefined>(undefined)
 export function AchievementsProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AchievementsState>(() => load())
   const savingRef = useRef<number | null>(null)
-  const { state: grumpState, actions: grumpActions } = useGrumpEngine()
+  const { state: animationState, transitionToState } = useAnimation()
 
   useEffect(() => {
     if (savingRef.current) clearTimeout(savingRef.current)
@@ -74,8 +74,21 @@ export function AchievementsProvider({ children }: { children: ReactNode }) {
       if (savingRef.current) clearTimeout(savingRef.current)
     }
   }, [state])
+  
+  // Calculate annoyance from animation state (heuristic)
+  const annoyanceLevel = useMemo(() => {
+     switch(animationState.currentState) {
+         case 'maximumGrump': return 100
+         case 'furious': return 90
+         case 'error': return 80
+         case 'annoyed': return 60
+         case 'skeptical': return 30
+         case 'suspicious': return 40
+         default: return 0
+     }
+  }, [animationState.currentState])
 
-  // Sync unlocks with Grump Engine Annoyance Level
+  // Sync unlocks with Annoyance Level
   useEffect(() => {
     const newlyUnlocked: UnlockId[] = []
     const unlockedSet = new Set(state.unlocked)
@@ -83,7 +96,7 @@ export function AchievementsProvider({ children }: { children: ReactNode }) {
     for (const item of AVAILABLE) {
       if (unlockedSet.has(item.id)) continue
       const prereqsOk = (item.prerequisites || []).every(p => unlockedSet.has(p))
-      if (grumpState.annoyance >= item.minAnnoyance && prereqsOk) {
+      if (annoyanceLevel >= item.minAnnoyance && prereqsOk) {
         unlockedSet.add(item.id)
         newlyUnlocked.push(item.id)
       }
@@ -91,9 +104,8 @@ export function AchievementsProvider({ children }: { children: ReactNode }) {
 
     if (newlyUnlocked.length > 0) {
       setState(prev => ({ ...prev, unlocked: Array.from(unlockedSet) }))
-      // TODO: Toast notification here would be nice
     }
-  }, [grumpState.annoyance, state.unlocked])
+  }, [annoyanceLevel, state.unlocked])
 
   const recordInteraction = ({ analysis }: RecordArgs): UnlockInfo[] => {
     // Calculate XP
@@ -101,10 +113,6 @@ export function AchievementsProvider({ children }: { children: ReactNode }) {
     if (analysis.emotionalState === 'annoyed') xpGain += 5
     if (analysis.emotionalState === 'maximumGrump') xpGain += 20
     
-    // Update Grump Engine
-    if (analysis.sentimentScore < -0.2) grumpActions.annoy(10)
-    else if (analysis.sentimentScore > 0.5) grumpActions.soothe(5)
-
     // Level up logic
     const newXp = state.xp + xpGain
     const newLevel = Math.floor(newXp / 100) + 1
@@ -115,13 +123,12 @@ export function AchievementsProvider({ children }: { children: ReactNode }) {
       level: newLevel
     }))
 
-    // Return any new unlocks (handled by effect above mostly, but we return empty for compat)
     return [] 
   }
 
   const reset = () => {
     setState({ unlocked: [], xp: 0, level: 1 })
-    grumpActions.soothe(100)
+    transitionToState('idle')
   }
 
   const value = useMemo(() => ({ state, recordInteraction, reset }), [state, recordInteraction])
