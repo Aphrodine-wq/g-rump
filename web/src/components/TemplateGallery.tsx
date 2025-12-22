@@ -1,10 +1,10 @@
 // Template Gallery - Browse animation templates
 
 import { useState, useEffect } from 'react'
-import GrumpAvatarWrapper from './GrumpAvatarWrapper'
 import { useAnimation } from '../store/AnimationStore'
 import { useChat } from '../store/ChatStore'
 import { gameTemplates, GameTemplate } from '../data/gameTemplates'
+import Grump2 from './Grump2'
 import './TemplateGallery.css'
 
 interface Template {
@@ -117,7 +117,7 @@ export default function TemplateGallery({ onNavigateToChat, onNavigate, onNaviga
       {/* Main Content */}
       <div className="gallery-content">
         <div className="gallery-intro">
-          <GrumpAvatarWrapper size="small" />
+          <Grump2 size="small" />
           <p>"Pick one. Or don't. I'll still judge whatever you end up making."</p>
         </div>
 

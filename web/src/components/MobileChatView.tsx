@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { useChat } from '../store/ChatStore'
-import { useAnimation } from '../store/AnimationStore'
-import GrumpAvatarWrapper from './GrumpAvatarWrapper'
+import Grump2 from './Grump2'
 import MessageBubble from './MessageBubble'
 import TypingIndicator from './TypingIndicator'
 import AnimationPreview from './AnimationPreview'
@@ -16,7 +15,6 @@ interface MobileChatViewProps {
 
 export default function MobileChatView({ onNavigate: _onNavigate }: MobileChatViewProps = {}) {
   const { messages, isTyping, sendMessage } = useChat()
-  const { transitionToState } = useAnimation()
   const [messageText, setMessageText] = useState('')
   const [showPreview, setShowPreview] = useState(false)
   const [showExport, setShowExport] = useState(false)
@@ -26,9 +24,7 @@ export default function MobileChatView({ onNavigate: _onNavigate }: MobileChatVi
     if (!messageText.trim()) return
     const userMessage = messageText.trim()
     setMessageText('')
-    transitionToState('thinkingDeep')
     await sendMessage(userMessage)
-    transitionToState('idle')
   }
 
   return (
@@ -47,7 +43,7 @@ export default function MobileChatView({ onNavigate: _onNavigate }: MobileChatVi
           <div className="mobile-messages">
             {messages.length === 0 && (
               <div className="mobile-welcome">
-                <GrumpAvatarWrapper size="medium" />
+                <Grump2 size="medium" />
                 <p>"What do you want?"</p>
               </div>
             )}
@@ -62,7 +58,7 @@ export default function MobileChatView({ onNavigate: _onNavigate }: MobileChatVi
 
             {isTyping && (
               <div className="mobile-typing">
-                <GrumpAvatarWrapper size="small" />
+                <Grump2 size="small" />
                 <TypingIndicator />
               </div>
             )}

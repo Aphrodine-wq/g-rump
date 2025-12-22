@@ -1,7 +1,7 @@
 // Share/Embed Modal - Share animations with others
 
 import { useState, useEffect } from 'react'
-import GrumpAvatarWrapper from './GrumpAvatarWrapper'
+import Grump2 from './Grump2'
 import { useToast } from '../hooks/useToast'
 import { generateQRCode, downloadQRCode } from '../utils/qrCode'
 import Toast from './Toast'
@@ -60,7 +60,7 @@ export default function ShareModal({ animationId, animationName, onClose }: Shar
         </div>
 
         <div className="modal-grump">
-          <GrumpAvatarWrapper size="small" />
+          <Grump2 size="small" />
           <p>"Sure, show it off. I did all the work anyway."</p>
         </div>
 

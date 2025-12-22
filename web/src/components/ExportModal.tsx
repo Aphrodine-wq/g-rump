@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { animationApi } from '../services/animationApi'
-import GrumpAvatarWrapper from './GrumpAvatarWrapper'
+import Grump2 from './Grump2'
 import './ExportModal.css'
 
 interface ExportModalProps {
@@ -69,13 +69,7 @@ export default function ExportModal({ animation, onClose }: ExportModalProps) {
         </div>
 
         <div className="modal-grump">
-          <GrumpAvatarWrapper 
-            size="small"
-            customState={{
-              glowColor: 'soft',
-              glowIntensity: 0.4
-            }}
-          />
+          <Grump2 size="small" />
           <p>"Finally done. Now pick a format before I change my mind."</p>
         </div>
 

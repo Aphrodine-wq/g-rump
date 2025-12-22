@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
-import GrumpAvatarWrapper from './GrumpAvatarWrapper'
-import { useAnimation } from '../store/AnimationStore'
+import Grump2 from './Grump2'
 import './LandingPage.css'
 
 interface LandingPageProps {
@@ -10,14 +9,6 @@ interface LandingPageProps {
 }
 
 export default function LandingPage({ onGetStarted, onLogin, onNavigate }: LandingPageProps) {
-  const { transitionToState } = useAnimation()
-
-  useEffect(() => {
-    // Set G-Rump to idle state
-    transitionToState('idle')
-    // Eye tracking is handled by GrumpAvatarWrapper internally
-  }, [transitionToState])
-
   return (
     <div className="landing-page">
       {/* Navigation */}
@@ -38,7 +29,7 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
       <section className="hero-section">
         <div className="hero-content">
           <div className="grump-hero">
-            <GrumpAvatarWrapper size="large" />
+            <Grump2 size="large" />
           </div>
           
           <h1 className="hero-title">
@@ -190,7 +181,7 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
       {/* Final CTA */}
       <section className="final-cta">
         <div className="grump-cta">
-          <GrumpAvatarWrapper size="medium" />
+          <Grump2 size="medium" />
         </div>
         <p>"Look, are you gonna sign up or what? I don't have all day."</p>
         <button className="cta-button" onClick={onGetStarted}>Start Creating →</button>

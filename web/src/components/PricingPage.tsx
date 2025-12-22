@@ -1,7 +1,7 @@
 // Pricing Page - Subscription plans and pricing
 
 import { useState, useEffect } from 'react'
-import GrumpAvatarWrapper from './GrumpAvatarWrapper'
+import Grump2 from './Grump2'
 import { useAnimation } from '../store/AnimationStore'
 import './PricingPage.css'
 
@@ -115,7 +115,7 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
       <section className="pricing-hero">
         <h1>Pricing</h1>
         <div className="grump-hero">
-          <GrumpAvatarWrapper size="medium" />
+          <Grump2 size="medium" />
           <p>"Look, I'll make your animations either way. But if you want the good stuff..."</p>
         </div>
 
@@ -219,7 +219,7 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
 
       {/* Final CTA */}
       <section className="pricing-cta">
-        <GrumpAvatarWrapper size="medium" />
+        <Grump2 size="medium" />
         <p>"Still thinking? The free tier is right there. I'll be waiting. Judgmentally."</p>
         <button className="cta-button" onClick={() => onNavigate?.('chat')}>Start Free →</button>
       </section>

@@ -1,8 +1,7 @@
 // Onboarding Flow - 3-step introduction to G-Rump
 
 import { useState, useEffect } from 'react'
-import GrumpAvatarWrapper from './GrumpAvatarWrapper'
-import { useAnimation } from '../store/AnimationStore'
+import Grump2 from './Grump2'
 import './OnboardingFlow.css'
 
 interface OnboardingFlowProps {
@@ -10,13 +9,8 @@ interface OnboardingFlowProps {
 }
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
-  const { transitionToState } = useAnimation()
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-
-  useEffect(() => {
-    transitionToState('idle')
-  }, [transitionToState])
 
   const categories = [
     { id: 'ui', name: '📱 UI/UX', desc: 'Buttons, loaders, transitions' },
@@ -50,7 +44,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
             <div className="step-content">
               <div className="step-grump">
-                <GrumpAvatarWrapper size="large" />
+                <Grump2 size="large" />
               </div>
               <h1>Meet G-Rump</h1>
               <div className="step-text">
@@ -95,7 +89,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <div className="work-number">2</div>
                   <h3>I'll Create It (And Judge You)</h3>
                   <div className="work-grump">
-                    <GrumpAvatarWrapper size="small" />
+                    <Grump2 size="small" />
                     <p>"A bouncing logo. How original. Fine, here's your bounce. I added anticipation because I have standards."</p>
                   </div>
                 </div>
@@ -149,7 +143,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 ))}
               </div>
               <div className="step-grump-small">
-                <GrumpAvatarWrapper size="small" />
+                <Grump2 size="small" />
                 <p>"Pick one. Or don't. I'll still help you either way."</p>
               </div>
             </div>

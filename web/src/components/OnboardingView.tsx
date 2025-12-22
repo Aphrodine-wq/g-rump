@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import GrumpFaceRig from './GrumpFaceRig'
+import Grump2 from './Grump2'
 import './OnboardingView.css'
 
 interface OnboardingViewProps {
@@ -52,7 +52,7 @@ export default function OnboardingView({ onComplete }: OnboardingViewProps) {
       <div className="onboarding-content">
         {pages[currentPage].showAvatar && (
           <div className="onboarding-avatar">
-            <GrumpFaceRig size={120} />
+            <Grump2 size={120} />
           </div>
         )}
 

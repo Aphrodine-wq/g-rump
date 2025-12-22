@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useChat } from '../store/ChatStore'
 import { useAnimation } from '../store/AnimationStore'
 import { useWorkspace } from '../store/WorkspaceStore'
-import GrumpFaceRig from './GrumpFaceRig'
+import Grump2 from './Grump2'
 import MessageBubble from './MessageBubble'
 import InputBar from './InputBar'
 import TypingIndicator from './TypingIndicator'
@@ -351,7 +351,7 @@ export default function ChatView() {
         <section className="avatar-section">
           <div className="avatar-container">
             <div className="avatar-face">
-              <GrumpFaceRig size={180} />
+              <Grump2 size={180} />
             </div>
           </div>
           <p className="status-text">{getStatusText()}</p>

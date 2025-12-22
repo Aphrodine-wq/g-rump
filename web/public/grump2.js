@@ -290,7 +290,7 @@
         if(m) {
           setEyebrows(m.eyebrowL, m.eyebrowR);
           try {
-            face.style.filter = `hue-rotate(${m.color})`;
+            face.style.setProperty('--theme-face-bg', m.color);
           } catch (e) {
             console.warn('Grump2: Error setting face filter', e);
           }

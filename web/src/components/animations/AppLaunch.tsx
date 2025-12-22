@@ -1,7 +1,7 @@
 import { useState, useEffect, ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { useAnimation } from '../../store/AnimationStore'
-import GrumpFaceRig from '../GrumpFaceRig'
+import Grump2 from '../Grump2'
 import './AppLaunch.css'
 
 interface AppLaunchProps {
@@ -140,7 +140,7 @@ export default function AppLaunch({ children, onComplete }: AppLaunchProps) {
               duration: 0.4
             }}
           >
-            <GrumpFaceRig size={180} />
+            <Grump2 size={180} />
           </motion.div>
         </motion.div>
       )}
@@ -158,7 +158,7 @@ export default function AppLaunch({ children, onComplete }: AppLaunchProps) {
             duration: 0.4
           }}
         >
-          <GrumpFaceRig size={180} />
+          <Grump2 size={180} />
           <motion.div
             className="launch-ui-content"
             initial={{ y: 100, opacity: 0 }}
