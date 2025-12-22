@@ -16,10 +16,10 @@ export default function Grump2({ size = 'medium', className = '', style = {} }: 
   const getSizeInPixels = () => {
     if (typeof size === 'number') return size
     switch (size) {
-      case 'small': return 150
-      case 'medium': return 300
-      case 'large': return 450
-      default: return 300
+      case 'small': return 120
+      case 'medium': return 250
+      case 'large': return 400
+      default: return 250
     }
   }
 
