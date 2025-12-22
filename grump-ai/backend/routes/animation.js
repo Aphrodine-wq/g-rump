@@ -92,6 +92,32 @@ router.post('/create', animationUsageLimiter, async (req, res) => {
 });
 
 /**
+ * GET /api/animation/history
+ * Get user's animation history
+ */
+// TODO: Add authenticate middleware
+router.get('/history', async (req, res) => {
+  try {
+    const userId = req.user?.id || 'anonymous';
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = parseInt(req.query.offset) || 0;
+    
+    const history = await animationService.getHistory(userId, limit, offset);
+    
+    res.json({
+      success: true,
+      history,
+    });
+  } catch (error) {
+    console.error('Get history error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+/**
  * GET /api/animation/:id
  * Get animation by ID
  */
@@ -148,32 +174,6 @@ router.post('/:id/export', async (req, res) => {
     });
   } catch (error) {
     console.error('Export error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
-
-/**
- * GET /api/animation/history
- * Get user's animation history
- */
-// TODO: Add authenticate middleware
-router.get('/history', async (req, res) => {
-  try {
-    const userId = req.user?.id || 'anonymous';
-    const limit = parseInt(req.query.limit) || 20;
-    const offset = parseInt(req.query.offset) || 0;
-    
-    const history = await animationService.getHistory(userId, limit, offset);
-    
-    res.json({
-      success: true,
-      history,
-    });
-  } catch (error) {
-    console.error('Get history error:', error);
     res.status(500).json({
       success: false,
       error: error.message,
