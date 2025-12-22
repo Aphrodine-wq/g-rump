@@ -153,15 +153,33 @@
       window.trackingTimeout = setTimeout(() => { isTracking = false; springSystem.pupils.x.target = 0; springSystem.pupils.y.target = 0; }, 2000);
     });
 
+    // --- STATE SYSTEM ---
+    let grumpState = {
+      mood: 'grumpy',
+      intensity: 5,
+      energy: 5,
+      annoyance: 0
+    };
+
+    const emitStateUpdate = () => {
+      const event = new CustomEvent('grump-state-update', { detail: { ...grumpState } });
+      window.dispatchEvent(event);
+    };
+
     // React Interaction API
     window.GrumpEngine = {
       setMode: (mode) => {
         console.log('Grump3: Mode set to', mode);
         currentMode = mode;
+        grumpState.mood = mode;
         if (mode === 'rage') {
             springSystem.scale.val.target = 1.2;
             setTimeout(() => springSystem.scale.val.target = 1.0, 200);
         }
+        emitStateUpdate();
+      },
+      setMood: (mood) => {
+        window.GrumpEngine.setMode(mood);
       },
       trigger: (action) => {
         if (action === 'jump') {
@@ -171,6 +189,25 @@
         if (action === 'squash') {
             springSystem.scale.val.vel = -0.1;
         }
+      },
+      getState: () => {
+        return { ...grumpState };
+      },
+      annoy: (amount) => {
+        grumpState.annoyance = Math.min(10, grumpState.annoyance + amount);
+        grumpState.mood = grumpState.annoyance > 8 ? 'rage' : 'annoyed';
+        currentMode = grumpState.mood;
+        emitStateUpdate();
+        return grumpState.annoyance;
+      },
+      soothe: (amount) => {
+        grumpState.annoyance = Math.max(0, grumpState.annoyance - amount);
+        if (grumpState.annoyance < 3) {
+            grumpState.mood = 'idle';
+            currentMode = 'idle';
+        }
+        emitStateUpdate();
+        return grumpState.annoyance;
       }
     };
 
