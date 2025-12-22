@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 
-export type EmotionalState = 
+export type EmotionalState =
   | 'idle' | 'listening' | 'processing' | 'responding'
   | 'skeptical' | 'annoyed' | 'impressed' | 'suspicious'
   | 'softMode' | 'maximumGrump' | 'sleepy' | 'error'
   | 'thinkingDeep' | 'smug' | 'exasperatedSigh' | 'reluctantAgreement'
   | 'sleep' | 'jumpscare' | 'birthday' | 'threeAM'
+  | 'codeReview' | 'designMode' | 'animationFlow' | 'debugMode' | 'playtesting'
 
 export type BlinkType = 'standard' | 'slow' | 'heavy' | 'quickDouble' | 'half' | 'wink'
 export type ParticleType = 'sleepZ' | 'confetti' | 'coffeeSteam' | 'angerParticle' | 'sparkle' | 'glitchRectangle' | null
@@ -539,6 +540,50 @@ function getStateConfig(state: EmotionalState): Partial<AnimationState> {
       glowIntensity: 0.2,
       glowPulseRate: 3.0,
       glowColor: 'soft'
+    },
+    codeReview: {
+      leftEyebrowRotation: -12,
+      rightEyebrowRotation: 12,
+      leftEyebrowY: -3,
+      rightEyebrowY: -3,
+      mouthState: 'pursed',
+      glowIntensity: 0.55,
+      glowPulseRate: 1.3,
+      glowColor: 'orange'
+    },
+    designMode: {
+      leftEyebrowRotation: -8,
+      rightEyebrowRotation: 8,
+      mouthState: 'open',
+      glowIntensity: 0.5,
+      glowPulseRate: 1.8,
+      glowColor: 'orange'
+    },
+    animationFlow: {
+      leftEyebrowRotation: -15,
+      rightEyebrowRotation: 15,
+      mouthState: 'almostSmile',
+      glowIntensity: 0.45,
+      glowPulseRate: 2.2,
+      glowColor: 'orange'
+    },
+    debugMode: {
+      leftEyebrowRotation: -10,
+      rightEyebrowRotation: 10,
+      leftEyebrowY: 5,
+      rightEyebrowY: 5,
+      mouthState: 'frown',
+      glowIntensity: 0.7,
+      glowPulseRate: 0.9,
+      glowColor: 'intense'
+    },
+    playtesting: {
+      leftEyebrowRotation: -5,
+      rightEyebrowRotation: 5,
+      mouthState: 'open',
+      glowIntensity: 0.6,
+      glowPulseRate: 1.5,
+      glowColor: 'orange'
     }
   }
 

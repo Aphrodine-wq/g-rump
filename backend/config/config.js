@@ -7,15 +7,15 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
     anthropic: {
       apiKey: process.env.ANTHROPIC_API_KEY,
-      temperature: parseFloat(process.env.ANTHROPIC_TEMPERATURE || '0.9'), // Claude temperature (0-1), higher = more creative/human-like
-      max_tokens: parseInt(process.env.ANTHROPIC_MAX_TOKENS || '256'), // Fully optimized: reduced to 256 tokens to save ~40% on output costs
+      temperature: parseFloat(process.env.ANTHROPIC_TEMPERATURE || '0.85'), // Slightly lower for consistency in expert domains
+      max_tokens: parseInt(process.env.ANTHROPIC_MAX_TOKENS || '200'), // Tight limit: 200 tokens (~120 words). Grump doesn't ramble.
     },
     groq: {
       apiKey: process.env.GROQ_API_KEY,
       model: process.env.GROQ_MODEL || 'llama-3.1-70b-versatile',
-      temperature: parseFloat(process.env.GROQ_TEMPERATURE || '0.9'), // Higher = more creative/human-like (0-2)
-      top_p: parseFloat(process.env.GROQ_TOP_P || '0.95'), // Nucleus sampling for more natural responses
-      max_tokens: parseInt(process.env.GROQ_MAX_TOKENS || '256'), // Fully optimized: reduced to 256 tokens to save output costs
+      temperature: parseFloat(process.env.GROQ_TEMPERATURE || '0.85'), // Slightly lower for consistency
+      top_p: parseFloat(process.env.GROQ_TOP_P || '0.9'), // Slightly tighter sampling for punchier responses
+      max_tokens: parseInt(process.env.GROQ_MAX_TOKENS || '200'), // Tight limit: 200 tokens to keep Grump concise
     },
   // Use AI_PROVIDER env var if set, otherwise default to Groq if key exists, else Anthropic
   aiProvider: process.env.AI_PROVIDER || (process.env.GROQ_API_KEY ? 'groq' : 'anthropic'),

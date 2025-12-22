@@ -82,6 +82,53 @@ const generateKeyframes = (prompt: string): AnimationProperties => {
     };
   }
 
+  if (p.includes('glitch')) {
+    return {
+      name: 'glitch-custom',
+      duration: '3s',
+      timing: 'steps(10)',
+      iteration: 'infinite',
+      keyframes: `
+@keyframes glitch-custom {
+  0% { transform: translate(0); clip-path: inset(0 0 0 0); }
+  10% { transform: translate(-2px, 2px); clip-path: inset(10% 0 85% 0); }
+  20% { transform: translate(2px, -2px); clip-path: inset(85% 0 5% 0); }
+  30% { transform: translate(-2px, -2px); clip-path: inset(50% 0 30% 0); }
+  40% { transform: translate(2px, 2px); clip-path: inset(10% 0 60% 0); }
+  50% { transform: translate(0); clip-path: inset(0 0 0 0); }
+}`
+    };
+  }
+
+  if (p.includes('orbit')) {
+    return {
+      name: 'orbit-custom',
+      duration: '3s',
+      timing: 'linear',
+      iteration: 'infinite',
+      keyframes: `
+@keyframes orbit-custom {
+  0% { transform: rotate(0deg) translateX(30px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
+}`
+    };
+  }
+
+  if (p.includes('type') || p.includes('write')) {
+    return {
+      name: 'typewriter-custom',
+      duration: '2s',
+      timing: 'steps(20)',
+      iteration: 'infinite',
+      keyframes: `
+@keyframes typewriter-custom {
+  0% { width: 0; border-right: 2px solid white; }
+  90% { width: 100%; border-right: 2px solid white; }
+  100% { width: 100%; border-right: none; }
+}`
+    };
+  }
+
   // Default: Wiggle
   return {
     name: 'wiggle-custom',
