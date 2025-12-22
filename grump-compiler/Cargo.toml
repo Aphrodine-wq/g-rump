@@ -6,6 +6,9 @@ authors = ["G-Rump Team"]
 description = "The Animation-First Game Programming Language Compiler"
 license = "MIT"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 # Lexer & Parser
 logos = "0.14"              # Fast lexer generator
@@ -29,6 +32,10 @@ regex = "1.10"
 # Random for CLI personality
 rand = "0.8"
 
+# WASM support
+wasm-bindgen = "0.2"
+console_error_panic_hook = { version = "0.1.7", optional = true }
+
 [dev-dependencies]
 criterion = "0.5"
 
@@ -36,3 +43,5 @@ criterion = "0.5"
 name = "grump"
 path = "src/cli/main.rs"
 
+[features]
+default = ["console_error_panic_hook"]
