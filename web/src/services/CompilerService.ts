@@ -116,7 +116,7 @@ export class CompilerService {
       const title = titleMatch ? titleMatch[1] : 'Untitled Game';
 
       // 2. Parse State
-      const _stateBlock = this.extractBlock(sourceCode, 'state');
+      // const _stateBlock = this.extractBlock(sourceCode, 'state');
       
       // 3. Parse Entities
       const entities = this.parseEntities(sourceCode);
