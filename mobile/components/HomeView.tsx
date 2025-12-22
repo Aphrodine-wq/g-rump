@@ -18,14 +18,38 @@ import Grump2 from './Grump2';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import GameEnvironment from './GameEnvironment';
+import * as Haptics from 'expo-haptics';
+import { Audio } from 'expo-av';
 
 const { width, height } = Dimensions.get('window');
 
+// Procedural-like sound mapping using expo-av (simulated since Web Audio API is limited in RN)
+const playSound = async (type: 'type' | 'send' | 'receive' | 'error') => {
+  try {
+    // In a real app, we would load these from assets. 
+    // For now, we trigger haptics as the primary feedback
+    if (type === 'type') {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } else if (type === 'send') {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    } else if (type === 'receive') {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } else if (type === 'error') {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
+  } catch (error) {
+    console.warn('Haptics failed', error);
+  }
+};
+
+import SettingsView from './SettingsView';
+
 export default function HomeView() {
-  const { messages, isTyping, errorMessage, sendMessage, createNewSession } = useChat();
+  const { messages, isTyping, errorMessage, sendMessage, clearSession } = useChat();
   const [messageText, setMessageText] = useState('');
   const [mood, setMood] = useState<'neutral' | 'typing' | 'annoyed' | 'angry' | 'happy' | 'surprised'>('annoyed');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const insets = useSafeAreaInsets();
   const messagesEndRef = useRef<ScrollView>(null);
   
@@ -44,9 +68,11 @@ export default function HomeView() {
         // Snap to positions
         if (gestureState.dy < -50) {
           // Dragged up -> Expand
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           Animated.spring(drawerHeight, { toValue: height * 0.85, useNativeDriver: false }).start();
         } else if (gestureState.dy > 50) {
           // Dragged down -> Collapse
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           Animated.spring(drawerHeight, { toValue: height * 0.4, useNativeDriver: false }).start();
         } else {
            // Return to default
@@ -64,6 +90,7 @@ export default function HomeView() {
     if (isTyping) setMood('typing');
     else if (messages.length > 0 && messages[messages.length - 1].sender === 'grump') {
       setMood('annoyed');
+      playSound('receive');
       setTimeout(() => setMood('neutral'), 3000);
     } else {
       setMood('neutral');
@@ -79,8 +106,13 @@ export default function HomeView() {
     const text = messageText.trim();
     setMessageText('');
     setMood('typing');
+    playSound('send');
     await sendMessage(text);
   };
+
+  if (showSettings) {
+    return <SettingsView onClose={() => setShowSettings(false)} />;
+  }
 
   return (
     <View style={styles.container}>
@@ -90,11 +122,27 @@ export default function HomeView() {
       {/* Grump Area (Top) */}
       <View style={[styles.grumpArea, { paddingTop: insets.top }]}>
         <View style={styles.header}>
-           <TouchableOpacity style={styles.menuButton} onPress={() => setIsMenuOpen(true)}>
+           <TouchableOpacity 
+             style={styles.menuButton} 
+             onPress={() => {
+               setIsMenuOpen(true);
+               Haptics.selectionAsync();
+             }}
+             accessibilityLabel="Open Menu"
+             accessibilityHint="Opens the main navigation menu"
+           >
              <Text style={styles.menuIcon}>☰</Text>
            </TouchableOpacity>
            <Text style={styles.headerTitle}>G-RUMP</Text>
-           <TouchableOpacity style={styles.menuButton} onPress={createNewSession}>
+           <TouchableOpacity 
+             style={styles.menuButton} 
+             onPress={() => {
+               clearSession();
+               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+             }}
+             accessibilityLabel="New Chat"
+             accessibilityHint="Clears the current conversation"
+           >
              <Text style={styles.menuIcon}>+</Text>
            </TouchableOpacity>
         </View>
@@ -139,10 +187,18 @@ export default function HomeView() {
               placeholder="Type here..."
               placeholderTextColor="#8E8E93"
               value={messageText}
-              onChangeText={setMessageText}
+              onChangeText={(t) => {
+                setMessageText(t);
+                if (Math.random() > 0.5) playSound('type'); // Sparse haptics for typing
+              }}
               onSubmitEditing={handleSend}
+              accessibilityLabel="Message Input"
             />
-            <TouchableOpacity style={styles.sendBtn} onPress={handleSend}>
+            <TouchableOpacity 
+              style={styles.sendBtn} 
+              onPress={handleSend}
+              accessibilityLabel="Send Message"
+            >
               <Text style={styles.sendBtnText}>↑</Text>
             </TouchableOpacity>
           </View>
@@ -159,19 +215,26 @@ export default function HomeView() {
           <View style={[styles.menuContainer, { paddingTop: insets.top + 20 }]}>
             <Text style={styles.menuTitle}>Menu</Text>
             
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={() => {
+              Haptics.selectionAsync();
+              setIsMenuOpen(false);
+              setShowSettings(true);
+            }}>
               <Text style={styles.menuItemText}>Settings</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={() => Haptics.selectionAsync()}>
               <Text style={styles.menuItemText}>History</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={() => Haptics.selectionAsync()}>
               <Text style={styles.menuItemText}>About Grump</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
               style={styles.closeMenuBtn}
-              onPress={() => setIsMenuOpen(false)}
+              onPress={() => {
+                setIsMenuOpen(false);
+                Haptics.selectionAsync();
+              }}
             >
               <Text style={styles.closeMenuText}>Close</Text>
             </TouchableOpacity>
