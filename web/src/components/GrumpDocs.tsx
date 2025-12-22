@@ -84,6 +84,68 @@ audioManager.voice.speak("I am very grumpy today.");`}
             </ul>
           </DocSection>
 
+          <DocSection title="Output Capabilities">
+            <p className="text-gray-600 leading-relaxed mb-4">
+              G-Rump supports a massive array of export formats for web, mobile, games, and video.
+            </p>
+            
+            <h4 className="font-semibold mb-3 text-gray-800">Export Formats</h4>
+            <div className="overflow-x-auto mb-6">
+              <table className="w-full text-sm text-left text-gray-600">
+                <thead className="bg-gray-50 text-gray-900 font-semibold">
+                  <tr>
+                    <th className="p-3 rounded-tl-xl">Format</th>
+                    <th className="p-3">Status</th>
+                    <th className="p-3 rounded-tr-xl">Use Case</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 border border-gray-100 rounded-b-xl">
+                  <tr><td className="p-3 font-medium">CSS Animation</td><td className="p-3 text-green-600">✅ Ready</td><td className="p-3">Web, Interactive</td></tr>
+                  <tr><td className="p-3 font-medium">SVG + SMIL</td><td className="p-3 text-green-600">✅ Ready</td><td className="p-3">Scalable Graphics</td></tr>
+                  <tr><td className="p-3 font-medium">Canvas JS</td><td className="p-3 text-green-600">✅ Ready</td><td className="p-3">Web Games</td></tr>
+                  <tr><td className="p-3 font-medium">Phaser 3</td><td className="p-3 text-green-600">✅ Ready</td><td className="p-3">Game Dev</td></tr>
+                  <tr><td className="p-3 font-medium">MP4 / GIF</td><td className="p-3 text-yellow-600">🚧 In Progress</td><td className="p-3">Video / Social</td></tr>
+                  <tr><td className="p-3 font-medium">Lottie JSON</td><td className="p-3 text-yellow-600">🚧 In Progress</td><td className="p-3">Mobile Apps</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h4 className="font-semibold mb-3 text-gray-800">Code Generation Targets</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <div className="flex justify-between items-center mb-2">
+                   <h5 className="font-bold text-gray-900">iOS / macOS 🍎</h5>
+                   <span className="text-xs font-mono bg-white px-2 py-1 rounded border">Swift</span>
+                </div>
+                <p className="text-xs text-gray-600">Native performance, 120fps+ animations, SwiftUI integration.</p>
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <div className="flex justify-between items-center mb-2">
+                   <h5 className="font-bold text-gray-900">Android 🤖</h5>
+                   <span className="text-xs font-mono bg-white px-2 py-1 rounded border">Kotlin</span>
+                </div>
+                <p className="text-xs text-gray-600">OpenGL ES, Jetpack Compose, Coroutine-based async.</p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <div className="flex justify-between items-center mb-2">
+                   <h5 className="font-bold text-gray-900">Web 🌐</h5>
+                   <span className="text-xs font-mono bg-white px-2 py-1 rounded border">TypeScript</span>
+                </div>
+                <p className="text-xs text-gray-600">Canvas (High Perf), SVG (Scalable), Three.js (3D).</p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <div className="flex justify-between items-center mb-2">
+                   <h5 className="font-bold text-gray-900">Game Engines 🎮</h5>
+                   <span className="text-xs font-mono bg-white px-2 py-1 rounded border">C# / C++</span>
+                </div>
+                <p className="text-xs text-gray-600">Unity (Animator), Unreal (Sequencer), Godot.</p>
+              </div>
+            </div>
+          </DocSection>
+
           <DocSection title="Configuration Variables">
             <p className="text-gray-600 mb-6">
               GRUMP's behavior and appearance are controlled by a centralized configuration object.
