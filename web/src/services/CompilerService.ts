@@ -162,7 +162,7 @@ export class CompilerService {
     }
   }
 
-  private static extractBlock(source: string, blockName: string): string {
+  private static _extractBlock(source: string, blockName: string): string {
     const regex = new RegExp(`${blockName}\\s*\\{([^}]+)\\}`, 's');
     const match = source.match(regex);
     return match ? match[1] : '';
