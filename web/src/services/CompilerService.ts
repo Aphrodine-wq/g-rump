@@ -109,14 +109,14 @@ export class CompilerService {
     };
   `;
 
-  public static compile(sourceCode: string, platform: string = 'web'): CompilationResult {
+  public static compile(sourceCode: string, _platform: string = 'web'): CompilationResult {
     try {
       // 1. Parse Metadata
       const titleMatch = sourceCode.match(/@app\s+"([^"]+)"/);
       const title = titleMatch ? titleMatch[1] : 'Untitled Game';
 
       // 2. Parse State
-      const stateBlock = this.extractBlock(sourceCode, 'state');
+      const _stateBlock = this.extractBlock(sourceCode, 'state');
       
       // 3. Parse Entities
       const entities = this.parseEntities(sourceCode);
@@ -199,13 +199,13 @@ export class CompilerService {
     return match ? match[1] : '';
   }
 
-  private static parseSystems(source: string): string[] {
+  private static parseSystems(_source: string): string[] {
     const systems: string[] = [];
     // Basic system parser implementation
     return systems;
   }
 
-  private static generateJs(entities: any[], systems: any[]): string {
+  private static generateJs(entities: any[], _systems: any[]): string {
     let js = '';
 
     // Generate Entities

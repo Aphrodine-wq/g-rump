@@ -284,7 +284,9 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
       heavy: 600,
       quickDouble: 250,
       half: 100,
-      wink: 200
+      wink: 200,
+      flutter: 50,
+      wide: 300
     }
 
     setState(prev => ({ ...prev, isBlinking: true, blinkType: type }))
