@@ -21,7 +21,7 @@ interface GameDevWorkspaceProps {
 export default function GameDevWorkspace({ 
   projectId: _projectId, 
   templateCode,
-  onNavigate: _onNavigate,
+  onNavigate,
   onExport 
 }: GameDevWorkspaceProps) {
   const [code, setCode] = useState(templateCode || getDefaultGameCode())

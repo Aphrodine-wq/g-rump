@@ -4,7 +4,7 @@ import './LandingPage.css'
 interface LandingPageProps {
   onGetStarted: () => void
   onLogin: () => void
-  onNavigate?: (view: 'pricing' | 'templates' | 'dashboard' | 'settings') => void
+  onNavigate?: (view: 'pricing' | 'templates' | 'dashboard' | 'settings' | 'gamedev') => void
 }
 
 export default function LandingPage({ onGetStarted, onLogin, onNavigate }: LandingPageProps) {
