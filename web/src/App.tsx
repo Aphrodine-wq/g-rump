@@ -1,9 +1,10 @@
-// Main App - New White Design with Landing Page and Chat Interface
+// Main App - Modern Glassmorphic Design with Smooth Page Transitions
 
 import { useState, useEffect } from 'react'
 import { ChatProvider, useChat } from './store/ChatStore'
 import { WorkspaceProvider } from './store/WorkspaceStore'
 import { AnimationProvider } from './store/AnimationStore'
+import { PageTransition } from './components/PageTransition'
 import LandingPage from './components/LandingPage'
 import ChatInterface from './components/ChatInterface'
 import MobileChatView from './components/MobileChatView'
@@ -54,49 +55,51 @@ function App() {
         <ChatProvider>
           <WorkspaceProvider>
             <div className="app">
-            {currentView === 'onboarding' && (
-              <OnboardingFlow onComplete={handleOnboardingComplete} />
-            )}
-            {currentView === 'landing' && (
-              <LandingPage 
-                onGetStarted={handleGetStarted}
-                onLogin={handleLogin}
-                onNavigate={(view) => setCurrentView(view)}
-              />
-            )}
-            {currentView === 'chat' && (
-              <ChatViewWithTemplate 
-                isMobile={isMobile}
-                templatePrompt={pendingTemplatePrompt}
-                onTemplateSent={() => setPendingTemplatePrompt(null)}
-              />
-            )}
-            {currentView === 'templates' && (
-              <TemplateGallery 
-                onNavigateToChat={(templatePrompt) => {
-                  setPendingTemplatePrompt(templatePrompt || null)
-                  setCurrentView('chat')
-                }}
-                onNavigate={(view) => setCurrentView(view)}
-                onNavigateToGameDev={(templateCode) => {
-                  setCurrentGameTemplate(templateCode || null)
-                  setCurrentView('gamedev')
-                }}
-              />
-            )}
-            {currentView === 'dashboard' && <UserDashboard onNavigate={(view) => setCurrentView(view)} />}
-            {currentView === 'settings' && <SettingsPage onNavigate={(view) => setCurrentView(view)} />}
-            {currentView === 'pricing' && <PricingPage onNavigate={(view) => setCurrentView(view)} />}
-            {currentView === 'gamedev' && (
-              <GameDevWorkspace 
-                templateCode={currentGameTemplate || undefined}
-                onNavigate={(view) => setCurrentView(view as View)}
-                onExport={(code, target) => {
-                  console.log('Export game:', code, target)
-                  // Handle export
-                }}
-              />
-            )}
+              <PageTransition key={currentView}>
+                {currentView === 'onboarding' && (
+                  <OnboardingFlow onComplete={handleOnboardingComplete} />
+                )}
+                {currentView === 'landing' && (
+                  <LandingPage
+                    onGetStarted={handleGetStarted}
+                    onLogin={handleLogin}
+                    onNavigate={(view) => setCurrentView(view)}
+                  />
+                )}
+                {currentView === 'chat' && (
+                  <ChatViewWithTemplate
+                    isMobile={isMobile}
+                    templatePrompt={pendingTemplatePrompt}
+                    onTemplateSent={() => setPendingTemplatePrompt(null)}
+                  />
+                )}
+                {currentView === 'templates' && (
+                  <TemplateGallery
+                    onNavigateToChat={(templatePrompt) => {
+                      setPendingTemplatePrompt(templatePrompt || null)
+                      setCurrentView('chat')
+                    }}
+                    onNavigate={(view) => setCurrentView(view)}
+                    onNavigateToGameDev={(templateCode) => {
+                      setCurrentGameTemplate(templateCode || null)
+                      setCurrentView('gamedev')
+                    }}
+                  />
+                )}
+                {currentView === 'dashboard' && <UserDashboard onNavigate={(view) => setCurrentView(view)} />}
+                {currentView === 'settings' && <SettingsPage onNavigate={(view) => setCurrentView(view)} />}
+                {currentView === 'pricing' && <PricingPage onNavigate={(view) => setCurrentView(view)} />}
+                {currentView === 'gamedev' && (
+                  <GameDevWorkspace
+                    templateCode={currentGameTemplate || undefined}
+                    onNavigate={(view) => setCurrentView(view as View)}
+                    onExport={(code, target) => {
+                      console.log('Export game:', code, target)
+                      // Handle export
+                    }}
+                  />
+                )}
+              </PageTransition>
             </div>
           </WorkspaceProvider>
         </ChatProvider>
