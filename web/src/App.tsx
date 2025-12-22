@@ -149,15 +149,15 @@ function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <AchievementsProvider>
-          <AnimationProvider>
+        <AnimationProvider>
+          <AchievementsProvider>
             <ChatProvider>
               <WorkspaceProvider>
                 <AppContent />
               </WorkspaceProvider>
             </ChatProvider>
-          </AnimationProvider>
-        </AchievementsProvider>
+          </AchievementsProvider>
+        </AnimationProvider>
       </AuthProvider>
     </ErrorBoundary>
   )
