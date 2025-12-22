@@ -102,6 +102,7 @@ function App() {
                     }}
                   />
                 )}
+                {currentView === 'education' && <EducationView onNavigate={(view) => setCurrentView(view as View)} />}
               </PageTransition>
               </div>
             </WorkspaceProvider>

@@ -8,7 +8,7 @@ import Grump2 from './Grump2'
 import './UserDashboard.css'
 
 interface UserDashboardProps {
-  onNavigate?: (view: 'chat' | 'templates' | 'settings' | 'pricing') => void
+  onNavigate?: (view: 'chat' | 'templates' | 'settings' | 'pricing' | 'education') => void
 }
 
 export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
