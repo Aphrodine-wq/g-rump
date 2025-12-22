@@ -27,7 +27,7 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
         'Preview only (no downloads)',
         '720p resolution',
         'Community support',
-        'G-Rump watermark'
+        'g-rump watermark'
       ],
       cta: 'Get Started',
       highlight: false
@@ -75,8 +75,8 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
 
   const faqs = [
     {
-      question: 'Can I use G-Rump animations commercially?',
-      answer: 'Yes! All animations you create are yours to use however you want, including commercial projects. G-Rump might judge your projects, but he won\'t sue you.',
+      question: 'Can I use g-rump animations commercially?',
+      answer: 'Yes! All animations you create are yours to use however you want, including commercial projects. g-rump might judge your projects, but he won\'t sue you.',
       open: true
     },
     {
@@ -101,12 +101,12 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
       {/* Navigation */}
       <nav className="pricing-nav">
         <div className="nav-brand">
-          <span className="brand-name">G-RUMP</span>
+          <span className="brand-name">g-rump</span>
         </div>
         <div className="nav-links">
           <button className="nav-link-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
           <button className="nav-link-btn" onClick={() => onNavigate?.('dashboard')}>Dashboard</button>
-          <button className="nav-link-btn" onClick={() => onNavigate?.('chat')}>Login</button>
+          <button className="nav-link-btn" onClick={() => onNavigate?.('dashboard')}>Login</button>
           <button className="nav-link-btn primary" onClick={() => onNavigate?.('chat')}>Sign Up</button>
         </div>
       </nav>
@@ -179,7 +179,7 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
       <section className="api-section">
         <h2>API Pricing</h2>
         <div className="api-card">
-          <p>For developers who want to integrate G-Rump into their own apps</p>
+          <p>For developers who want to integrate g-rump into their own apps</p>
           <div className="api-pricing">
             <div className="api-price">$0.05 per animation generated</div>
             <div className="api-discounts">
@@ -228,7 +228,7 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
       <footer className="pricing-footer">
         <div className="footer-content">
           <div className="footer-brand">
-            <span>G-RUMP</span>
+            <span>g-rump</span>
           </div>
           <div className="footer-links">
             <a href="#features">Features</a>
@@ -240,10 +240,9 @@ export default function PricingPage({ onNavigate }: PricingPageProps = {}) {
           </div>
         </div>
         <p className="footer-copyright">
-          © 2024 G-Rump · Terms · Privacy · "Stop reading the footer and make something"
+          © 2024 g-rump · Terms · Privacy · "Stop reading the footer and make something"
         </p>
       </footer>
     </div>
   )
 }
-

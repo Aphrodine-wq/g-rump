@@ -32,7 +32,7 @@ export default function MobileChatView({ onNavigate: _onNavigate }: MobileChatVi
       {/* Mobile Header */}
       <header className="mobile-header">
         <button className="back-btn">←</button>
-        <span className="mobile-title">G-RUMP</span>
+        <span className="mobile-title">g-rump</span>
         <button className="export-btn" onClick={() => setShowExport(true)}>Export</button>
       </header>
 

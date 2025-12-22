@@ -43,7 +43,7 @@ function App() {
   }
 
   const handleLogin = () => {
-    setCurrentView('chat')
+    setCurrentView('dashboard')
   }
 
   const handleOnboardingComplete = () => {

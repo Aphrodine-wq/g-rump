@@ -111,7 +111,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
       {/* Header */}
       <header className="chat-header">
         <div className="header-left">
-          <span className="header-title">G-RUMP</span>
+          <span className="header-title">g-rump</span>
           <button className="header-btn" onClick={() => createNewSession()}>New Chat</button>
         </div>
         <div className="header-right">
@@ -204,7 +204,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
                 →
               </button>
             </div>
-            <p className="input-footer">Made with G-Rump</p>
+            <p className="input-footer">Made with g-rump</p>
           </div>
         </div>
 

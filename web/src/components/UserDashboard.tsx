@@ -87,7 +87,7 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
       {/* Header */}
       <header className="dashboard-header">
         <div className="header-left">
-          <span className="header-title">G-RUMP</span>
+          <span className="header-title">g-rump</span>
           <button className="header-btn" onClick={() => onNavigate?.('chat')}>New Chat</button>
         </div>
         <div className="header-right">

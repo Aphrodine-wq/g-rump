@@ -13,7 +13,7 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
       {/* Navigation */}
       <nav className="landing-nav">
         <div className="nav-brand">
-          <span className="brand-name">G-RUMP</span>
+          <span className="brand-name">g-rump</span>
         </div>
         <div className="nav-links">
           <button className="nav-link-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
@@ -50,7 +50,7 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
               className="hero-input-field"
             />
             <button className="hero-cta" onClick={onGetStarted}>
-              Try G-Rump Free →
+              Try g-rump Free →
             </button>
           </div>
 
@@ -58,17 +58,42 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
         </div>
       </section>
 
-      {/* Video Section */}
-      <section className="video-section">
-        <h2 className="section-title">Watch G-Rump in Action</h2>
-        <div className="video-container">
-          <div className="video-placeholder">
-            <button className="play-button">
-              <svg width="60" height="60" viewBox="0 0 24 24" fill="white">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </button>
-            <p>"Make me a loading spinner"</p>
+      {/* Showcase Section (New) */}
+      <section className="showcase-section">
+        <h2 className="section-title">See It In Action</h2>
+        <div className="showcase-container">
+          <div className="showcase-grid">
+            {/* Demo 1: Bounce */}
+            <div className="showcase-item">
+              <div className="demo-box bounce-demo">
+                <div className="demo-circle"></div>
+              </div>
+              <p className="demo-label">"Make it bounce"</p>
+            </div>
+            
+            {/* Demo 2: Spinner */}
+            <div className="showcase-item">
+              <div className="demo-box">
+                <div className="demo-spinner"></div>
+              </div>
+              <p className="demo-label">"I need a loader"</p>
+            </div>
+
+            {/* Demo 3: Morph */}
+            <div className="showcase-item">
+              <div className="demo-box">
+                <div className="demo-morph"></div>
+              </div>
+              <p className="demo-label">"Morph circle to square"</p>
+            </div>
+
+            {/* Demo 4: Glow */}
+            <div className="showcase-item">
+              <div className="demo-box">
+                <button className="demo-btn-glow">Hover Me</button>
+              </div>
+              <p className="demo-label">"Make a glowing button"</p>
+            </div>
           </div>
         </div>
       </section>
@@ -80,7 +105,7 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
           <div className="step">
             <div className="step-icon">💬</div>
             <h3>Chat</h3>
-            <p>Tell G-Rump what you want (he'll judge)</p>
+            <p>Tell g-rump what you want (he'll judge)</p>
           </div>
           <div className="step">
             <div className="step-icon">🎬</div>
@@ -97,7 +122,7 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
 
       {/* What Can G-Rump Make */}
       <section className="examples-section">
-        <h2 className="section-title">What Can G-Rump Make?</h2>
+        <h2 className="section-title">What Can g-rump Make?</h2>
         <div className="examples-grid">
           {[
             { icon: '○ ○ ○', name: 'Loading Animations' },
@@ -124,7 +149,7 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
         <h2 className="section-title">What People Are Saying</h2>
         <div className="testimonial-cards">
           <div className="testimonial-card">
-            <p>"I asked for a simple bounce and G-Rump gave me a physics-perfect animation with squash and stretch I didn't even know I needed. Then he called my original idea 'mid'. 10/10"</p>
+            <p>"I asked for a simple bounce and g-rump gave me a physics-perfect animation with squash and stretch I didn't even know I needed. Then he called my original idea 'mid'. 10/10"</p>
             <p className="testimonial-author">— @indie_dev_sarah</p>
           </div>
           <div className="testimonial-card">
@@ -190,7 +215,7 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
       <footer className="landing-footer">
         <div className="footer-content">
           <div className="footer-brand">
-            <span>G-RUMP</span>
+            <span>g-rump</span>
           </div>
           <div className="footer-links">
             <button className="footer-link-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
@@ -200,10 +225,9 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
           </div>
         </div>
         <p className="footer-copyright">
-          © 2024 G-Rump · Terms · Privacy · "Stop reading the footer and make something"
+          © 2024 g-rump · Terms · Privacy · "Stop reading the footer and make something"
         </p>
       </footer>
     </div>
   )
 }
-
