@@ -1,0 +1,728 @@
+// G-Rump Animation Definitions for Grump Character
+// Advanced animation reasoning system for iOS/React Native/Web platforms
+// Makes Grump the undisputed king of animations
+
+entity GrumpCharacter {
+    // Core animation system with 6-layer reasoning
+
+    // ===== NEUTRAL MOOD =====
+    intent "Maintain baseline friendly presence" {
+        primary: "Show approachable personality"
+        secondary: ["Stay alert", "Be responsive"]
+        forbidden: ["Boredom", "Sleepiness"]
+        emotion: neutral
+        intensity: 0.3
+    }
+
+    hierarchy {
+        leader: eyes
+        secondary: [head, body]
+        tertiary: [brows]
+        still: [limbs]
+    }
+
+    beats {
+        beat "idle_blink" {
+            driver: eyes
+            duration: 0.15s
+            ease: smooth
+            priority: 8
+        }
+        beat "gentle_breath" {
+            driver: body
+            duration: 2.0s
+            ease: in_out
+            loop: true
+            priority: 3
+        }
+        beat "subtle_head_shift" {
+            driver: head
+            delay: 0.5s
+            duration: 1.5s
+            ease: smooth
+            priority: 4
+        }
+    }
+
+    causality {
+        blink_cycle → head_shift {
+            delay: 0.3s
+            strength: 0.2
+        }
+    }
+
+    timing {
+        blink_interval: 3-5s
+        breath_rate: 12/min
+        head_movement: 800ms
+    }
+
+    settling {
+        overshoot: 0.02
+        micro_settles: [
+            {
+                target: eyes
+                delay: 20ms
+                duration: 100ms
+                amount: 0.05
+            }
+        ]
+    }
+}
+
+// ===== ANNOYED MOOD =====
+entity GrumpCharacter {
+    intent "Express controlled frustration" {
+        primary: "Show mild irritation without aggression"
+        secondary: ["Maintain professionalism", "Stay engaging"]
+        forbidden: ["Rage", "Hostility", "Passive aggression"]
+        emotion: annoyed
+        intensity: 0.7
+    }
+
+    hierarchy {
+        leader: eyes
+        secondary: [brows, head]
+        tertiary: [body]
+        still: [limbs]
+    }
+
+    beats {
+        beat "anticipation_pause" {
+            duration: 0.08s
+            stillness: true
+            priority: 10
+        }
+        beat "eye_roll" {
+            driver: eyes
+            duration: 0.12s
+            ease: fast_out
+            priority: 10
+        }
+        beat "brow_furrow" {
+            driver: brows
+            delay: 0.02s
+            duration: 0.15s
+            ease: heavy
+            priority: 8
+        }
+        beat "head_shake" {
+            driver: head
+            delay: 0.06s
+            duration: 0.22s
+            ease: heavy
+            priority: 7
+        }
+        beat "recovery_settle" {
+            duration: 0.6s
+            ease: smooth
+            priority: 5
+        }
+    }
+
+    causality {
+        eye_roll → brows {
+            delay: 0.02s
+            strength: 0.6
+        }
+        brows → head {
+            delay: 0.04s
+            strength: 0.4
+        }
+        emotion_intensity → eye_roll_speed {
+            strength: 0.8
+        }
+    }
+
+    timing {
+        eye_movement: 120ms
+        brow_lag: 60ms
+        head_lag: 120ms
+        recovery: 600ms
+    }
+
+    settling {
+        overshoot: 0.08
+        asymmetry: 0.12
+        delayed_stop: 30ms
+        micro_settles: [
+            {
+                target: brows
+                delay: 50ms
+                duration: 200ms
+                amount: 0.08
+            },
+            {
+                target: head
+                delay: 80ms
+                duration: 300ms
+                amount: 0.05
+            }
+        ]
+    }
+}
+
+// ===== TYPING MOOD =====
+entity GrumpCharacter {
+    intent "Show active engagement in conversation" {
+        primary: "Indicate typing/thinking activity"
+        secondary: ["Stay focused", "Show concentration"]
+        emotion: typing
+        intensity: 0.5
+    }
+
+    hierarchy {
+        leader: eyes
+        secondary: [brows, head]
+        tertiary: [body]
+        still: [limbs]
+    }
+
+    beats {
+        beat "focus_blink" {
+            driver: eyes
+            duration: 0.1s
+            ease: sharp
+            priority: 9
+        }
+        beat "concentration_brows" {
+            driver: brows
+            delay: 0.05s
+            duration: 0.2s
+            ease: smooth
+            priority: 7
+        }
+        beat "typing_head_bob" {
+            driver: head
+            duration: 0.15s
+            ease: bounce
+            loop: true
+            priority: 6
+        }
+        beat "subtle_body_shift" {
+            driver: body
+            delay: 0.1s
+            duration: 0.3s
+            ease: smooth
+            priority: 4
+        }
+    }
+
+    causality {
+        typing_rhythm → head_bob {
+            strength: 0.7
+        }
+        concentration → brow_position {
+            delay: 0.03s
+            strength: 0.5
+        }
+    }
+
+    timing {
+        typing_speed: 200ms
+        blink_rate: 2x_normal
+        head_bob_interval: 150ms
+    }
+
+    settling {
+        overshoot: 0.03
+        micro_settles: [
+            {
+                target: brows
+                delay: 30ms
+                duration: 150ms
+                amount: 0.04
+            }
+        ]
+    }
+}
+
+// ===== ANGRY MOOD =====
+entity GrumpCharacter {
+    intent "Express strong disapproval with control" {
+        primary: "Show anger without losing composure"
+        secondary: ["Maintain character integrity", "Stay intimidating but not abusive"]
+        forbidden: ["Violence", "Uncontrolled rage"]
+        emotion: angry
+        intensity: 0.9
+    }
+
+    hierarchy {
+        leader: eyes
+        secondary: [brows, head]
+        tertiary: [body]
+        still: [limbs]
+    }
+
+    beats {
+        beat "rage_build" {
+            duration: 0.1s
+            stillness: true
+            priority: 10
+        }
+        beat "eye_glare" {
+            driver: eyes
+            duration: 0.08s
+            ease: instant
+            priority: 10
+        }
+        beat "brow_slash" {
+            driver: brows
+            delay: 0.01s
+            duration: 0.12s
+            ease: heavy
+            priority: 9
+        }
+        beat "head_jerk" {
+            driver: head
+            delay: 0.03s
+            duration: 0.18s
+            ease: heavy
+            priority: 8
+        }
+        beat "body_tense" {
+            driver: body
+            delay: 0.05s
+            duration: 0.25s
+            ease: sharp
+            priority: 7
+        }
+        beat "controlled_release" {
+            duration: 0.8s
+            ease: smooth
+            priority: 5
+        }
+    }
+
+    causality {
+        eye_glare → brows {
+            delay: 0.01s
+            strength: 0.9
+        }
+        brows → head {
+            delay: 0.02s
+            strength: 0.7
+        }
+        head → body {
+            delay: 0.02s
+            strength: 0.5
+        }
+        intensity → movement_speed {
+            strength: 1.0
+        }
+    }
+
+    timing {
+        eye_fixation: 80ms
+        brow_drop: 120ms
+        head_snap: 180ms
+        body_tension: 250ms
+        release: 800ms
+    }
+
+    settling {
+        overshoot: 0.15
+        asymmetry: 0.2
+        delayed_stop: 50ms
+        micro_settles: [
+            {
+                target: brows
+                delay: 60ms
+                duration: 250ms
+                amount: 0.12
+            },
+            {
+                target: head
+                delay: 100ms
+                duration: 400ms
+                amount: 0.08
+            },
+            {
+                target: body
+                delay: 150ms
+                duration: 500ms
+                amount: 0.06
+            }
+        ]
+    }
+}
+
+// ===== HAPPY MOOD =====
+entity GrumpCharacter {
+    intent "Show genuine delight and warmth" {
+        primary: "Express joy and friendliness"
+        secondary: ["Be welcoming", "Show enthusiasm"]
+        forbidden: ["Sarcasm", "Mockery", "Overexcitement"]
+        emotion: happy
+        intensity: 0.8
+    }
+
+    hierarchy {
+        leader: eyes
+        secondary: [brows, mouth, head]
+        tertiary: [body]
+        still: [limbs]
+    }
+
+    beats {
+        beat "joy_anticipation" {
+            duration: 0.06s
+            stillness: true
+            priority: 10
+        }
+        beat "eye_sparkle" {
+            driver: eyes
+            duration: 0.2s
+            ease: bounce
+            priority: 10
+        }
+        beat "brow_lift" {
+            driver: brows
+            delay: 0.02s
+            duration: 0.25s
+            ease: light
+            priority: 9
+        }
+        beat "smile_form" {
+            driver: mouth
+            delay: 0.05s
+            duration: 0.3s
+            ease: smooth
+            priority: 8
+        }
+        beat "head_tilt_joy" {
+            driver: head
+            delay: 0.08s
+            duration: 0.35s
+            ease: bounce
+            priority: 7
+        }
+        beat "body_bounce" {
+            driver: body
+            delay: 0.1s
+            duration: 0.4s
+            ease: bounce
+            priority: 6
+        }
+        beat "happy_settle" {
+            duration: 0.5s
+            ease: smooth
+            priority: 5
+        }
+    }
+
+    causality {
+        eye_sparkle → brows {
+            delay: 0.02s
+            strength: 0.8
+        }
+        brows → mouth {
+            delay: 0.03s
+            strength: 0.7
+        }
+        mouth → head {
+            delay: 0.03s
+            strength: 0.6
+        }
+        head → body {
+            delay: 0.02s
+            strength: 0.5
+        }
+    }
+
+    timing {
+        eye_brighten: 200ms
+        brow_arc: 250ms
+        smile_curve: 300ms
+        head_tilt: 350ms
+        body_bounce: 400ms
+    }
+
+    settling {
+        overshoot: 0.1
+        asymmetry: 0.05
+        delayed_stop: 20ms
+        micro_settles: [
+            {
+                target: eyes
+                delay: 40ms
+                duration: 180ms
+                amount: 0.06
+            },
+            {
+                target: mouth
+                delay: 60ms
+                duration: 220ms
+                amount: 0.08
+            }
+        ]
+    }
+}
+
+// ===== SURPRISED MOOD =====
+entity GrumpCharacter {
+    intent "Show genuine astonishment" {
+        primary: "Express surprise and wonder"
+        secondary: ["Stay engaged", "Show curiosity"]
+        emotion: surprised
+        intensity: 0.85
+    }
+
+    hierarchy {
+        leader: eyes
+        secondary: [brows, mouth, head]
+        tertiary: [body]
+        still: [limbs]
+    }
+
+    beats {
+        beat "surprise_freeze" {
+            duration: 0.04s
+            stillness: true
+            priority: 10
+        }
+        beat "eye_widen" {
+            driver: eyes
+            duration: 0.15s
+            ease: fast_out
+            priority: 10
+        }
+        beat "brow_shoot_up" {
+            driver: brows
+            delay: 0.01s
+            duration: 0.18s
+            ease: bounce
+            priority: 9
+        }
+        beat "mouth_open" {
+            driver: mouth
+            delay: 0.03s
+            duration: 0.22s
+            ease: fast_out
+            priority: 8
+        }
+        beat "head_recoil" {
+            driver: head
+            delay: 0.05s
+            duration: 0.28s
+            ease: heavy
+            priority: 7
+        }
+        beat "body_jolt" {
+            driver: body
+            delay: 0.07s
+            duration: 0.35s
+            ease: bounce
+            priority: 6
+        }
+        beat "settle_down" {
+            duration: 0.7s
+            ease: smooth
+            priority: 5
+        }
+    }
+
+    causality {
+        eye_widen → brows {
+            delay: 0.01s
+            strength: 0.95
+        }
+        brows → mouth {
+            delay: 0.02s
+            strength: 0.9
+        }
+        mouth → head {
+            delay: 0.02s
+            strength: 0.8
+        }
+        head → body {
+            delay: 0.02s
+            strength: 0.6
+        }
+    }
+
+    timing {
+        eye_dilation: 150ms
+        brow_lift: 180ms
+        mouth_drop: 220ms
+        head_pull: 280ms
+        body_shock: 350ms
+    }
+
+    settling {
+        overshoot: 0.12
+        asymmetry: 0.08
+        delayed_stop: 40ms
+        micro_settles: [
+            {
+                target: brows
+                delay: 50ms
+                duration: 250ms
+                amount: 0.1
+            },
+            {
+                target: mouth
+                delay: 70ms
+                duration: 300ms
+                amount: 0.12
+            },
+            {
+                target: head
+                delay: 90ms
+                duration: 350ms
+                amount: 0.07
+            }
+        ]
+    }
+}
+
+// ===== SPECIAL ANIMATIONS =====
+
+// Eye Roll Animation (for annoyed state)
+entity EyeRollAnimation {
+    intent "Show eye roll with full facial coordination" {
+        primary: "Execute complex eye movement sequence"
+        emotion: annoyed
+        intensity: 0.75
+    }
+
+    hierarchy {
+        leader: eyes
+        secondary: [eyelids, brows, head]
+        tertiary: [body]
+        still: [limbs]
+    }
+
+    beats {
+        beat "setup" {
+            duration: 0.05s
+            stillness: true
+        }
+        beat "eye_roll" {
+            driver: eyes
+            duration: 0.4s
+            ease: smooth
+            priority: 10
+        }
+        beat "eyelid_follow" {
+            driver: eyelids
+            delay: 0.1s
+            duration: 0.3s
+            ease: smooth
+            priority: 8
+        }
+        beat "brow_reaction" {
+            driver: brows
+            delay: 0.15s
+            duration: 0.25s
+            ease: heavy
+            priority: 7
+        }
+        beat "head_tilt" {
+            driver: head
+            delay: 0.2s
+            duration: 0.3s
+            ease: smooth
+            priority: 6
+        }
+    }
+
+    causality {
+        eye_roll → eyelids {
+            delay: 0.1s
+            strength: 0.7
+        }
+        eyelids → brows {
+            delay: 0.05s
+            strength: 0.6
+        }
+        brows → head {
+            delay: 0.05s
+            strength: 0.5
+        }
+    }
+
+    timing {
+        roll_duration: 400ms
+        eyelid_delay: 100ms
+        brow_delay: 150ms
+        head_delay: 200ms
+    }
+
+    settling {
+        overshoot: 0.08
+        micro_settles: [
+            {
+                target: eyes
+                delay: 30ms
+                duration: 150ms
+                amount: 0.06
+            }
+        ]
+    }
+}
+
+// Particle Effects for Mood Glow
+entity MoodGlowEffect {
+    intent "Create atmospheric mood indication" {
+        primary: "Enhance emotional expression with particles"
+        secondary: ["Add visual depth", "Increase engagement"]
+    }
+
+    hierarchy {
+        leader: glow_core
+        secondary: [particles, aura]
+        still: []
+    }
+
+    beats {
+        beat "glow_burst" {
+            driver: glow_core
+            duration: 0.3s
+            ease: fast_out
+            priority: 8
+        }
+        beat "particle_spawn" {
+            driver: particles
+            delay: 0.1s
+            duration: 0.5s
+            ease: smooth
+            priority: 7
+        }
+        beat "aura_expand" {
+            driver: aura
+            delay: 0.2s
+            duration: 0.8s
+            ease: smooth
+            priority: 6
+        }
+    }
+
+    causality {
+        mood_intensity → glow_brightness {
+            strength: 0.9
+        }
+        glow_burst → particle_count {
+            delay: 0.1s
+            strength: 0.7
+        }
+    }
+
+    timing {
+        pulse_rate: 2Hz
+        particle_lifetime: 1.5s
+        aura_fade: 2.0s
+    }
+
+    settling {
+        overshoot: 0.05
+        micro_settles: [
+            {
+                target: glow_core
+                delay: 40ms
+                duration: 200ms
+                amount: 0.04
+            }
+        ]
+    }
+}

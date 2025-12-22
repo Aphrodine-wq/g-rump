@@ -33,114 +33,43 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
           
           <h1 className="hero-title">
             The AI That Animates
-            <br />
-            <span className="subtitle">(Reluctantly)</span>
           </h1>
           
           <p className="hero-description">
             Tell me what you want. I'll make it move.
-            <br />
-            Try not to waste my time.
           </p>
 
           <div className="hero-input">
             <input 
               type="text" 
-              placeholder="Make me a bouncing logo"
+              placeholder="Make me a bouncing logo..."
               className="hero-input-field"
             />
             <button className="hero-cta" onClick={onGetStarted}>
-              Try g-rump Free →
+              Start →
             </button>
           </div>
-
-          <p className="hero-note">No credit card required</p>
         </div>
       </section>
 
-      {/* Showcase Section (New) */}
-      <section className="showcase-section">
-        <h2 className="section-title">See It In Action</h2>
-        <div className="showcase-container">
-          <div className="showcase-grid">
-            {/* Demo 1: Bounce */}
-            <div className="showcase-item">
-              <div className="demo-box bounce-demo">
-                <div className="demo-circle"></div>
-              </div>
-              <p className="demo-label">"Make it bounce"</p>
-            </div>
-            
-            {/* Demo 2: Spinner */}
-            <div className="showcase-item">
-              <div className="demo-box">
-                <div className="demo-spinner"></div>
-              </div>
-              <p className="demo-label">"I need a loader"</p>
-            </div>
-
-            {/* Demo 3: Morph */}
-            <div className="showcase-item">
-              <div className="demo-box">
-                <div className="demo-morph"></div>
-              </div>
-              <p className="demo-label">"Morph circle to square"</p>
-            </div>
-
-            {/* Demo 4: Glow */}
-            <div className="showcase-item">
-              <div className="demo-box">
-                <button className="demo-btn-glow">Hover Me</button>
-              </div>
-              <p className="demo-label">"Make a glowing button"</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="how-it-works">
-        <h2 className="section-title">How It Works</h2>
-        <div className="steps">
-          <div className="step">
-            <div className="step-icon">💬</div>
-            <h3>Chat</h3>
-            <p>Tell g-rump what you want (he'll judge)</p>
-          </div>
-          <div className="step">
-            <div className="step-icon">🎬</div>
-            <h3>Animate</h3>
-            <p>Watch him create it (while judging)</p>
-          </div>
-          <div className="step">
-            <div className="step-icon">📦</div>
-            <h3>Export</h3>
-            <p>Download in any format (still judging)</p>
-          </div>
-        </div>
-      </section>
-
-      {/* What Can G-Rump Make */}
-      <section className="examples-section">
-        <h2 className="section-title">What Can g-rump Make?</h2>
-        <div className="examples-grid">
-          {[
-            { icon: '○ ○ ○', name: 'Loading Animations' },
-            { icon: '◇', name: 'Logo Reveals' },
-            { icon: '┌─────┐', name: 'Button Effects' },
-            { icon: '⟳', name: 'Spinner & More' },
-            { icon: '★ ☆ ★', name: 'Particles & Effects' },
-            { icon: '╔═══╗', name: 'Stream Alerts' },
-            { icon: '👤 → 🏃', name: 'Game Sprites' },
-            { icon: '♪ ♫ ♪', name: 'Audio Visualizer' },
-            { icon: '│ ↑ │', name: 'Scroll Indicators' },
-            { icon: '│ │ │', name: 'Chart Animations' }
-          ].map((example, i) => (
-            <div key={i} className="example-card">
-              <div className="example-icon">{example.icon}</div>
-              <p>{example.name}</p>
-            </div>
-          ))}
+      {/* Simplified Features Grid */}
+      <section className="features-minimal">
+        <div className="features-grid">
+           <div className="feature-item" onClick={() => onNavigate?.('gamedev')}>
+             <span className="feature-icon">🎮</span>
+             <h3>Game Dev</h3>
+             <p>Create games instantly</p>
+           </div>
+           <div className="feature-item" onClick={() => onNavigate?.('templates')}>
+             <span className="feature-icon">✨</span>
+             <h3>Templates</h3>
+             <p>Start from scratch</p>
+           </div>
+           <div className="feature-item" onClick={() => onNavigate?.('pricing')}>
+             <span className="feature-icon">💎</span>
+             <h3>Pro</h3>
+             <p>Unlock everything</p>
+           </div>
         </div>
       </section>
 

@@ -26,25 +26,25 @@ export const LoginScreen: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#F5F5F7] flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-[#F5F5F7] flex items-center justify-center z-50 overflow-y-auto">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md p-8 bg-white rounded-3xl shadow-soft"
+        className="w-full max-w-sm p-6 bg-white rounded-3xl shadow-soft m-4"
       >
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <motion.h1 
-            className="text-4xl font-black mb-2 tracking-tight text-gray-900"
+            className="text-3xl font-black mb-1 tracking-tight text-gray-900"
             layoutId="title"
           >
             g-rump
           </motion.h1>
-          <p className="text-gray-500 font-medium">
+          <p className="text-gray-500 font-medium text-sm">
             {isLogin ? 'Welcome back, human.' : 'Oh great, another one.'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <AnimatePresence mode="wait">
             {!isLogin && (
               <motion.div
@@ -58,7 +58,7 @@ export const LoginScreen: React.FC = () => {
                   placeholder="Your Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full p-4 bg-gray-50 rounded-2xl outline-none text-gray-900 placeholder-gray-400 focus:shadow-float transition-all duration-300"
+                  className="w-full p-3 bg-gray-50 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:shadow-float transition-all duration-300 text-sm"
                   required={!isLogin}
                 />
               </motion.div>
@@ -70,7 +70,7 @@ export const LoginScreen: React.FC = () => {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-4 bg-gray-50 rounded-2xl outline-none text-gray-900 placeholder-gray-400 focus:shadow-float transition-all duration-300"
+            className="w-full p-3 bg-gray-50 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:shadow-float transition-all duration-300 text-sm"
             required
           />
 
@@ -79,38 +79,38 @@ export const LoginScreen: React.FC = () => {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-4 bg-gray-50 rounded-2xl outline-none text-gray-900 placeholder-gray-400 focus:shadow-float transition-all duration-300"
+            className="w-full p-3 bg-gray-50 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:shadow-float transition-all duration-300 text-sm"
             required
           />
 
           {error && (
-            <p className="text-red-500 text-sm text-center font-medium">{error}</p>
+            <p className="text-red-500 text-xs text-center font-medium">{error}</p>
           )}
 
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-4 bg-black text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+            className="w-full py-3 bg-black text-white rounded-xl font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
             disabled={isLoading}
           >
-            {isLoading ? 'Processing...' : (isLogin ? 'Sign In' : 'Join the Misery')}
+            {isLoading ? 'Processing...' : (isLogin ? 'Sign In' : 'Join')}
           </motion.button>
         </form>
 
-        <div className="mt-6 space-y-4 text-center">
+        <div className="mt-4 space-y-3 text-center">
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="text-gray-500 font-medium hover:text-gray-900 transition-colors"
+            className="text-gray-500 font-medium hover:text-gray-900 transition-colors text-sm"
           >
-            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+            {isLogin ? "Create account" : 'Sign in'}
           </button>
           
-          <div className="border-t border-gray-100 pt-4">
+          <div className="border-t border-gray-100 pt-3">
             <button
               onClick={continueAsGuest}
-              className="text-sm text-gray-400 font-medium hover:text-gray-600 transition-colors"
+              className="text-xs text-gray-400 font-medium hover:text-gray-600 transition-colors"
             >
-              Continue as Guest (Limited Access)
+              Guest Access
             </button>
           </div>
         </div>

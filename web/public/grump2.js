@@ -44,12 +44,15 @@
 
     // --- RENDER LOOP (120FPS+) ---
     const updatePhysics = (dt) => {
+      // 10x Speed Multiplier for "Super Efficiency"
+      const speedMultiplier = 10.0;
+      
       // Helper for spring physics
       const updateSpring = (spring, config = PHYSICS_CONFIG) => {
         const force = (spring.target - spring.pos) * config.stiffness;
         const acceleration = force / config.mass;
         spring.vel = (spring.vel + acceleration) * config.damping;
-        spring.pos += spring.vel;
+        spring.pos += spring.vel * speedMultiplier * dt; // Applied speed boost
       };
 
       // Update all springs

@@ -117,13 +117,20 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
     }
   }
 
+  const handleNewChat = () => {
+    createNewSession()
+    setMessageText('')
+    setUnlockToast({ message: 'New session started', type: 'info' })
+    setTimeout(() => setUnlockToast(null), 2000)
+  }
+
   return (
     <div className={`chat-interface ${isRageMode ? 'rage-mode-active' : ''}`}>
       {/* Header */}
       <header className="chat-header">
         <div className="header-left">
           <span className="header-title text-3xl">g-rump</span>
-          <button className="header-btn" onClick={() => createNewSession()}>New Chat</button>
+          <button className="header-btn" onClick={handleNewChat}>New Chat</button>
         </div>
         <div className="header-right">
           <button 

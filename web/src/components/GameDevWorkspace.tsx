@@ -337,9 +337,9 @@ export default function GameDevWorkspace({
       {/* Header */}
       <div className="gamedev-header">
         <div className="gamedev-window-controls">
-          <div className="window-dot red" />
-          <div className="window-dot yellow" />
-          <div className="window-dot green" />
+          <button className="gamedev-back-btn" onClick={() => onNavigate && onNavigate('dashboard')}>
+            ← Exit
+          </button>
         </div>
 
         <div className="gamedev-title-section">

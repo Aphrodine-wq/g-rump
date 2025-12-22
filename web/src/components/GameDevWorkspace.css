@@ -28,7 +28,22 @@
 .gamedev-window-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+}
+
+.gamedev-back-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gamedev-back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .window-dot {
