@@ -1,11 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Instrument+Serif:ital,wght@0,400;1,400&display=swap');
+/* Import Glassmorphism Design System */
+@import './styles/glassmorphism.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import Glassmorphism Design System */
-@import './styles/glassmorphism.css';
 
 :root {
   /* White theme (default) */
