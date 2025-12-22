@@ -2,6 +2,7 @@
 // 800+ idle anims + multiple mega-sequences + advanced autonomous chat
 // The grump2.js script is loaded globally in index.html and auto-initializes when elements are ready
 
+import { useAnimation } from '../store/AnimationStore'
 import './Grump2.css'
 
 interface Grump2Props {
@@ -12,9 +13,8 @@ interface Grump2Props {
   isCoding?: boolean
 }
 
-// Global declaration moved to hooks/useGrumpEngine.ts to avoid conflicts
-
 export default function Grump2({ size = 'medium', className = '', style = {}, isRageMode = false, isCoding = false }: Grump2Props) {
+  const { state } = useAnimation()
   const BASE_SIZE = 300
   
   const getSizeInPixels = () => {
@@ -30,11 +30,18 @@ export default function Grump2({ size = 'medium', className = '', style = {}, is
   const targetSize = getSizeInPixels()
   const scale = targetSize / BASE_SIZE
 
-  const handleInteraction = (type: string) => {
-    if (window.GrumpEngine && window.GrumpEngine.trigger) {
-      window.GrumpEngine.trigger(type);
-    }
-  };
+  // Map store state to CSS variables
+  const animationStyle = {
+    '--eyebrow-left-rotate': `${state.leftEyebrowRotation}deg`,
+    '--eyebrow-right-rotate': `${state.rightEyebrowRotation}deg`,
+    '--eyebrow-left-y': `${state.leftEyebrowY}px`,
+    '--eyebrow-right-y': `${state.rightEyebrowY}px`,
+    '--pupil-x': `${state.leftPupilX}px`, 
+    '--pupil-y': `${state.leftPupilY}px`,
+    '--mouth-open': state.mouthState === 'open' ? '20px' : state.mouthState === 'pursed' ? '5px' : '0px',
+    '--face-scale': state.breathingScale,
+    // Add other mappings as needed
+  } as React.CSSProperties
 
   return (
     <div 
@@ -43,10 +50,9 @@ export default function Grump2({ size = 'medium', className = '', style = {}, is
         width: targetSize, 
         height: targetSize, 
         position: 'relative',
+        ...animationStyle,
         ...style 
       }}
-      onClick={() => handleInteraction('jump')}
-      onMouseEnter={() => handleInteraction('squash')}
     >
       <div 
         className="grump2-container" 
@@ -62,7 +68,6 @@ export default function Grump2({ size = 'medium', className = '', style = {}, is
       >
         {isCoding && (
           <div className="coding-overlay absolute inset-0 flex items-center justify-center opacity-50 pointer-events-none">
-             {/* Optional: Add laptop or glasses here via CSS or SVG */}
           </div>
         )}
         {/* Arms */}

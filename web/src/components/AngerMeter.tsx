@@ -1,10 +1,29 @@
-import { useGrumpEngine } from '../hooks/useGrumpEngine'
+import { useAnimation, EmotionalState } from '../store/AnimationStore'
 import { useAchievements } from '../store/AchievementsStore'
 
 export default function AngerMeter() {
-  const { state: grumpState } = useGrumpEngine()
+  const { state: animationState } = useAnimation()
   const { state: achievementState } = useAchievements()
-  const pct = Math.max(0, Math.min(100, grumpState.annoyance))
+  
+  // Derive annoyance percentage from emotional state
+  const getAnnoyanceLevel = (state: EmotionalState): number => {
+    switch (state) {
+      case 'idle': return 0
+      case 'softMode': return 0
+      case 'happy': return 0
+      case 'impressed': return 10
+      case 'thinkingDeep': return 20
+      case 'skeptical': return 30
+      case 'suspicious': return 40
+      case 'annoyed': return 60
+      case 'exasperatedSigh': return 70
+      case 'maximumGrump': return 100
+      case 'error': return 80
+      default: return 0
+    }
+  }
+
+  const pct = getAnnoyanceLevel(animationState.currentState)
 
   // Only show if anger > 0
   if (pct === 0) return null
@@ -55,7 +74,7 @@ export default function AngerMeter() {
           width: `${pct}%`, 
           height: '100%', 
           background: color, 
-          borderRadius: 999,
+          borderRadius: 999, 
           transition: 'width 0.5s cubic-bezier(0.25, 1, 0.5, 1)' 
         }} />
       </div>
