@@ -24,12 +24,12 @@ export default function Grump2({ mood = 'annoyed', size = 300 }: Grump2Props) {
 
   // Mood Definitions
   const moods = {
-    neutral: { color: '#888888', eyebrowL: 0, eyebrowR: 0, mouth: 0 },
-    annoyed: { color: '#966666', eyebrowL: 12, eyebrowR: -8, mouth: -5 },
-    typing: { color: '#777777', eyebrowL: 5, eyebrowR: -5, mouth: 5 },
-    angry: { color: '#ff4444', eyebrowL: 15, eyebrowR: -15, mouth: -10 },
-    happy: { color: '#88cc88', eyebrowL: -5, eyebrowR: -5, mouth: 10 },
-    surprised: { color: '#8888cc', eyebrowL: -10, eyebrowR: -10, mouth: 15 },
+    neutral: { color: '#8E8E93', eyebrowL: 0, eyebrowR: 0, mouth: 0 },
+    annoyed: { color: '#8E8E93', eyebrowL: 12, eyebrowR: -8, mouth: -5 },
+    typing: { color: '#8E8E93', eyebrowL: 5, eyebrowR: -5, mouth: 5 },
+    angry: { color: '#FF3B30', eyebrowL: 15, eyebrowR: -15, mouth: -10 },
+    happy: { color: '#34C759', eyebrowL: -5, eyebrowR: -5, mouth: 10 },
+    surprised: { color: '#5856D6', eyebrowL: -10, eyebrowR: -10, mouth: 15 },
   };
 
   const currentMood = moods[mood] || moods.neutral;
@@ -39,14 +39,14 @@ export default function Grump2({ mood = 'annoyed', size = 300 }: Grump2Props) {
     Animated.loop(
       Animated.sequence([
         Animated.timing(breathAnim, {
-          toValue: 1.02,
-          duration: 2000,
+          toValue: 1.03,
+          duration: 2500,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(breathAnim, {
           toValue: 1,
-          duration: 2000,
+          duration: 2500,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
@@ -57,15 +57,15 @@ export default function Grump2({ mood = 'annoyed', size = 300 }: Grump2Props) {
     Animated.loop(
       Animated.sequence([
         Animated.timing(floatAnim, {
-          toValue: -5,
-          duration: 1500,
-          easing: Easing.inOut(Easing.ease),
+          toValue: -8,
+          duration: 2000,
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         }),
         Animated.timing(floatAnim, {
           toValue: 0,
-          duration: 1500,
-          easing: Easing.inOut(Easing.ease),
+          duration: 2000,
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         }),
       ])

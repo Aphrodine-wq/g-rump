@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
 
 interface Message {
   id: string;
@@ -96,25 +96,36 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
   },
   messageContent: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#ffffff',
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#E5E5EA', // Off-white for readability
     marginBottom: 4,
+    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
+  },
+  userMessageContent: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#1C1C1E', // Dark gray text on white bubble
+    marginBottom: 4,
+    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
   },
   cursor: {
     opacity: 0.5,
+    color: '#32D74B', // Cursor color matches accent
   },
   messageTimestamp: {
-    fontSize: 11,
-    color: '#666666',
-    marginTop: 4,
-    fontWeight: '300',
+    fontSize: 10,
+    color: '#8E8E93',
+    marginTop: 2,
+    fontWeight: '500',
+    alignSelf: 'flex-start',
   },
   userMessageTimestamp: {
-    fontSize: 11,
-    color: '#666666',
-    marginTop: 4,
-    fontWeight: '300',
+    fontSize: 10,
+    color: 'rgba(0,0,0,0.4)',
+    marginTop: 2,
+    fontWeight: '500',
+    alignSelf: 'flex-end',
   },
 });
 

@@ -12,12 +12,12 @@ import {
   Animated,
   PanResponder,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useChat } from '../store/ChatStore';
 import Grump2 from './Grump2';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
+import GameEnvironment from './GameEnvironment';
 
 const { width, height } = Dimensions.get('window');
 
@@ -25,6 +25,7 @@ export default function HomeView() {
   const { messages, isTyping, errorMessage, sendMessage, createNewSession } = useChat();
   const [messageText, setMessageText] = useState('');
   const [mood, setMood] = useState<'neutral' | 'typing' | 'annoyed' | 'angry' | 'happy' | 'surprised'>('annoyed');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const insets = useSafeAreaInsets();
   const messagesEndRef = useRef<ScrollView>(null);
   
@@ -83,8 +84,8 @@ export default function HomeView() {
 
   return (
     <View style={styles.container}>
-      {/* Background */}
-      <LinearGradient colors={['#1a1a1a', '#000000']} style={styles.background} />
+      {/* Background Environment */}
+      <GameEnvironment />
 
       {/* Grump Area (Top) */}
       <View style={[styles.grumpArea, { paddingTop: insets.top }]}>
@@ -136,7 +137,7 @@ export default function HomeView() {
             <TextInput
               style={styles.input}
               placeholder="Type here..."
-              placeholderTextColor="#666"
+              placeholderTextColor="#8E8E93"
               value={messageText}
               onChangeText={setMessageText}
               onSubmitEditing={handleSend}
@@ -186,9 +187,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  background: {
-    ...StyleSheet.absoluteFillObject,
-  },
   grumpArea: {
     flex: 1,
     alignItems: 'center',
@@ -207,30 +205,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
   menuIcon: {
-    color: '#fff',
+    color: '#D1D1D6',
     fontSize: 20,
   },
   headerTitle: {
-    color: '#fff',
+    color: '#D1D1D6',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
     letterSpacing: 2,
     alignSelf: 'center',
+    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
   },
   grumpWrapper: {
     marginTop: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.5,
+    shadowRadius: 30,
   },
   chatDrawer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#1c1c1e', // Apple-like dark gray
+    backgroundColor: 'rgba(28, 28, 30, 0.95)', // Blur effect simulation
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     shadowColor: '#000',
@@ -265,7 +268,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#555',
+    color: '#636366',
     fontStyle: 'italic',
   },
   inputContainer: {
@@ -291,7 +294,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#0a84ff', // iOS Blue
+    backgroundColor: '#32D74B', // Success Green for contrast
     justifyContent: 'center',
     alignItems: 'center',
   },
