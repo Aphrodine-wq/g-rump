@@ -1,5 +1,12 @@
 import { useState, useEffect } from 'react';
 
+export interface GrumpState {
+  mood: string;
+  intensity: number;
+  energy: number;
+  annoyance: number;
+}
+
 declare global {
   interface Window {
     GrumpEngine?: {
@@ -7,15 +14,10 @@ declare global {
       annoy: (amount: number) => number;
       soothe: (amount: number) => number;
       getState: () => GrumpState;
+      trigger: (action: string) => void;
+      setMode: (mode: string) => void;
     };
   }
-}
-
-export interface GrumpState {
-  mood: string;
-  intensity: number;
-  energy: number;
-  annoyance: number;
 }
 
 export function useGrumpEngine() {

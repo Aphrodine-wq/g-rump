@@ -12,11 +12,7 @@ interface Grump2Props {
   isCoding?: boolean
 }
 
-declare global {
-  interface Window {
-    GrumpEngine: any;
-  }
-}
+// Global declaration moved to hooks/useGrumpEngine.ts to avoid conflicts
 
 export default function Grump2({ size = 'medium', className = '', style = {}, isRageMode = false, isCoding = false }: Grump2Props) {
   const BASE_SIZE = 300
@@ -30,6 +26,9 @@ export default function Grump2({ size = 'medium', className = '', style = {}, is
       default: return 250
     }
   }
+
+  const targetSize = getSizeInPixels()
+  const scale = targetSize / BASE_SIZE
 
   const handleInteraction = (type: string) => {
     if (window.GrumpEngine && window.GrumpEngine.trigger) {
