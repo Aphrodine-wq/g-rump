@@ -37,6 +37,7 @@ export default function AngerMeter() {
 
   return (
     <div
+      title={`Current Annoyance: ${pct}%`}
       style={{
         position: 'absolute',
         top: 20,

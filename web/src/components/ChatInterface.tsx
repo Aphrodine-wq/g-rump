@@ -186,6 +186,11 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
             {messages.length === 0 && (
               <div className="welcome-message">
                 <p className="welcome-text">"What do you want?"</p>
+                <div className="quick-replies flex gap-2 justify-center mt-4">
+                  <button onClick={() => setMessageText("I'm bored")} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full text-gray-600 transition-colors">I'm bored</button>
+                  <button onClick={() => setMessageText("Make me laugh")} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full text-gray-600 transition-colors">Make me laugh</button>
+                  <button onClick={() => setMessageText("Roast my code")} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full text-gray-600 transition-colors">Roast my code</button>
+                </div>
               </div>
             )}
 

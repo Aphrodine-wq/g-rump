@@ -121,7 +121,18 @@ export class ContextAwarenessService {
       
       'calm': 'zen',
       'peace': 'zen',
-      'relax': 'zen'
+      'relax': 'zen',
+
+      // New Additions
+      'slow': 'bored',
+      'too slow': 'bored',
+      'hurry': 'annoyed',
+      'faster': 'wired',
+      'joke': 'skeptical',
+      'roast': 'mocking',
+      'code': 'codeReview',
+      'bug': 'debugMode',
+      'fix': 'debugMode'
     }
 
     // Check for keyword matches

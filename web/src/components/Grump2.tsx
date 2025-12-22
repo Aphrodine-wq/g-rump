@@ -40,6 +40,7 @@ export default function Grump2({ size = 'medium', className = '', style = {}, is
     '--pupil-y': `${state.leftPupilY}px`,
     '--mouth-open': state.mouthState === 'open' ? '20px' : state.mouthState === 'pursed' ? '5px' : '0px',
     '--face-scale': state.breathingScale,
+    '--head-tilt': `${state.microMovementState?.headTilt || 0}deg`,
     // Add other mappings as needed
   } as React.CSSProperties
 
@@ -50,6 +51,7 @@ export default function Grump2({ size = 'medium', className = '', style = {}, is
         width: targetSize, 
         height: targetSize, 
         position: 'relative',
+        transform: `rotate(var(--head-tilt))`,
         ...animationStyle,
         ...style 
       }}

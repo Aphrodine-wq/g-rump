@@ -87,7 +87,12 @@ export default function ChatView() {
       >
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-          <Text style={styles.logo}>G-RUMP</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+             <Text style={styles.logo}>G-RUMP</Text>
+             <View style={{backgroundColor: '#ff3b30', borderRadius: 4, paddingHorizontal: 4, paddingVertical: 2}}>
+                <Text style={{color: 'white', fontSize: 10, fontWeight: 'bold'}}>BETA</Text>
+             </View>
+          </View>
           <View style={styles.headerActions}>
             <TouchableOpacity
               style={styles.iconBtn}
