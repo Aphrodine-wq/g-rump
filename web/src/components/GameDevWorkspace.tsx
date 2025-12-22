@@ -18,6 +18,8 @@ interface GameDevWorkspaceProps {
   onExport?: (code: string, target: string) => void
 }
 
+import { CompilerService } from '../services/CompilerService'
+
 export default function GameDevWorkspace({ 
   projectId: _projectId, 
   templateCode,
@@ -86,106 +88,20 @@ export default function GameDevWorkspace({
     setCompileError(null)
 
     try {
-      // 🚀 REAL-TIME WASM COMPILATION
-      // We import the WASM module dynamically to avoid loading it until needed
+      // Use the new CompilerService to execute the code
+      const result = CompilerService.compile(code, targetPlatform);
       
-      const useWasm = true; // Enabled! Uses mock until real build replaces it.
-
-      if (useWasm) {
-         try {
-           // Import the WASM wrapper (which points to index.js mock or pkg/ index.js)
-           // @ts-ignore
-           const wasm = await import('../grump-compiler-wasm');
-           await wasm.default(); // Initialize WASM
-           
-           const result = wasm.compile_code_wasm(code, targetPlatform);
-           
-           // Handle the serializable result
-           if (result.success && result.output) {
-             setCompiledGameHtml(result.output);
-             setIsRunning(true);
-           } else {
-             throw new Error(result.error || 'Unknown compilation error');
-           }
-           return;
-         } catch (e) {
-           console.warn("WASM compilation failed, falling back to mock delay:", e);
-           // Fall through to mock
-         }
-      }
-
-      // Fallback: Check if we're in a real environment or need to mock
-      // Since the Rust backend might not be running on Vercel yet, we'll gracefully fallback
-      const useMockCompilation = true; // Temporary flag until WASM is ready
-
-      if (useMockCompilation) {
-        // Simulate compilation delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Return a mock compiled game
-        const mockResult = {
-          compiled: {
-            code: `
-              <!DOCTYPE html>
-              <html>
-                <body style="margin:0;overflow:hidden;background:#111;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:monospace;">
-                  <div style="text-align:center;">
-                    <h1>Game Preview</h1>
-                    <p>Compiled from: ${projectName}</p>
-                    <p style="color:#888; font-size: 14px;">Target: ${targetPlatform}</p>
-                    <div style="width:50px;height:50px;background:#44ff44;margin:20px auto;border-radius:50%;animation:bounce 1s infinite;"></div>
-                    <style>
-                      @keyframes bounce {
-                        0%, 100% { transform: translateY(0); }
-                        50% { transform: translateY(-20px); }
-                      }
-                    </style>
-                    <p style="color:#666; font-size: 12px; margin-top: 20px;">
-                      (WASM Compiler Module Prepared - Build pipeline integration pending)
-                    </p>
-                  </div>
-                </body>
-              </html>
-            `
-          }
-        };
-        
-        setCompiledGameHtml(mockResult.compiled.code)
-        setIsRunning(true)
-        console.log('Mock compilation successful');
-        return;
-      }
-
-      const response = await fetch('/api/game/compile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, target: targetPlatform })
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error?.message || error.message || 'Compilation failed')
-      }
-
-      const result = await response.json()
-      console.log('Compilation successful:', result)
-      
-      if (result.compiled?.code) {
-        setCompiledGameHtml(result.compiled.code)
-        setIsRunning(true)
+      if (result.success && result.output) {
+         setCompiledGameHtml(result.output);
+         setIsRunning(true);
       } else {
-        throw new Error('No compiled code received')
+         throw new Error(result.error || 'Compilation failed');
       }
+
     } catch (error: any) {
       const errorMessage = error.message || 'Compilation failed'
       setCompileError(errorMessage)
       setIsRunning(false)
-      
-      // Show detailed error if available
-      if (error.response?.data?.error) {
-        const details = error.response.data.error
-        setCompileError(`${errorMessage}: ${details.message || details.details || ''}`)
-      }
     } finally {
       setIsCompiling(false)
     }
