@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { animationApi } from '../services/animationApi'
+import { getCurrentTier } from '../config/pricing'
 import Grump2 from './Grump2'
 import './ExportModal.css'
 
@@ -18,6 +19,9 @@ export default function ExportModal({ animation, onClose }: ExportModalProps) {
   const [background, setBackground] = useState('transparent')
   const [includeWatermark, setIncludeWatermark] = useState(true)
 
+  const currentTier = getCurrentTier()
+  const isPro = currentTier.id !== 'free'
+
   const formats = [
     { id: 'gif', name: 'GIF', desc: 'Basic' },
     { id: 'mp4', name: 'MP4', desc: 'Video' },
@@ -28,6 +32,22 @@ export default function ExportModal({ animation, onClose }: ExportModalProps) {
     { id: 'css', name: 'CSS', desc: 'Web', pro: true },
     { id: 'code', name: 'G-Rump', desc: 'Dev', pro: true },
   ]
+
+  const handleFormatSelect = (formatId: string, isFormatPro?: boolean) => {
+    if (isFormatPro && !isPro) {
+      alert(`The ${formatId.toUpperCase()} format is available on the Pro plan.`)
+      return
+    }
+    setSelectedFormat(formatId)
+  }
+
+  const handleWatermarkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isPro && !e.target.checked) {
+      alert('Removing the watermark requires the Pro plan.')
+      return
+    }
+    setIncludeWatermark(e.target.checked)
+  }
 
   const handleExport = async () => {
     if (!animation) {
@@ -89,7 +109,8 @@ export default function ExportModal({ animation, onClose }: ExportModalProps) {
                 <button
                   key={format.id}
                   className={`format-btn ${selectedFormat === format.id ? 'active' : ''} ${format.pro ? 'pro' : ''}`}
-                  onClick={() => setSelectedFormat(format.id)}
+                  onClick={() => handleFormatSelect(format.id, format.pro)}
+                  style={format.pro && !isPro ? { opacity: 0.7 } : {}}
                 >
                   <div className="format-name">{format.name}</div>
                   <div className="format-desc">{format.desc}</div>
@@ -107,7 +128,7 @@ export default function ExportModal({ animation, onClose }: ExportModalProps) {
                 <select value={resolution} onChange={(e) => setResolution(e.target.value)}>
                   <option value="720p">720p</option>
                   <option value="1080p">1080p</option>
-                  <option value="4k" disabled>4K (Pro)</option>
+                  <option value="4k" disabled={!isPro}>4K {isPro ? '' : '(Pro)'}</option>
                 </select>
               </div>
               <div className="setting-item">
@@ -163,9 +184,9 @@ export default function ExportModal({ animation, onClose }: ExportModalProps) {
                 <input 
                   type="checkbox" 
                   checked={includeWatermark}
-                  onChange={(e) => setIncludeWatermark(e.target.checked)}
+                  onChange={handleWatermarkChange}
                 />
-                <span>Include G-Rump watermark (uncheck with Pro)</span>
+                <span>Include G-Rump watermark {!isPro && '(uncheck with Pro)'}</span>
               </label>
             </div>
           </div>

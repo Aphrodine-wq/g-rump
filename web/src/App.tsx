@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { ChatProvider, useChat } from './store/ChatStore'
 import { WorkspaceProvider } from './store/WorkspaceStore'
 import { AnimationProvider } from './store/AnimationStore'
+import { AchievementsProvider } from './store/AchievementsStore'
 import { PageTransition } from './components/PageTransition'
 import LandingPage from './components/LandingPage'
 import ChatInterface from './components/ChatInterface'
@@ -12,12 +13,13 @@ import TemplateGallery from './components/TemplateGallery'
 import UserDashboard from './components/UserDashboard'
 import SettingsPage from './components/SettingsPage'
 import PricingPage from './components/PricingPage'
+import EducationView from './components/EducationView'
 import OnboardingFlow from './components/OnboardingFlow'
 import GameDevWorkspace from './components/GameDevWorkspace'
 import ErrorBoundary from './components/ErrorBoundary'
 import './App.css'
 
-type View = 'landing' | 'chat' | 'templates' | 'dashboard' | 'settings' | 'pricing' | 'onboarding' | 'gamedev'
+type View = 'landing' | 'chat' | 'templates' | 'dashboard' | 'settings' | 'pricing' | 'onboarding' | 'gamedev' | 'education'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>(() => {
@@ -51,10 +53,11 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <AnimationProvider>
-        <ChatProvider>
-          <WorkspaceProvider>
-            <div className="app">
+      <AchievementsProvider>
+        <AnimationProvider>
+          <ChatProvider>
+            <WorkspaceProvider>
+              <div className="app">
               <PageTransition key={currentView}>
                 {currentView === 'onboarding' && (
                   <OnboardingFlow onComplete={handleOnboardingComplete} />
@@ -100,10 +103,11 @@ function App() {
                   />
                 )}
               </PageTransition>
-            </div>
-          </WorkspaceProvider>
-        </ChatProvider>
-      </AnimationProvider>
+              </div>
+            </WorkspaceProvider>
+          </ChatProvider>
+        </AnimationProvider>
+      </AchievementsProvider>
     </ErrorBoundary>
   )
 }

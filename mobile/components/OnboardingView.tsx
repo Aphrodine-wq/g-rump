@@ -1,86 +1,105 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Grump2 from './Grump2';
 
 interface OnboardingViewProps {
   onComplete: () => void;
 }
 
-interface OnboardingPage {
-  title: string;
-  description: string;
-  showAvatar: boolean;
-}
+const { width, height } = Dimensions.get('window');
 
 export default function OnboardingView({ onComplete }: OnboardingViewProps) {
-  const [currentPage, setCurrentPage] = useState(0);
+  const [step, setStep] = useState<'intro' | 'tutorial' | 'ready'>('intro');
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const textAnim = useRef(new Animated.Value(0)).current;
+  const [showButton, setShowButton] = useState(false);
 
-  const pages: OnboardingPage[] = [
-    {
-      title: "Oh good. You're here.",
-      description: "I'm Grump. The world's crankiest AI. I'll help, but I won't be happy about it.",
-      showAvatar: true,
-    },
-    {
-      title: "I'm not mean.",
-      description: "Just perpetually unimpressed. But I'll help anyway.",
-      showAvatar: true,
-    },
-    {
-      title: "Ready? I guess.",
-      description: "Ask me anything. I'll complain, but I'll help.",
-      showAvatar: true,
-    },
-  ];
+  useEffect(() => {
+    // Sequence: Grump fades in -> Wait -> Text fades in
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 2000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(textAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+    ]).start(() => setShowButton(true));
+  }, []);
 
   const handleContinue = () => {
-    if (currentPage < pages.length - 1) {
-      setCurrentPage(currentPage + 1);
+    if (step === 'intro') {
+      setStep('tutorial');
+    } else if (step === 'tutorial') {
+      setStep('ready');
     } else {
       onComplete();
     }
   };
 
+  const renderContent = () => {
+    switch (step) {
+      case 'intro':
+        return (
+          <View style={styles.textWrapper}>
+            <Text style={styles.title}>G-RUMP</Text>
+            <Text style={styles.subtitle}>The Anti-Assistant</Text>
+          </View>
+        );
+      case 'tutorial':
+        return (
+          <View style={styles.textWrapper}>
+            <Text style={styles.instruction}>
+              I'm here to help, but I won't pretend to like it.
+            </Text>
+            <View style={styles.bulletPoints}>
+              <Text style={styles.bullet}>• Swipe to ignore me</Text>
+              <Text style={styles.bullet}>• Tap to annoy me</Text>
+              <Text style={styles.bullet}>• Type to make me work</Text>
+            </View>
+          </View>
+        );
+      case 'ready':
+        return (
+          <View style={styles.textWrapper}>
+            <Text style={styles.instruction}>
+              Let's get this over with.
+            </Text>
+          </View>
+        );
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.skipContainer}>
-        <TouchableOpacity onPress={onComplete} style={styles.skipButton}>
-          <Text style={styles.skipText}>Skip</Text>
-        </TouchableOpacity>
-      </View>
+      <LinearGradient
+        colors={['#000000', '#1a1a1a']}
+        style={styles.background}
+      />
+      
+      <Animated.View style={[styles.grumpContainer, { opacity: fadeAnim }]}>
+        <Grump2 mood={step === 'ready' ? 'annoyed' : 'neutral'} size={width * 0.8} />
+      </Animated.View>
 
-      <View style={styles.content}>
-        {pages[currentPage].showAvatar && (
-          <View style={styles.avatarContainer}>
-            <Grump2 mood="annoyed" size={250} />
-          </View>
+      <Animated.View style={[styles.contentContainer, { opacity: textAnim }]}>
+        {renderContent()}
+        
+        {showButton && (
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={handleContinue}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.buttonText}>
+              {step === 'ready' ? 'Enter' : 'Next'}
+            </Text>
+          </TouchableOpacity>
         )}
-
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{pages[currentPage].title}</Text>
-          <Text style={styles.description}>{pages[currentPage].description}</Text>
-        </View>
-
-        <View style={styles.indicators}>
-          {pages.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.indicator,
-                index === currentPage && styles.indicatorActive,
-              ]}
-            />
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={handleContinue} style={styles.continueButton}>
-          <Text style={styles.continueButtonText}>
-            {currentPage < pages.length - 1 ? 'Continue' : 'Get Started'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -88,79 +107,81 @@ export default function OnboardingView({ onComplete }: OnboardingViewProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
-  },
-  skipContainer: {
-    padding: 16,
-    alignItems: 'flex-end',
-  },
-  skipButton: {
-    padding: 8,
-  },
-  skipText: {
-    fontSize: 16,
-    color: '#666666',
-    fontWeight: '300',
-  },
-  content: {
-    flex: 1,
+    backgroundColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 40,
   },
-  avatarContainer: {
-    marginBottom: 40,
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
-  textContainer: {
-    maxWidth: 400,
+  grumpContainer: {
+    marginTop: -100,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contentContainer: {
+    position: 'absolute',
+    bottom: 80,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  textWrapper: {
+    alignItems: 'center',
+    marginBottom: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 42,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: 2,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#888',
     fontWeight: '400',
-    marginBottom: 16,
-    color: '#ffffff',
-    fontFamily: 'Georgia',
+    letterSpacing: 1,
+  },
+  instruction: {
+    fontSize: 24,
+    color: '#fff',
     textAlign: 'center',
+    fontWeight: '500',
+    lineHeight: 32,
+    marginBottom: 20,
   },
-  description: {
+  bulletPoints: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+  },
+  bullet: {
     fontSize: 16,
-    lineHeight: 24,
-    color: '#666666',
-    marginBottom: 40,
-    fontWeight: '300',
-    textAlign: 'center',
-  },
-  indicators: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 20,
-  },
-  indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#222222',
-  },
-  indicatorActive: {
-    backgroundColor: '#ffffff',
-  },
-  footer: {
-    padding: 32,
-    alignItems: 'center',
-  },
-  continueButton: {
-    backgroundColor: '#ffffff',
-    paddingVertical: 14,
-    paddingHorizontal: 40,
-    borderRadius: 24,
-    minWidth: 200,
-  },
-  continueButtonText: {
-    color: '#000000',
-    fontSize: 16,
+    color: '#aaa',
+    marginBottom: 12,
     fontWeight: '400',
-    textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#fff',
+    paddingVertical: 16,
+    paddingHorizontal: 60,
+    borderRadius: 30,
+    shadowColor: '#fff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  buttonText: {
+    color: '#000',
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 });
 

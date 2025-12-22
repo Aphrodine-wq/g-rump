@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { animationApi } from '../services/animationApi'
 import { useAnimation } from '../store/AnimationStore'
+import { getCurrentTier, getRemainingMessages } from '../config/pricing'
 import Grump2 from './Grump2'
 import './UserDashboard.css'
 
@@ -12,10 +13,25 @@ interface UserDashboardProps {
 
 export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
   const { transitionToState } = useAnimation()
-  const [usage] = useState({ created: 7, limit: 10 })
+  const currentTier = getCurrentTier()
+  const [usage, setUsage] = useState({ 
+    created: currentTier.messagesPerMonth - getRemainingMessages(), 
+    limit: currentTier.messagesPerMonth 
+  })
   const [recentAnimations, setRecentAnimations] = useState<any[]>([])
 
   useEffect(() => {
+    // Refresh usage on mount
+    const tier = getCurrentTier()
+    const remaining = getRemainingMessages()
+    // If unlimited (large number), show a simpler view or cap it
+    const isUnlimited = tier.messagesPerMonth >= 1000000
+    
+    setUsage({
+      created: isUnlimited ? 0 : tier.messagesPerMonth - remaining,
+      limit: tier.messagesPerMonth
+    })
+
     // Load animation history from API
     const loadHistory = async () => {
       try {
@@ -63,7 +79,8 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
     transitionToState('idle')
   }, [transitionToState])
 
-  const usagePercentage = (usage.created / usage.limit) * 100
+  const usagePercentage = usage.limit >= 1000000 ? 0 : (usage.created / usage.limit) * 100
+  const isProOrHigher = currentTier.id !== 'free'
 
   return (
     <div className="user-dashboard">
@@ -76,7 +93,12 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
         <div className="header-right">
           <button className="header-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
           <button className="header-btn" onClick={() => onNavigate?.('settings')}>Settings</button>
-          <button className="header-btn pro" onClick={() => onNavigate?.('pricing')}>Pro ✨</button>
+          {!isProOrHigher && (
+            <button className="header-btn pro" onClick={() => onNavigate?.('pricing')}>Pro ✨</button>
+          )}
+          {isProOrHigher && (
+             <span className="badge-pro">{currentTier.name.toUpperCase()}</span>
+          )}
         </div>
       </header>
 
@@ -84,7 +106,11 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
       <div className="welcome-section">
         <div className="welcome-content">
           <h1>Welcome back, Alex</h1>
-          <button className="upgrade-btn" onClick={() => onNavigate?.('pricing')}>Upgrade to Pro</button>
+          {!isProOrHigher ? (
+             <button className="upgrade-btn" onClick={() => onNavigate?.('pricing')}>Upgrade to Pro</button>
+          ) : (
+             <p className="pro-welcome">You are on the {currentTier.name} plan. Create something awesome!</p>
+          )}
         </div>
         <div className="welcome-grump">
           <Grump2 size="medium" />
@@ -95,35 +121,89 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
       {/* Usage Section */}
       <div className="usage-section">
         <div className="usage-card">
-          <h3>Today's Usage</h3>
+          <h3>Monthly Usage</h3>
           <div className="usage-stats">
             <div className="usage-info">
-              <span className="usage-number">{usage.created}/{usage.limit}</span>
-              <span className="usage-label">animations today</span>
+              {usage.limit >= 1000000 ? (
+                <span className="usage-number">Unlimited</span>
+              ) : (
+                <span className="usage-number">{usage.created}/{usage.limit}</span>
+              )}
+              <span className="usage-label">animations</span>
             </div>
-            <div className="usage-bar">
-              <div 
-                className="usage-progress" 
-                style={{ width: `${usagePercentage}%` }}
-              />
-            </div>
-            <p className="usage-reset">Resets in: 14h 23m</p>
+            {usage.limit < 1000000 && (
+              <div className="usage-bar">
+                <div 
+                  className="usage-progress" 
+                  style={{ width: `${usagePercentage}%` }}
+                />
+              </div>
+            )}
+            <p className="usage-reset">Resets in: 14 days</p>
           </div>
         </div>
 
         <div className="plan-card">
-          <h3>FREE PLAN</h3>
+          <h3>{currentTier.name.toUpperCase()} PLAN</h3>
           <div className="plan-info">
-            <span className="plan-usage">{usage.created} / {usage.limit} animations today</span>
-            <div className="plan-bar">
-              <div 
-                className="plan-progress" 
-                style={{ width: `${usagePercentage}%` }}
-              />
-            </div>
-            <p className="plan-percentage">{Math.round(usagePercentage)}%</p>
-            <button className="plan-upgrade" onClick={() => onNavigate?.('pricing')}>Need more? Go Pro →</button>
+             {usage.limit >= 1000000 ? (
+               <span className="plan-usage">Unlimited Access</span>
+             ) : (
+               <span className="plan-usage">{usage.created} / {usage.limit} animations used</span>
+             )}
+            
+            {usage.limit < 1000000 && (
+              <>
+                <div className="plan-bar">
+                  <div 
+                    className="plan-progress" 
+                    style={{ width: `${usagePercentage}%` }}
+                  />
+                </div>
+                <p className="plan-percentage">{Math.round(usagePercentage)}%</p>
+              </>
+            )}
+            
+            {currentTier.id !== 'enterprise' && (
+              <button className="plan-upgrade" onClick={() => onNavigate?.('pricing')}>
+                {currentTier.id === 'free' ? 'Need more? Go Pro →' : 'Upgrade Plan →'}
+              </button>
+            )}
           </div>
+        </div>
+      </div>
+
+      {/* Creator Tools & Marketplace (New Features) */}
+      <div className="creations-section">
+        <div className="section-header">
+           <h2>Creator Tools</h2>
+        </div>
+        <div className="actions-grid" style={{ marginBottom: '2rem' }}>
+           <div className="action-card" style={{ cursor: 'pointer', borderColor: '#a855f7' }}>
+             <div className="action-icon">🛒</div>
+             <h3>Marketplace</h3>
+             <p>{currentTier.id === 'free' ? 'Browse assets' : 'Sell your animations'}</p>
+             {currentTier.id === 'free' && <span className="feature-tag">Buy & Download</span>}
+             {isProOrHigher && <span className="feature-tag pro">Earn 90% Rev</span>}
+           </div>
+           
+           <div className="action-card" style={{ cursor: 'pointer', borderColor: '#3b82f6' }} onClick={() => onNavigate?.('education')}>
+             <div className="action-icon">🎓</div>
+             <h3>Education</h3>
+             <p>Master animation skills</p>
+             <span className="feature-tag">New Courses</span>
+           </div>
+
+           <div className="action-card" style={{ cursor: 'pointer', borderColor: '#10b981' }}>
+             <div className="action-icon">👤</div>
+             <h3>Character Creator</h3>
+             <p>Build custom rigs</p>
+             {currentTier.id === 'free' ? (
+                <span className="feature-tag lock">Pro Only</span>
+             ) : (
+                <span className="feature-tag pro">5 Slots</span>
+             )}
+           </div>
         </div>
       </div>
 
@@ -149,6 +229,11 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
               </div>
             </div>
           ))}
+          {recentAnimations.length === 0 && (
+            <div className="empty-state">
+              <p>No animations yet. Start creating!</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -170,45 +255,6 @@ export default function UserDashboard({ onNavigate }: UserDashboardProps = {}) {
             <div className="action-icon">✨</div>
             <h3>Random Idea</h3>
             <p>Let G-Rump surprise you</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Chat History */}
-      <div className="history-section">
-        <h2>Chat History</h2>
-        <div className="history-list">
-          <div className="history-item">
-            <div className="history-icon">📁</div>
-            <div className="history-content">
-              <h4>Loading spinner for app</h4>
-              <p>"A loading spinner. How original..."</p>
-            </div>
-            <span className="history-date">Today</span>
-          </div>
-          <div className="history-item">
-            <div className="history-icon">📁</div>
-            <div className="history-content">
-              <h4>Logo animation for startup</h4>
-              <p>"Let me add some actual animation principles..."</p>
-            </div>
-            <span className="history-date">Yesterday</span>
-          </div>
-          <div className="history-item">
-            <div className="history-icon">📁</div>
-            <div className="history-content">
-              <h4>Button hover effects</h4>
-              <p>"Fine. Here's your button effect..."</p>
-            </div>
-            <span className="history-date">2 days ago</span>
-          </div>
-          <div className="history-item">
-            <div className="history-icon">📁</div>
-            <div className="history-content">
-              <h4>Game character run cycle</h4>
-              <p>"Oh? An actual challenge?..."</p>
-            </div>
-            <span className="history-date">3 days ago</span>
           </div>
         </div>
       </div>

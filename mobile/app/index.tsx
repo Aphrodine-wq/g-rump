@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ChatView from '../components/ChatView';
+import { View, StyleSheet } from 'react-native';
+import HomeView from '../components/HomeView';
 import OnboardingView from '../components/OnboardingView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Index() {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     checkOnboarding();
@@ -37,11 +35,11 @@ export default function Index() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
       {!hasCompletedOnboarding ? (
         <OnboardingView onComplete={handleCompleteOnboarding} />
       ) : (
-        <ChatView />
+        <HomeView />
       )}
     </View>
   );

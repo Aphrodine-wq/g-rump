@@ -100,7 +100,9 @@ export default function PricingView() {
 
               <div className="tier-limits">
                 <div className="limit-item">
-                  <span className="limit-value">{tier.messagesPerMonth.toLocaleString()}</span>
+                  <span className="limit-value">
+                    {tier.messagesPerMonth >= 1000000 ? 'Unlimited' : tier.messagesPerMonth.toLocaleString()}
+                  </span>
                   <span className="limit-label">messages/month</span>
                 </div>
               </div>
@@ -123,7 +125,7 @@ export default function PricingView() {
                   handleSelectTier(tier)
                 }}
               >
-                {getCurrentTier().id === tier.id ? 'Current Plan' : tier.price === 0 ? 'Get Started' : 'Subscribe'}
+                {getCurrentTier().id === tier.id ? 'Current Plan' : tier.id === 'enterprise' ? 'Contact Sales' : tier.price === 0 ? 'Get Started' : 'Subscribe'}
               </button>
             </div>
           )

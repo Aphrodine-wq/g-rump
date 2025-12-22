@@ -3,7 +3,10 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useChat } from '../store/ChatStore'
+import { useAnimation } from '../store/AnimationStore'
+import { useAchievements } from '../store/AchievementsStore'
 import { animationApi, type Animation } from '../services/animationApi'
+import { contextAwarenessService } from '../services/ContextAwareness'
 import Grump2 from './Grump2'
 import MessageBubble from './MessageBubble'
 import TypingIndicator from './TypingIndicator'
@@ -11,6 +14,8 @@ import AnimationPreview from './AnimationPreview'
 import ExportModal from './ExportModal'
 import { MessageSkeleton } from './LoadingSkeleton'
 import './ChatInterface.css'
+import AngerMeter from './AngerMeter'
+import Toast from './Toast'
 
 interface ChatInterfaceProps {
   onNavigate?: (view: 'templates' | 'dashboard' | 'settings' | 'pricing' | 'chat' | 'gamedev') => void
@@ -18,9 +23,12 @@ interface ChatInterfaceProps {
 
 export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
   const { messages, isTyping, sendMessage, createNewSession } = useChat()
+  const { transitionToState, triggerEyeRoll, triggerScreenShake } = useAnimation()
+  const { recordInteraction } = useAchievements()
   const [messageText, setMessageText] = useState('')
   const [showExportModal, setShowExportModal] = useState(false)
   const [currentAnimation, setCurrentAnimation] = useState<Animation | null>(null)
+  const [unlockToast, setUnlockToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const chatMessagesRef = useRef<HTMLDivElement>(null)
@@ -39,6 +47,32 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
     const userMessage = messageText.trim()
     setMessageText('')
 
+    // Analyze the message for emotional context
+    const analysis = contextAwarenessService.analyzeMessage(userMessage)
+
+    // Trigger emotional reactions based on analysis
+    if (analysis.emotionalState === 'maximumGrump') {
+      transitionToState('maximumGrump')
+      triggerEyeRoll()
+      triggerScreenShake()
+    } else if (analysis.emotionalState === 'annoyed') {
+      transitionToState('annoyed')
+      triggerEyeRoll()
+    } else if (analysis.emotionalState === 'skeptical') {
+      transitionToState('skeptical')
+    }
+
+    // Record interaction and check for unlocks
+    const unlocks = recordInteraction({ analysis, content: userMessage })
+    if (unlocks.length > 0) {
+      const unlockNames = unlocks.map(u => u.name).join(', ')
+      setUnlockToast({
+        message: `New unlock${unlocks.length > 1 ? 's' : ''}: ${unlockNames}!`,
+        type: 'success'
+      })
+      setTimeout(() => setUnlockToast(null), 4000)
+    }
+
     // Check if this is an animation request
     const isAnimationRequest = animationApi.isAnimationRequest(userMessage)
 
@@ -56,7 +90,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
             style: 'default',
             format: 'gif'
           })
-          
+
           setCurrentAnimation(animation)
         } catch (error) {
           console.error('Failed to create animation:', error)
@@ -93,6 +127,9 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
       <div className="chat-main">
         {/* Left: Chat */}
         <div className="chat-panel">
+          {/* Anger Meter */}
+          <AngerMeter />
+
           {/* Grump2 - Always visible */}
           <div className="grump2-fixed-container">
             <Grump2 />
@@ -185,6 +222,15 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
         <ExportModal
           animation={currentAnimation}
           onClose={() => setShowExportModal(false)}
+        />
+      )}
+
+      {/* Unlock Toast */}
+      {unlockToast && (
+        <Toast
+          message={unlockToast.message}
+          type={unlockToast.type}
+          onClose={() => setUnlockToast(null)}
         />
       )}
     </div>

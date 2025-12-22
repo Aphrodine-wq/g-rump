@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useChat } from '../store/ChatStore';
 import Grump2 from './Grump2';
@@ -21,7 +20,6 @@ export default function ChatView() {
   const [messageText, setMessageText] = useState('');
   const [mood, setMood] = useState<'neutral' | 'typing' | 'annoyed' | 'angry' | 'happy' | 'surprised'>('annoyed');
   const [statusText, setStatusText] = useState('what do you want');
-  const [darkMode] = useState(true); // Always dark for now
   const messagesEndRef = useRef<ScrollView>(null);
   const insets = useSafeAreaInsets();
 
@@ -81,18 +79,14 @@ export default function ChatView() {
   };
 
   return (
-    <LinearGradient
-      colors={['#667eea', '#764ba2', '#f093fb']}
-      locations={[0, 0.5, 1]}
-      style={styles.gradientContainer}
-    >
+    <View style={styles.mainContainer}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={insets.top}
+        keyboardVerticalOffset={0}
       >
         {/* Header */}
-        <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <Text style={styles.logo}>G-RUMP</Text>
           <View style={styles.headerActions}>
             <TouchableOpacity
@@ -108,80 +102,81 @@ export default function ChatView() {
           </View>
         </View>
 
-      {/* Avatar Section */}
-      <View style={styles.avatarSection}>
-        <View style={styles.avatarContainer}>
-          {/* <View style={styles.avatarRing} /> Ring removed for new design */}
-          <View style={styles.avatarFace}>
-            <Grump2 mood={mood} size={250} />
+        {/* Avatar Section */}
+        <View style={styles.avatarSection}>
+          <View style={styles.avatarContainer}>
+            <View style={styles.avatarFace}>
+              <Grump2 mood={mood} size={200} />
+            </View>
           </View>
+          <Text style={styles.statusText}>{statusText}</Text>
         </View>
-        <Text style={styles.statusText}>{statusText}</Text>
-      </View>
 
-      {/* Messages */}
-      <ScrollView
-        ref={messagesEndRef}
-        style={styles.messagesContainer}
-        contentContainerStyle={styles.messagesList}
-        onContentSizeChange={scrollToBottom}
-      >
-        {messages.length === 0 && !isTyping ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>"Go ahead. I'm listening."</Text>
-            <Text style={styles.emptyStateSubtext}>(reluctantly)</Text>
+        {/* Messages */}
+        <ScrollView
+          ref={messagesEndRef}
+          style={styles.messagesContainer}
+          contentContainerStyle={styles.messagesList}
+          onContentSizeChange={scrollToBottom}
+          showsVerticalScrollIndicator={false}
+        >
+          {messages.length === 0 && !isTyping ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>"Go ahead. I'm listening."</Text>
+              <Text style={styles.emptyStateSubtext}>(reluctantly)</Text>
+            </View>
+          ) : (
+            <>
+              {messages.map((message, i) => (
+                <MessageBubble key={message.id} message={message} index={i} />
+              ))}
+              {isTyping && <TypingIndicator />}
+            </>
+          )}
+        </ScrollView>
+
+        {/* Error Message */}
+        {errorMessage && (
+          <View style={styles.errorMessage}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
           </View>
-        ) : (
-          <>
-            {messages.map((message, i) => (
-              <MessageBubble key={message.id} message={message} index={i} />
-            ))}
-            {isTyping && <TypingIndicator />}
-          </>
         )}
-      </ScrollView>
 
-      {/* Error Message */}
-      {errorMessage && (
-        <View style={styles.errorMessage}>
-          <Text style={styles.errorText}>{errorMessage}</Text>
+        {/* Input Bar */}
+        <View style={[styles.inputSection, { paddingBottom: insets.bottom + 12 }]}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.inputField}
+              placeholder="Say something..."
+              placeholderTextColor="#86868b"
+              value={messageText}
+              onChangeText={handleTextChange}
+              onSubmitEditing={handleSend}
+              editable={!isTyping}
+              multiline={false}
+              returnKeyType="send"
+            />
+            <TouchableOpacity
+              style={[styles.sendButton, (!messageText.trim() || isTyping) && styles.sendButtonDisabled]}
+              onPress={handleSend}
+              disabled={!messageText.trim() || isTyping}
+            >
+              <Text style={styles.sendButtonText}>→</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
-
-      {/* Input Bar */}
-      <View style={[styles.inputSection, { paddingBottom: insets.bottom + 16 }]}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.inputField}
-            placeholder="say something..."
-            placeholderTextColor="#666666"
-            value={messageText}
-            onChangeText={handleTextChange}
-            onSubmitEditing={handleSend}
-            editable={!isTyping}
-            multiline={false}
-          />
-          <TouchableOpacity
-            style={[styles.sendButton, (!messageText.trim() || isTyping) && styles.sendButtonDisabled]}
-            onPress={handleSend}
-            disabled={!messageText.trim() || isTyping}
-          >
-            <Text style={styles.sendButtonText}>→</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
       </KeyboardAvoidingView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gradientContainer: {
+  mainContainer: {
     flex: 1,
+    backgroundColor: '#f5f5f7', // Apple standard gray
   },
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
@@ -189,15 +184,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingBottom: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderBottomWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 12,
+    zIndex: 10,
   },
   logo: {
     fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: '#1d1d1f',
     letterSpacing: -0.5,
   },
   headerActions: {
@@ -205,85 +204,88 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   iconBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
   iconBtnText: {
-    color: '#1a1a1a',
+    color: '#1d1d1f',
     fontSize: 20,
-    fontWeight: '500',
+    fontWeight: '400',
+    marginTop: -2,
   },
   avatarSection: {
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: 32,
     paddingHorizontal: 32,
+    backgroundColor: '#f5f5f7',
   },
   avatarContainer: {
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  avatarRing: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 1,
-    borderColor: '#222222',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
   },
   avatarFace: {
     position: 'relative',
     zIndex: 1,
   },
   statusText: {
-    marginTop: 24,
-    fontSize: 15,
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontWeight: '400',
-    letterSpacing: 0.5,
+    marginTop: 20,
+    fontSize: 14,
+    color: '#86868b',
+    fontWeight: '500',
+    letterSpacing: 0.2,
     textTransform: 'lowercase',
   },
   messagesContainer: {
     flex: 1,
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    marginTop: -20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 12,
   },
   messagesList: {
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    gap: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    gap: 12,
   },
   emptyState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
+    gap: 8,
     minHeight: 200,
+    marginTop: 40,
   },
   emptyStateText: {
-    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
-    fontSize: 18,
+    fontSize: 17,
     fontStyle: 'italic',
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: '#86868b',
     fontWeight: '500',
   },
   emptyStateSubtext: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 13,
+    color: '#aeaeb2',
     fontWeight: '400',
   },
   errorMessage: {
     padding: 12,
-    backgroundColor: 'rgba(255, 59, 48, 0.9)',
+    backgroundColor: '#ff3b30',
     alignItems: 'center',
     borderRadius: 12,
     marginHorizontal: 24,
@@ -292,14 +294,18 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 13,
     color: '#ffffff',
-    fontWeight: '500',
+    fontWeight: '600',
   },
   inputSection: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingTop: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: '#ffffff',
+    borderTopWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 0.04,
+    shadowRadius: 16,
+    zIndex: 20,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -307,50 +313,42 @@ const styles = StyleSheet.create({
     maxWidth: 600,
     alignSelf: 'center',
     width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    borderRadius: 28,
-    paddingHorizontal: 4,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
+    backgroundColor: '#f5f5f7',
+    borderRadius: 24,
+    paddingHorizontal: 6,
+    paddingVertical: 6,
+    borderWidth: 0,
   },
   inputField: {
     flex: 1,
-    height: 48,
-    paddingHorizontal: 20,
+    height: 44,
+    paddingHorizontal: 16,
     fontSize: 16,
-    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
     fontWeight: '400',
     backgroundColor: 'transparent',
-    borderWidth: 0,
-    color: '#1a1a1a',
+    color: '#1d1d1f',
   },
   sendButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#3b82f6',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#1d1d1f',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#3b82f6',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   sendButtonDisabled: {
-    opacity: 0.4,
-    backgroundColor: '#9ca3af',
+    opacity: 0.3,
+    backgroundColor: '#86868b',
+    shadowOpacity: 0,
   },
   sendButtonText: {
     color: '#ffffff',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '600',
+    marginTop: -2,
   },
 });
-

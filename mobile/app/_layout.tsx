@@ -10,14 +10,14 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: '#000000' },
+            contentStyle: { backgroundColor: '#FFFFFF' },
+            animation: 'slide_from_right',
           }}
         >
           <Stack.Screen name="index" />
         </Stack>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
       </AnimationProvider>
     </ChatProvider>
   );
 }
-

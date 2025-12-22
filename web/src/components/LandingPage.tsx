@@ -142,35 +142,35 @@ export default function LandingPage({ onGetStarted, onLogin, onNavigate }: Landi
             <h3>FREE</h3>
             <div className="price">$0</div>
             <ul>
-              <li>10 anims/day</li>
+              <li>1 anim/day</li>
               <li>Basic exports</li>
-              <li>720p</li>
               <li>Watermark</li>
+              <li>Free assets</li>
             </ul>
             <button onClick={onGetStarted}>Get Started</button>
           </div>
           <div className="pricing-card featured">
             <div className="badge">★ MOST POPULAR ★</div>
             <h3>PRO</h3>
-            <div className="price">$12<span>/month</span></div>
+            <div className="price">$49<span>/month</span></div>
             <ul>
-              <li>Unlimited</li>
-              <li>All exports</li>
-              <li>4K resolution</li>
-              <li>No watermark</li>
-              <li>API access</li>
+              <li>200 anims/day</li>
+              <li>4K + No watermark</li>
+              <li>Character Creator</li>
+              <li>Timeline Editor</li>
+              <li>Sell Marketplace</li>
             </ul>
             <button className="primary" onClick={onGetStarted}>Go Pro →</button>
           </div>
           <div className="pricing-card">
             <h3>TEAM</h3>
-            <div className="price">$29<span>/seat</span></div>
+            <div className="price">$199<span>/seat</span></div>
             <ul>
-              <li>Everything in Pro</li>
+              <li>500 anims/day</li>
               <li>Team workspace</li>
-              <li>Brand kit</li>
-              <li>Collaboration</li>
-              <li>SSO</li>
+              <li>Unlimited Chars</li>
+              <li>Enterprise API</li>
+              <li>Priority Support</li>
             </ul>
             <button onClick={onGetStarted}>Contact Us</button>
           </div>

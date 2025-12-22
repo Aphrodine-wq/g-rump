@@ -91,29 +91,56 @@
       let userAnnoyanceLevel = 0;
 
       const moods = {
-        grumpy: { color: '#888', eyebrowL: 8, eyebrowR: -8, mouthCurve: -5 },
-        angry: { color: '#f44', eyebrowL: 15, eyebrowR: -15, mouthCurve: -12 },
-        sad: { color: '#668', eyebrowL: -12, eyebrowR: -12, mouthCurve: -8 },
-        bored: { color: '#777', eyebrowL: 2, eyebrowR: -2, mouthCurve: -2 },
-        annoyed: { color: '#966', eyebrowL: 12, eyebrowR: -8, mouthCurve: -6 },
-        sarcastic: { color: '#797', eyebrowL: -5, eyebrowR: 10, mouthCurve: 3 },
-        tired: { color: '#556', eyebrowL: -8, eyebrowR: -8, mouthCurve: -3 },
-        glitchy: { color: '#0f0', eyebrowL: 20, eyebrowR: -5, mouthCurve: 0 },
-        manic: { color: '#f8f', eyebrowL: 18, eyebrowR: 18, mouthCurve: 15 },
-        depressed: { color: '#445', eyebrowL: -15, eyebrowR: -15, mouthCurve: -15 }
+        grumpy: { color: '#86868b', eyebrowL: 8, eyebrowR: -8, mouthCurve: -5 },
+        angry: { color: '#ff3b30', eyebrowL: 15, eyebrowR: -15, mouthCurve: -12 },
+        sad: { color: '#0066cc', eyebrowL: -12, eyebrowR: -12, mouthCurve: -8 },
+        bored: { color: '#86868b', eyebrowL: 2, eyebrowR: -2, mouthCurve: -2 },
+        annoyed: { color: '#ff9500', eyebrowL: 12, eyebrowR: -8, mouthCurve: -6 },
+        sarcastic: { color: '#34c759', eyebrowL: -5, eyebrowR: 10, mouthCurve: 3 },
+        tired: { color: '#545456', eyebrowL: -8, eyebrowR: -8, mouthCurve: -3 },
+        glitchy: { color: '#af52de', eyebrowL: 20, eyebrowR: -5, mouthCurve: 0 },
+        manic: { color: '#ff2d55', eyebrowL: 18, eyebrowR: 18, mouthCurve: 15 },
+        depressed: { color: '#1c1c1e', eyebrowL: -15, eyebrowR: -15, mouthCurve: -15 }
       };
 
-      /* ---------- TINY TWEEN ENGINE ---------- */
+      // Broadcast state to React
+      const broadcastState = () => {
+        const event = new CustomEvent('grump-state-update', {
+          detail: {
+            mood: currentMood,
+            intensity: moodIntensity,
+            energy: energyLevel,
+            annoyance: userAnnoyanceLevel
+          }
+        });
+        window.dispatchEvent(event);
+      };
+
+      /* ---------- TINY TWEEN ENGINE (120FPS OPTIMIZED) ---------- */
       const tween = (target, props, dur, easing = t => t < .5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2) => {
         return new Promise(resolve => {
-          const start = performance.now(), keys = Object.keys(props);
+          const start = performance.now();
+          const keys = Object.keys(props);
           const init = keys.reduce((a,k)=>(a[k]=parseFloat(getComputedStyle(styleTarget).getPropertyValue(props[k]))||0,a),{});
-          const step = now => {
-            const t = Math.min((now-start)/dur,1), eased = easing(t);
-            keys.forEach(k=> styleTarget.style.setProperty(props[k], (init[k]+(target[k]-init[k])*eased).toFixed(2)+'px'));
-            if(t<1) requestAnimationFrame(step);
-            else resolve();
-          }; requestAnimationFrame(step);
+          
+          const step = (now) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / dur, 1);
+            const eased = easing(progress);
+            
+            keys.forEach(k => {
+              const val = init[k] + (target[k] - init[k]) * eased;
+              styleTarget.style.setProperty(props[k], val.toFixed(3) + (k.includes('scale') ? '' : 'px'));
+            });
+
+            if (progress < 1) {
+              requestAnimationFrame(step);
+            } else {
+              resolve();
+            }
+          };
+          
+          requestAnimationFrame(step);
         });
       };
 
@@ -255,8 +282,6 @@
         ()=> setMouthOpen(rand(-10,-5)),
         ()=> setMouthOpen(0),
         ()=> { setMouthOpen(12); setTimeout(()=>setMouthOpen(0),400); },
-        
-        // And many more... (full 800+ available in source)
       ];
 
       /* ---------- IDLE SCHEDULER ---------- */
@@ -296,6 +321,7 @@
             console.warn('Grump2: Error setting face filter', e);
           }
           setMouthOpen(m.mouthCurve);
+          broadcastState(); // Notify React
         }
       };
 
@@ -308,6 +334,7 @@
         }
         energyLevel = Math.max(1, Math.min(10, energyLevel + rand(-1, 1)));
         moodIntensity = Math.max(1, moodIntensity - 0.1);
+        broadcastState();
       }, 15000);
 
       /* ---------- MOUSE TRACKING ---------- */
@@ -315,8 +342,33 @@
         if(face && chance(0.3)) lookAt(e.clientX, e.clientY);
       });
 
+      /* ---------- EXPOSE API TO WINDOW ---------- */
+      window.GrumpEngine = {
+        setMood: changeMood,
+        annoy: (amount) => {
+          userAnnoyanceLevel = Math.min(100, userAnnoyanceLevel + amount);
+          if(userAnnoyanceLevel > 80) changeMood('angry');
+          else if(userAnnoyanceLevel > 50) changeMood('annoyed');
+          broadcastState();
+          return userAnnoyanceLevel;
+        },
+        soothe: (amount) => {
+          userAnnoyanceLevel = Math.max(0, userAnnoyanceLevel - amount);
+          if(userAnnoyanceLevel < 20) changeMood('grumpy'); // Default state
+          broadcastState();
+          return userAnnoyanceLevel;
+        },
+        getState: () => ({
+          mood: currentMood,
+          intensity: moodIntensity,
+          energy: energyLevel,
+          annoyance: userAnnoyanceLevel
+        })
+      };
+
       /* ---------- START SYSTEMS ---------- */
       runIdle();
+      broadcastState(); // Initial state
       
       console.log('Grump2 initialized successfully');
     } catch (error) {
