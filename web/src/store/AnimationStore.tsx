@@ -7,11 +7,14 @@ export type EmotionalState =
   | 'thinkingDeep' | 'smug' | 'exasperatedSigh' | 'reluctantAgreement'
   | 'sleep' | 'jumpscare' | 'birthday' | 'threeAM'
   | 'codeReview' | 'designMode' | 'animationFlow' | 'debugMode' | 'playtesting'
+  | 'bored' | 'confused' | 'ecstatic' | 'panicked' | 'triumphant'
+  | 'judging' | 'mocking' | 'sarcastic' | 'deadpan' | 'furious'
+  | 'kafkaesque' | 'existentialDread' | 'zen' | 'wired' | 'caffeinated'
 
-export type BlinkType = 'standard' | 'slow' | 'heavy' | 'quickDouble' | 'half' | 'wink'
-export type ParticleType = 'sleepZ' | 'confetti' | 'coffeeSteam' | 'angerParticle' | 'sparkle' | 'glitchRectangle' | null
-export type AccessoryType = 'coffeeMug' | 'partyHat' | null
-export type MouthState = 'flat' | 'frown' | 'slightFrown' | 'smirk' | 'open' | 'pursed' | 'tight' | 'almostSmile' | 'part' | 'muttering' | 'exaggeratedFrown' | 'neutral' | 'wavy'
+export type BlinkType = 'standard' | 'slow' | 'heavy' | 'quickDouble' | 'half' | 'wink' | 'flutter' | 'wide'
+export type ParticleType = 'sleepZ' | 'confetti' | 'coffeeSteam' | 'angerParticle' | 'sparkle' | 'glitchRectangle' | 'rain' | 'binary' | 'fire' | 'heart' | null
+export type AccessoryType = 'coffeeMug' | 'partyHat' | 'sunglasses' | 'monocle' | 'headset' | 'crown' | null
+export type MouthState = 'flat' | 'frown' | 'slightFrown' | 'smirk' | 'open' | 'pursed' | 'tight' | 'almostSmile' | 'part' | 'muttering' | 'exaggeratedFrown' | 'neutral' | 'wavy' | 'wideOpen' | 'gritTeeth' | 'tongueOut'
 export type GlowColor = 'red' | 'orange' | 'soft' | 'intense'
 
 export interface MicroMovementState {
@@ -583,6 +586,152 @@ function getStateConfig(state: EmotionalState): Partial<AnimationState> {
       mouthState: 'open',
       glowIntensity: 0.6,
       glowPulseRate: 1.5,
+      glowColor: 'orange'
+    },
+    bored: {
+      leftEyebrowRotation: 0,
+      rightEyebrowRotation: 0,
+      leftEyelidTopY: -10,
+      rightEyelidTopY: -10,
+      mouthState: 'flat',
+      glowIntensity: 0.1,
+      glowPulseRate: 0.5,
+      glowColor: 'soft'
+    },
+    confused: {
+      leftEyebrowRotation: -15,
+      rightEyebrowRotation: 5,
+      leftEyebrowY: -5,
+      rightEyebrowY: 0,
+      mouthState: 'wavy',
+      glowIntensity: 0.4,
+      glowPulseRate: 2.0,
+      glowColor: 'orange'
+    },
+    ecstatic: {
+      leftEyebrowRotation: 10,
+      rightEyebrowRotation: -10,
+      leftEyebrowY: -10,
+      rightEyebrowY: -10,
+      mouthState: 'wideOpen',
+      glowIntensity: 1.0,
+      glowPulseRate: 4.0,
+      glowColor: 'intense'
+    },
+    panicked: {
+      leftEyebrowRotation: 15,
+      rightEyebrowRotation: -15,
+      leftPupilSize: 6,
+      rightPupilSize: 6,
+      mouthState: 'open',
+      glowIntensity: 0.9,
+      glowPulseRate: 6.0,
+      glowColor: 'red'
+    },
+    triumphant: {
+      leftEyebrowRotation: -5,
+      rightEyebrowRotation: 5,
+      mouthState: 'smirk',
+      glowIntensity: 0.8,
+      glowPulseRate: 1.5,
+      glowColor: 'orange'
+    },
+    judging: {
+      leftEyebrowRotation: -5,
+      rightEyebrowRotation: -5,
+      leftEyelidTopY: -15,
+      rightEyelidTopY: -15,
+      mouthState: 'tight',
+      glowIntensity: 0.3,
+      glowPulseRate: 1.0,
+      glowColor: 'soft'
+    },
+    mocking: {
+      leftEyebrowRotation: -15,
+      rightEyebrowRotation: -5,
+      mouthState: 'tongueOut',
+      glowIntensity: 0.6,
+      glowPulseRate: 2.5,
+      glowColor: 'orange'
+    },
+    sarcastic: {
+      leftEyebrowRotation: -5,
+      rightEyebrowRotation: -15,
+      mouthState: 'smirk',
+      leftEyelidTopY: -18,
+      rightEyelidTopY: -12,
+      glowIntensity: 0.4,
+      glowPulseRate: 1.2,
+      glowColor: 'orange'
+    },
+    deadpan: {
+      leftEyebrowRotation: 0,
+      rightEyebrowRotation: 0,
+      mouthState: 'flat',
+      leftEyelidTopY: -20,
+      rightEyelidTopY: -20,
+      glowIntensity: 0.2,
+      glowPulseRate: 0.5,
+      glowColor: 'soft'
+    },
+    furious: {
+      leftEyebrowRotation: -30,
+      rightEyebrowRotation: 30,
+      leftEyebrowY: 5,
+      rightEyebrowY: 5,
+      mouthState: 'gritTeeth',
+      glowIntensity: 1.0,
+      glowPulseRate: 8.0,
+      glowColor: 'intense'
+    },
+    kafkaesque: {
+      leftEyebrowRotation: -5,
+      rightEyebrowRotation: 15,
+      leftPupilSize: 4,
+      rightPupilSize: 14,
+      mouthState: 'wavy',
+      glowIntensity: 0.1,
+      glowPulseRate: 0.2,
+      glowColor: 'soft'
+    },
+    existentialDread: {
+      leftEyebrowRotation: 10,
+      rightEyebrowRotation: -10,
+      leftPupilSize: 16,
+      rightPupilSize: 16,
+      mouthState: 'open',
+      glowIntensity: 0.05,
+      glowPulseRate: 0.1,
+      glowColor: 'soft'
+    },
+    zen: {
+      leftEyebrowRotation: 0,
+      rightEyebrowRotation: 0,
+      leftEyelidTopY: 0, // Closed eyes
+      rightEyelidTopY: 0,
+      mouthState: 'almostSmile',
+      glowIntensity: 0.6,
+      glowPulseRate: 0.5,
+      glowColor: 'soft'
+    },
+    wired: {
+      leftEyebrowRotation: -10,
+      rightEyebrowRotation: 10,
+      leftPupilSize: 4,
+      rightPupilSize: 4,
+      mouthState: 'tight',
+      glowIntensity: 0.9,
+      glowPulseRate: 10.0,
+      glowColor: 'intense'
+    },
+    caffeinated: {
+      leftEyebrowRotation: -15,
+      rightEyebrowRotation: 15,
+      leftPupilSize: 14,
+      rightPupilSize: 14,
+      mouthState: 'wideOpen',
+      glowIntensity: 0.8,
+      glowPulseRate: 5.0,
       glowColor: 'orange'
     }
   }

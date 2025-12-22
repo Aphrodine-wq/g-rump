@@ -64,6 +64,64 @@ export class ContextAwarenessService {
       'worst day': 'maximumGrump',
       'terrible': 'maximumGrump',
       'hate this': 'maximumGrump',
+      'furious': 'furious',
+      'angry': 'furious',
+
+      // New Expanded Triggers
+      'bored': 'bored',
+      'boring': 'bored',
+      'nothing to do': 'bored',
+      
+      'confused': 'confused',
+      'what?': 'confused',
+      'huh?': 'confused',
+      'explain': 'confused',
+      
+      'yay': 'ecstatic',
+      'awesome': 'ecstatic',
+      'amazing': 'ecstatic',
+      'best day': 'ecstatic',
+      
+      'omg': 'panicked',
+      'help!': 'panicked',
+      'broken': 'panicked',
+      'crash': 'panicked',
+      'emergency': 'panicked',
+      
+      'i did it': 'triumphant',
+      'solved': 'triumphant',
+      'fixed': 'triumphant',
+      'winner': 'triumphant',
+      
+      'judge me': 'judging',
+      'rate this': 'judging',
+      'opinion': 'judging',
+      
+      'lol': 'mocking',
+      'lmao': 'mocking',
+      'funny': 'mocking',
+      
+      'yeah right': 'sarcastic',
+      'sure': 'sarcastic',
+      'whatever': 'sarcastic',
+      
+      'meh': 'deadpan',
+      'okay': 'deadpan',
+      'fine': 'deadpan',
+      
+      'coffee': 'caffeinated',
+      'caffeine': 'caffeinated',
+      'energy': 'wired',
+      'fast': 'wired',
+      
+      'life': 'existentialDread',
+      'meaning': 'existentialDread',
+      'why are we here': 'existentialDread',
+      'universe': 'kafkaesque',
+      
+      'calm': 'zen',
+      'peace': 'zen',
+      'relax': 'zen'
     }
 
     // Check for keyword matches
