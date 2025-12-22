@@ -1,3 +1,4 @@
+
 // Procedural CSS Animation Generator
 // Generates keyframes based on intent detection
 
@@ -82,24 +83,26 @@ const generateKeyframes = (prompt: string): AnimationProperties => {
     };
   }
 
+  // ENHANCED GLITCH: Chromatic Aberration + Clip Path
   if (p.includes('glitch')) {
     return {
       name: 'glitch-custom',
-      duration: '3s',
-      timing: 'steps(10)',
+      duration: '2s',
+      timing: 'steps(2, end)',
       iteration: 'infinite',
       keyframes: `
 @keyframes glitch-custom {
-  0% { transform: translate(0); clip-path: inset(0 0 0 0); }
-  10% { transform: translate(-2px, 2px); clip-path: inset(10% 0 85% 0); }
-  20% { transform: translate(2px, -2px); clip-path: inset(85% 0 5% 0); }
-  30% { transform: translate(-2px, -2px); clip-path: inset(50% 0 30% 0); }
-  40% { transform: translate(2px, 2px); clip-path: inset(10% 0 60% 0); }
-  50% { transform: translate(0); clip-path: inset(0 0 0 0); }
+  0% { transform: translate(0); text-shadow: none; clip-path: inset(0 0 0 0); }
+  10% { transform: translate(-2px, 1px); text-shadow: 2px 0 red, -2px 0 blue; clip-path: inset(10% 0 85% 0); }
+  20% { transform: translate(1px, -1px); text-shadow: -2px 0 red, 2px 0 blue; clip-path: inset(85% 0 5% 0); }
+  30% { transform: translate(-1px, 2px); text-shadow: 2px 0 red, -2px 0 blue; clip-path: inset(50% 0 30% 0); }
+  40% { transform: translate(2px, -1px); text-shadow: -2px 0 red, 2px 0 blue; clip-path: inset(10% 0 60% 0); }
+  50% { transform: translate(0); text-shadow: none; clip-path: inset(0 0 0 0); }
 }`
     };
   }
 
+  // ENHANCED ORBIT: Complex Transform Origin
   if (p.includes('orbit')) {
     return {
       name: 'orbit-custom',
@@ -108,23 +111,48 @@ const generateKeyframes = (prompt: string): AnimationProperties => {
       iteration: 'infinite',
       keyframes: `
 @keyframes orbit-custom {
-  0% { transform: rotate(0deg) translateX(30px) rotate(0deg); }
-  100% { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
+  0% { transform: rotate(0deg) translateX(40px) rotate(0deg) scale(1); }
+  25% { transform: rotate(90deg) translateX(40px) rotate(-90deg) scale(0.8); }
+  50% { transform: rotate(180deg) translateX(40px) rotate(-180deg) scale(0.6); z-index: -1; opacity: 0.5; }
+  75% { transform: rotate(270deg) translateX(40px) rotate(-270deg) scale(0.8); }
+  100% { transform: rotate(360deg) translateX(40px) rotate(-360deg) scale(1); }
 }`
     };
   }
 
+  // ENHANCED TYPEWRITER: Character-by-character reveal
   if (p.includes('type') || p.includes('write')) {
     return {
       name: 'typewriter-custom',
       duration: '2s',
-      timing: 'steps(20)',
+      timing: 'steps(40, end)',
       iteration: 'infinite',
       keyframes: `
 @keyframes typewriter-custom {
-  0% { width: 0; border-right: 2px solid white; }
-  90% { width: 100%; border-right: 2px solid white; }
+  0% { width: 0; border-right: 2px solid rgba(255,255,255,0.75); }
+  90% { width: 100%; border-right: 2px solid rgba(255,255,255,0.75); }
   100% { width: 100%; border-right: none; }
+}`
+    };
+  }
+
+  // NEW: NEON PULSE
+  if (p.includes('neon') || p.includes('glow')) {
+    return {
+      name: 'neon-pulse',
+      duration: '1.5s',
+      timing: 'ease-in-out',
+      iteration: 'infinite',
+      keyframes: `
+@keyframes neon-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #e60073;
+  }
+  50% { 
+    box-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6;
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #ff4da6;
+  }
 }`
     };
   }
@@ -242,6 +270,7 @@ export const createProceduralAnimation = (prompt: string) => {
   color: white;
   font-weight: bold;
   animation: ${props.name} ${props.duration} ${props.timing} ${props.iteration};
+  ${props.name.includes('type') ? 'overflow: hidden; white-space: nowrap;' : ''}
 }
 
 ${props.keyframes}

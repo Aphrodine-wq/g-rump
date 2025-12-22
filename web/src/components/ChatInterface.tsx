@@ -246,6 +246,63 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
             animation={currentAnimation}
             onExport={() => setShowExportModal(true)}
           />
+          
+          {/* Interactive Widget Control */}
+          {currentAnimation && (
+            <div className="interactive-controls p-4 bg-gray-900 rounded-lg mt-4 border border-gray-800">
+              <h3 className="text-gray-400 text-xs uppercase tracking-wider mb-3">Live Parameters</h3>
+              <div className="flex flex-col gap-3">
+                <div className="control-group">
+                  <label className="text-gray-500 text-xs">Speed</label>
+                  <input 
+                    type="range" 
+                    min="0.1" 
+                    max="3" 
+                    step="0.1" 
+                    defaultValue="1"
+                    onChange={(e) => {
+                      const speed = parseFloat(e.target.value);
+                      const el = document.querySelector('.animated-element') as HTMLElement;
+                      if (el) el.style.animationDuration = `${1/speed}s`;
+                      audioManager.grump.type(); // Click feedback
+                    }}
+                    className="w-full accent-indigo-500 bg-gray-800 h-2 rounded-full appearance-none"
+                  />
+                </div>
+                <div className="control-group">
+                  <label className="text-gray-500 text-xs">Scale</label>
+                  <input 
+                    type="range" 
+                    min="0.5" 
+                    max="2" 
+                    step="0.1" 
+                    defaultValue="1"
+                    onChange={(e) => {
+                      const scale = parseFloat(e.target.value);
+                      const el = document.querySelector('.animated-element') as HTMLElement;
+                      if (el) el.style.transform = `scale(${scale})`;
+                      audioManager.grump.type();
+                    }}
+                    className="w-full accent-purple-500 bg-gray-800 h-2 rounded-full appearance-none"
+                  />
+                </div>
+                <button 
+                  className="mt-2 bg-gray-800 hover:bg-gray-700 text-white text-xs py-2 px-4 rounded transition-colors"
+                  onClick={() => {
+                    const el = document.querySelector('.animated-element') as HTMLElement;
+                    if (el) {
+                      el.style.animation = 'none';
+                      el.offsetHeight; /* trigger reflow */
+                      el.style.animation = ''; 
+                      audioManager.grump.success();
+                    }
+                  }}
+                >
+                  Replay Animation
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

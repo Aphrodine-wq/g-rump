@@ -1,5 +1,7 @@
+
 // Procedural Audio Engine
 // Generates synthesized sound effects using Web Audio API
+// Upgraded for G-Rump 3.0: FM Synthesis & Envelopes
 
 export class ProceduralAudio {
   private ctx: AudioContext;
@@ -9,72 +11,117 @@ export class ProceduralAudio {
     this.ctx = context;
     this.masterGain = this.ctx.createGain();
     this.masterGain.connect(this.ctx.destination);
+    this.masterGain.gain.value = 0.5;
   }
 
-  private createOscillator(type: OscillatorType, freq: number, duration: number, vol: number = 0.1) {
+  // --- Sound Effects ---
+
+  // A low, rumbling grumble (FM Synthesis)
+  public grumble() {
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const mod = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const modGain = this.ctx.createGain();
+
+    // Carrier
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(80, t);
+    osc.frequency.linearRampToValueAtTime(60, t + 0.3);
+
+    // Modulator (for the "growl" texture)
+    mod.type = 'sine';
+    mod.frequency.setValueAtTime(30, t);
+    
+    // Connections
+    mod.connect(modGain);
+    modGain.connect(osc.frequency);
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+
+    // Envelopes
+    modGain.gain.setValueAtTime(50, t);
+    
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.3, t + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+
+    osc.start(t);
+    mod.start(t);
+    osc.stop(t + 0.5);
+    mod.stop(t + 0.5);
+  }
+
+  // A happy "ding" (Major arpeggio)
+  public success() {
+    const t = this.ctx.currentTime;
+    
+    const playNote = (freq: number, time: number) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, time);
+      
+      gain.gain.setValueAtTime(0, time);
+      gain.gain.linearRampToValueAtTime(0.1, time + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.4);
+      
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      
+      osc.start(time);
+      osc.stop(time + 0.5);
+    };
+
+    // C Major Arpeggio (C5, E5, G5, C6)
+    playNote(523.25, t);
+    playNote(659.25, t + 0.1);
+    playNote(783.99, t + 0.2);
+    playNote(1046.50, t + 0.3);
+  }
+
+  // An annoying error buzz
+  public error() {
+    const t = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
 
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-    
-    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, t);
+    osc.frequency.linearRampToValueAtTime(100, t + 0.3);
+
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.linearRampToValueAtTime(0, t + 0.3);
 
     osc.connect(gain);
     gain.connect(this.masterGain);
 
-    osc.start();
-    osc.stop(this.ctx.currentTime + duration);
+    osc.start(t);
+    osc.stop(t + 0.3);
   }
 
-  // "Grump" voice - low frequency sawtooth with modulation
-  public grumble() {
+  // Typewriter click
+  public type() {
+    // Noise burst simulation for mechanical click
+    const t = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    const filter = this.ctx.createBiquadFilter();
 
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(80, this.ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(60, this.ctx.currentTime + 0.3);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(800 + Math.random() * 200, t);
 
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(400, this.ctx.currentTime);
+    gain.gain.setValueAtTime(0.05, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
 
-    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.3);
-
-    osc.connect(filter);
-    filter.connect(gain);
+    osc.connect(gain);
     gain.connect(this.masterGain);
 
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.3);
-  }
-
-  // Success chime - Major triad arpeggio
-  public success() {
-    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
-
-    notes.forEach((freq, i) => {
-      setTimeout(() => {
-        this.createOscillator('sine', freq, 0.4, 0.05);
-      }, i * 100);
-    });
-  }
-
-  // Error buzz - Discordant sawtooth
-  public error() {
-    this.createOscillator('sawtooth', 150, 0.3, 0.1);
-    setTimeout(() => this.createOscillator('sawtooth', 140, 0.3, 0.1), 50);
-  }
-
-  // Typing sound - High pitch tick
-  public type() {
-    this.createOscillator('square', 800, 0.05, 0.02);
+    osc.start(t);
+    osc.stop(t + 0.05);
   }
 
   public setVolume(vol: number) {
-    this.masterGain.gain.setValueAtTime(vol, this.ctx.currentTime);
+    this.masterGain.gain.setValueAtTime(Math.max(0, Math.min(1, vol)), this.ctx.currentTime);
   }
 }
