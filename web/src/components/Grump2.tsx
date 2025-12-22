@@ -33,7 +33,6 @@ export default function Grump2({ size = 'medium', className = '', style = {} }: 
         width: targetSize, 
         height: targetSize, 
         position: 'relative',
-        overflow: 'hidden',
         ...style 
       }}
     >
@@ -49,21 +48,48 @@ export default function Grump2({ size = 'medium', className = '', style = {} }: 
           left: 0
         } as React.CSSProperties}
       >
+        {/* Arms */}
+        <div className="arm left" />
+        <div className="arm right" />
+        
+        {/* Hands */}
+        <div className="hand left">
+          <div className="hand-inner">
+            <div className="finger" />
+            <div className="finger" />
+            <div className="finger" />
+            <div className="finger" />
+            <div className="thumb" />
+          </div>
+        </div>
+        <div className="hand right">
+          <div className="hand-inner">
+            <div className="finger" />
+            <div className="finger" />
+            <div className="finger" />
+            <div className="finger" />
+            <div className="thumb" />
+          </div>
+        </div>
+
+        {/* Face */}
         <div className="face">
-          <div className="eyes-container">
-            <div className="eye left-eye">
-              <div className="pupil" />
-            </div>
-            <div className="eye right-eye">
-              <div className="pupil" />
-            </div>
+          <div className="eyebrow left" />
+          <div className="eyebrow right" />
+          
+          <div className="eye left">
+            <div className="pupil" />
           </div>
-          <div className="eyebrows-container">
-            <div className="eyebrow left-eyebrow" />
-            <div className="eyebrow right-eyebrow" />
+          <div className="eye right">
+            <div className="pupil" />
           </div>
-          <div className="mouth" />
+          
           <div className="nose" />
+          
+          <div className="mouth">
+            <div className="mouth-line top" />
+            <div className="mouth-line bottom" />
+          </div>
         </div>
       </div>
     </div>

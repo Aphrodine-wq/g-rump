@@ -1,0 +1,4215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grump</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --mouth-open: 0px;
+      --eyebrow-left-rotate: 8deg;
+      --eyebrow-right-rotate: -8deg;
+      --eyebrow-left-y: 0px;
+      --eyebrow-right-y: 0px;
+      --pupil-x: 0px;
+      --pupil-y: 0px;
+      --face-x: 0px;
+      --face-y: 0px;
+      --face-rotate: 0deg;
+      --face-scale: 1;
+      --bg-color: #ffffff;
+      --bg-filter: none;
+      --hand-left-x: -120px;
+      --hand-left-y: 150px;
+      --hand-left-rotate: 15deg;
+      --hand-right-x: 120px;
+      --hand-right-y: 150px;
+      --hand-right-rotate: -15deg;
+      --hand-left-opacity: 0;
+      --hand-right-opacity: 0;
+      --arm-left-opacity: 0;
+      --arm-right-opacity: 0;
+      --arm-left-length: 120px;
+      --arm-right-length: 120px;
+      --arm-left-angle: 25deg;
+      --arm-right-angle: -25deg;
+      --vignette-opacity: 0;
+      --screen-shake: 0px;
+      --chat-x: 0px;
+      --chat-y: 0px;
+      --chat-rotate: 0deg;
+      --chat-opacity: 1;
+      --toggle-x: 0px;
+      --keyboard-y: 0px;
+      --keyboard-rotate: 0deg;
+      --keyboard-opacity: 0;
+      
+      /* Theme colors */
+      --theme-bg: #ffffff;
+      --theme-text: #000000;
+      --theme-face-bg: #ffffff;
+      --theme-shadow: rgba(0, 0, 0, 0.28);
+      --theme-chat-bg: #f5f5f5;
+      --theme-chat-border: #e0e0e0;
+    }
+
+    [data-theme="dark"] {
+      --theme-bg: #1a1a2e;
+      --theme-text: #ffffff;
+      --theme-face-bg: #16213e;
+      --theme-shadow: rgba(0, 0, 0, 0.5);
+      --theme-chat-bg: #0f0f1a;
+      --theme-chat-border: #333355;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg-color, var(--theme-bg));
+      overflow: hidden;
+      transition: background 0.5s ease;
+      filter: var(--bg-filter);
+      transform: translateX(var(--screen-shake));
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* THEME TOGGLE */
+    .theme-toggle-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateX(var(--toggle-x));
+      transition: transform 0.3s ease;
+    }
+
+    .theme-toggle {
+      width: 60px;
+      height: 30px;
+      background: var(--theme-chat-border);
+      border-radius: 15px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .theme-toggle::before {
+      content: '☀️';
+      position: absolute;
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+    }
+
+    .theme-toggle::after {
+      content: '🌙';
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+    }
+
+    .toggle-knob {
+      width: 26px;
+      height: 26px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: left 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    [data-theme="dark"] .toggle-knob {
+      left: 32px;
+    }
+
+    /* ENVIRONMENT OVERLAYS */
+    .environment {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.8) 100%);
+      opacity: var(--vignette-opacity);
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      z-index: 999;
+    }
+
+    .flash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1001;
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 998;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      background: #000;
+      border-radius: 0;
+    }
+
+    /* GRUMP CONTAINER */
+    .grump-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    /* ARMS - dynamic extension */
+    .arm {
+      position: absolute;
+      width: 28px;
+      background: var(--theme-face-bg);
+      box-shadow: 
+        0 4px 20px var(--theme-shadow),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      z-index: 5;
+      transform-origin: top center;
+      transition: all 0.15s cubic-bezier(0.34, 1.2, 0.64, 1);
+      border-radius: 0 0 10px 10px;
+    }
+
+    .arm.left {
+      height: var(--arm-left-length, 120px);
+      left: 50%;
+      top: 50%;
+      transform: translate(-150px, 60px) rotate(var(--arm-left-angle, 25deg));
+      opacity: var(--arm-left-opacity);
+    }
+
+    .arm.right {
+      height: var(--arm-right-length, 120px);
+      right: 50%;
+      top: 50%;
+      transform: translate(150px, 60px) rotate(var(--arm-right-angle, -25deg));
+      opacity: var(--arm-right-opacity);
+      border-radius: 0 0 10px 10px;
+    }
+
+    /* HANDS */
+    .hand {
+      width: 60px;
+      height: 60px;
+      background: var(--theme-face-bg);
+      position: absolute;
+      box-shadow: 
+        0 8px 20px var(--theme-shadow),
+        0 15px 40px rgba(0, 0, 0, 0.2);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      z-index: 10;
+    }
+
+    .hand.left {
+      transform: translate(var(--hand-left-x), var(--hand-left-y)) rotate(var(--hand-left-rotate));
+      opacity: var(--hand-left-opacity);
+    }
+
+    .hand.right {
+      transform: translate(var(--hand-right-x), var(--hand-right-y)) rotate(var(--hand-right-rotate));
+      opacity: var(--hand-right-opacity);
+    }
+
+    .hand-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Fingers */
+    .finger {
+      width: 12px;
+      height: 20px;
+      background: var(--theme-face-bg);
+      position: absolute;
+      top: -18px;
+      box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .hand.left .finger:nth-child(1) { left: 5px; height: 16px; }
+    .hand.left .finger:nth-child(2) { left: 18px; height: 22px; }
+    .hand.left .finger:nth-child(3) { left: 31px; height: 24px; }
+    .hand.left .finger:nth-child(4) { left: 44px; height: 20px; }
+
+    .hand.right .finger:nth-child(1) { left: 5px; height: 20px; }
+    .hand.right .finger:nth-child(2) { left: 18px; height: 24px; }
+    .hand.right .finger:nth-child(3) { left: 31px; height: 22px; }
+    .hand.right .finger:nth-child(4) { left: 44px; height: 16px; }
+
+    /* Thumb */
+    .thumb {
+      width: 16px;
+      height: 25px;
+      background: var(--theme-face-bg);
+      position: absolute;
+      top: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .hand.left .thumb {
+      right: -14px;
+      transform: rotate(-20deg);
+    }
+
+    .hand.right .thumb {
+      left: -14px;
+      transform: rotate(20deg);
+    }
+
+    .face {
+      width: 300px;
+      height: 300px;
+      background: var(--theme-face-bg);
+      position: relative;
+      box-shadow: 
+        0 35px 120px var(--theme-shadow), 
+        0 15px 50px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        inset 0 -2px 0 rgba(0,0,0,0.03);
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, box-shadow 0.3s ease;
+      transform: translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(var(--face-scale));
+    }
+
+    /* Subtle highlight */
+    .face::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Ground shadow */
+    .face::after {
+      content: '';
+      position: absolute;
+      bottom: -50px;
+      left: 15%;
+      right: 15%;
+      height: 50px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.25) 0%, transparent 70%);
+      filter: blur(15px);
+      pointer-events: none;
+    }
+
+    .face.transform-rage {
+      background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+      box-shadow: 
+        0 35px 120px rgba(255, 0, 0, 0.5), 
+        0 15px 50px rgba(255, 0, 0, 0.3),
+        0 0 100px rgba(255, 0, 0, 0.4),
+        inset 0 0 40px rgba(0,0,0,0.3);
+    }
+
+    /* EYEBROWS - enhanced flow */
+    .eyebrow {
+      width: 60px;
+      height: 10px;
+      background: var(--theme-text);
+      position: absolute;
+      top: 58px;
+      transition: transform 0.12s cubic-bezier(0.34, 1.2, 0.64, 1), box-shadow 0.15s ease;
+      box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.3),
+        0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .eyebrow.left {
+      left: 55px;
+      transform-origin: right center;
+      transform: rotate(var(--eyebrow-left-rotate)) translateY(var(--eyebrow-left-y)) translateZ(0);
+    }
+
+    .eyebrow.right {
+      right: 55px;
+      transform-origin: left center;
+      transform: rotate(var(--eyebrow-right-rotate)) translateY(var(--eyebrow-right-y)) translateZ(0);
+    }
+
+    /* EYES */
+    .eye {
+      width: 45px;
+      height: 45px;
+      background: var(--theme-text);
+      position: absolute;
+      top: 85px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.1s ease, box-shadow 0.15s ease;
+      box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.4),
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .eye.left {
+      left: 60px;
+    }
+
+    .eye.right {
+      right: 60px;
+    }
+
+    .pupil {
+      width: 14px;
+      height: 14px;
+      background: var(--theme-face-bg);
+      transition: transform 0.08s ease, width 0.15s ease, height 0.15s ease;
+      transform: translate(var(--pupil-x), var(--pupil-y));
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+    }
+
+    /* NOSE */
+    .nose {
+      width: 18px;
+      height: 35px;
+      background: var(--theme-text);
+      position: absolute;
+      top: 148px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.35),
+        0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* MOUTH */
+    .mouth {
+      position: absolute;
+      bottom: 55px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--mouth-open);
+      transition: gap 0.08s ease, transform 0.1s ease;
+    }
+
+    .mouth-line {
+      width: 90px;
+      height: 10px;
+      background: var(--theme-text);
+      border-radius: 0 0 50% 50%;
+      transition: transform 0.1s ease, border-radius 0.1s ease, box-shadow 0.15s ease;
+      box-shadow: 
+        0 3px 6px rgba(0, 0, 0, 0.35),
+        0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .mouth-line.top {
+      border-radius: 50% 50% 0 0;
+    }
+
+    .mouth-line.bottom {
+      transform: scaleX(0.85);
+    }
+
+    /* CHAT - minimal floating text */
+    .chat-container {
+      position: fixed;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%) translateX(var(--chat-x)) translateY(var(--chat-y)) rotate(var(--chat-rotate));
+      opacity: var(--chat-opacity);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+      z-index: 100;
+      width: 450px;
+    }
+
+    .chat-messages {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 25px;
+      min-height: 60px;
+    }
+
+    .chat-message {
+      font-size: 17px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      animation: messageIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      letter-spacing: -0.03em;
+      line-height: 1.4;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    @keyframes messageIn {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .chat-message.user {
+      color: var(--theme-text);
+      text-align: right;
+      align-self: flex-end;
+      font-weight: 600;
+    }
+
+    .chat-message.grump {
+      color: var(--theme-text);
+      opacity: 0.5;
+      font-style: italic;
+    }
+
+    .chat-message.typing {
+      color: var(--theme-text);
+      opacity: 0.3;
+      font-style: italic;
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      gap: 4px;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--theme-text);
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: dotPulse 1.4s infinite;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dotPulse {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    .chat-input-area {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--theme-text);
+      opacity: 0.15;
+      transition: opacity 0.3s ease;
+    }
+
+    .chat-input-area:focus-within {
+      opacity: 1;
+      border-color: var(--theme-text);
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 0;
+      border: none;
+      font-size: 16px;
+      font-weight: 400;
+      background: transparent;
+      color: var(--theme-text);
+      outline: none;
+      letter-spacing: -0.02em;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .chat-input::placeholder {
+      color: var(--theme-text);
+      opacity: 0.4;
+    }
+
+    .chat-send {
+      padding: 10px 20px;
+      background: transparent;
+      color: var(--theme-text);
+      border: 1.5px solid currentColor;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: all 0.2s ease;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .chat-send:hover {
+      background: var(--theme-text);
+      color: var(--theme-bg);
+    }
+
+    /* GRUMP'S KEYBOARD */
+    .grump-keyboard {
+      position: absolute;
+      width: 220px;
+      height: 80px;
+      background: var(--theme-face-bg);
+      border: 2px solid var(--theme-text);
+      border-radius: 10px;
+      bottom: -180px;
+      left: 50%;
+      transform: translateX(-50%) translateY(var(--keyboard-y, 0px)) rotate(var(--keyboard-rotate, 0deg));
+      opacity: var(--keyboard-opacity, 0);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+      box-shadow: 0 15px 50px var(--theme-shadow);
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 4px;
+      padding: 10px;
+      z-index: 50;
+    }
+
+    .key {
+      background: var(--theme-chat-border);
+      border-radius: 4px;
+      transition: transform 0.05s ease, background 0.08s ease;
+    }
+
+    .key.pressed {
+      transform: scale(0.8) translateY(2px);
+      background: var(--theme-text);
+    }
+
+    .key.space {
+      grid-column: 3 / 8;
+    }
+
+    /* Keyboard hints - minimal */
+    .keyboard-hints {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      font-size: 10px;
+      color: var(--theme-text);
+      opacity: 0.2;
+      transition: color 0.3s ease, opacity 0.3s ease;
+      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+      letter-spacing: 0.03em;
+    }
+
+    .keyboard-hints:hover {
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="vignette"></div>
+  <div class="flash"></div>
+  <div class="particles"></div>
+  
+  <!-- Theme Toggle -->
+  <div class="theme-toggle-container">
+    <div class="theme-toggle" id="themeToggle">
+      <div class="toggle-knob"></div>
+    </div>
+  </div>
+  
+  <div class="grump-container">
+    <!-- Arms -->
+    <div class="arm left"></div>
+    <div class="arm right"></div>
+    
+    <div class="hand left">
+      <div class="hand-inner">
+        <div class="finger"></div>
+        <div class="finger"></div>
+        <div class="finger"></div>
+        <div class="finger"></div>
+        <div class="thumb"></div>
+      </div>
+    </div>
+    
+    <div class="face">
+      <div class="eyebrow left"></div>
+      <div class="eyebrow right"></div>
+      <div class="eye left"><div class="pupil"></div></div>
+      <div class="eye right"><div class="pupil"></div></div>
+      <div class="nose"></div>
+      <div class="mouth">
+        <div class="mouth-line top"></div>
+        <div class="mouth-line bottom"></div>
+      </div>
+    </div>
+    
+    <div class="hand right">
+      <div class="hand-inner">
+        <div class="finger"></div>
+        <div class="finger"></div>
+        <div class="finger"></div>
+        <div class="finger"></div>
+        <div class="thumb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Box -->
+  <div class="chat-container" id="chatContainer">
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-message grump">...what do you want?</div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chatInput" placeholder="say something">
+      <button class="chat-send" id="chatSend">Send</button>
+    </div>
+  </div>
+
+  <!-- Grump's Keyboard -->
+  <div class="grump-keyboard" id="grumpKeyboard">
+    <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+    <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+    <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+    <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+    <div class="key"></div><div class="key"></div><div class="key space"></div><div class="key"></div><div class="key"></div>
+  </div>
+
+  <div class="keyboard-hints">N Y E R S D Z C L W H F T X | 1-0 | - = ⌫ | G=keyboard | B=ragebait</div>
+
+  <script>
+    const root = document.documentElement;
+    const face = document.querySelector('.face');
+    const eyes = document.querySelectorAll('.eye');
+    const eyebrowLeft = document.querySelector('.eyebrow.left');
+    const eyebrowRight = document.querySelector('.eyebrow.right');
+    const mouth = document.querySelector('.mouth');
+    const nose = document.querySelector('.nose');
+    const handLeft = document.querySelector('.hand.left');
+    const handRight = document.querySelector('.hand.right');
+    const armLeft = document.querySelector('.arm.left');
+    const armRight = document.querySelector('.arm.right');
+    const vignette = document.querySelector('.vignette');
+    const flash = document.querySelector('.flash');
+    const particles = document.querySelector('.particles');
+    const themeToggle = document.getElementById('themeToggle');
+    const chatContainer = document.getElementById('chatContainer');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+    const grumpKeyboard = document.getElementById('grumpKeyboard');
+    const keys = grumpKeyboard.querySelectorAll('.key');
+    
+    let faceRect = face.getBoundingClientRect();
+    let faceCenterX = faceRect.left + faceRect.width / 2;
+    let faceCenterY = faceRect.top + faceRect.height / 2;
+    
+    // State
+    let isBlinking = false;
+    let isFlinching = false;
+    let isStartled = false;
+    let isTransformed = false;
+    let suspicionLevel = 0;
+    let stareTime = 0;
+    let lastMouseMove = Date.now();
+    let mouseInFace = false;
+    let currentMood = 'grumpy';
+    let twitchTimeout = null;
+    let isDarkTheme = false;
+    let chatVisible = true;
+    let microExpressionInterval = null;
+
+    // Update face position on resize
+    window.addEventListener('resize', () => {
+      faceRect = face.getBoundingClientRect();
+      faceCenterX = faceRect.left + faceRect.width / 2;
+      faceCenterY = faceRect.top + faceRect.height / 2;
+    });
+
+    // ============ THEME TOGGLE ============
+    
+    themeToggle.addEventListener('click', () => {
+      toggleTheme();
+    });
+
+    function toggleTheme(grumpInitiated = false) {
+      isDarkTheme = !isDarkTheme;
+      document.body.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
+      
+      if (!grumpInitiated) {
+        // Grump reacts to user toggling
+        microExpression('surprised');
+        setTimeout(() => {
+          lookAt(window.innerWidth - 80, 40); // Look at toggle
+          setTimeout(() => {
+            setEyebrows(isDarkTheme ? 5 : 12, isDarkTheme ? -5 : -12);
+            setTimeout(() => resetFace(), 800);
+          }, 400);
+        }, 200);
+      }
+    }
+
+    function grumpToggleTheme() {
+      // Grump reaches up and toggles it himself
+      showRightHand();
+      
+      // Anticipation - look at toggle first
+      lookAt(window.innerWidth - 80, 40);
+      setEyebrows(5, -10);
+      
+      setTimeout(() => {
+        // Reach up
+        setRightHand(280, -180, -30);
+        
+        setTimeout(() => {
+          // Flick!
+          root.style.setProperty('--toggle-x', '10px');
+          toggleTheme(true);
+          
+          setTimeout(() => {
+            root.style.setProperty('--toggle-x', '0px');
+            
+            // Smug look
+            setEyebrows(isDarkTheme ? 3 : 10, isDarkTheme ? -3 : -10);
+            movePupils(0, 0);
+            
+            setTimeout(() => {
+              hideRightHand();
+              resetHands();
+              resetFace();
+            }, 600);
+          }, 150);
+        }, 400);
+      }, 500);
+    }
+
+    // ============ CHAT INTERACTION ============
+    
+    const grumpResponses = [
+      "Ugh. What now?",
+      "*sigh* ...fine.",
+      "Did I ask?",
+      "Cool story.",
+      "And I should care because...?",
+      "Wow. Fascinating. 🙄",
+      "*visible disappointment*",
+      "That's... a choice.",
+      "I'm literally a square.",
+      "My enthusiasm is overwhelming. Can you tell?",
+    ];
+
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    chatInput.addEventListener('focus', () => {
+      // Grump notices input focus
+      lookAt(chatContainer.getBoundingClientRect().left + 200, chatContainer.getBoundingClientRect().top);
+      microExpression('suspicious');
+    });
+
+    function sendMessage() {
+      const message = chatInput.value.trim();
+      if (!message) return;
+      
+      // Add user message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-message user';
+      userMsg.textContent = message;
+      chatMessages.appendChild(userMsg);
+      chatInput.value = '';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      // Grump reads message
+      lookAt(chatContainer.getBoundingClientRect().left + 200, chatContainer.getBoundingClientRect().top + 50);
+      microExpression('reading');
+      
+      // Grump responds after "reading"
+      setTimeout(() => {
+        const response = grumpResponses[Math.floor(Math.random() * grumpResponses.length)];
+        const grumpMsg = document.createElement('div');
+        grumpMsg.className = 'chat-message grump';
+        grumpMsg.textContent = response;
+        chatMessages.appendChild(grumpMsg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // React to own response
+        microExpression('smug');
+        movePupils(0, 0);
+      }, 1000 + Math.random() * 500);
+    }
+
+    function slapChat() {
+      if (!chatVisible) {
+        // Bring it back
+        bringBackChat();
+        return;
+      }
+      
+      // Anticipation - wind up
+      setEyebrows(15, -15);
+      eyes.forEach(eye => eye.style.transform = 'scaleY(0.8)');
+      moveFace(-20, 0);
+      rotateFace(-10);
+      
+      showRightHand();
+      setRightHand(200, 150, -45);
+      
+      setTimeout(() => {
+        // SLAP!
+        rotateFace(15);
+        moveFace(30, 0);
+        setRightHand(-250, 200, 60);
+        
+        // Chat flies off
+        root.style.setProperty('--chat-x', '800px');
+        root.style.setProperty('--chat-rotate', '45deg');
+        root.style.setProperty('--chat-opacity', '0');
+        
+        screenShake(8, 300);
+        
+        chatVisible = false;
+        
+        setTimeout(() => {
+          // Satisfied look
+          resetFace();
+          setEyebrows(5, -5);
+          hideRightHand();
+          resetHands();
+          
+          // Smug nod
+          setTimeout(() => nodYes(), 300);
+        }, 400);
+      }, 300);
+    }
+
+    function bringBackChat() {
+      // Reluctantly bring it back
+      showLeftHand();
+      setLeftHand(-350, 200, -30);
+      
+      setEyebrows(10, -10);
+      eyeRoll();
+      
+      setTimeout(() => {
+        // Drag it back
+        setLeftHand(-150, 200, -20);
+        root.style.setProperty('--chat-x', '0px');
+        root.style.setProperty('--chat-rotate', '0deg');
+        root.style.setProperty('--chat-opacity', '1');
+        
+        chatVisible = true;
+        
+        setTimeout(() => {
+          hideLeftHand();
+          resetHands();
+          resetFace();
+        }, 500);
+      }, 600);
+    }
+
+    // ============ ARM FUNCTIONS - Dynamic sync ============
+    
+    function showLeftArm() {
+      root.style.setProperty('--arm-left-opacity', '1');
+    }
+
+    function showRightArm() {
+      root.style.setProperty('--arm-right-opacity', '1');
+    }
+
+    function hideLeftArm() {
+      root.style.setProperty('--arm-left-opacity', '0');
+    }
+
+    function hideRightArm() {
+      root.style.setProperty('--arm-right-opacity', '0');
+    }
+
+    // Sync arm with hand position
+    function syncLeftArm() {
+      const handX = parseFloat(getComputedStyle(root).getPropertyValue('--hand-left-x')) || -120;
+      const handY = parseFloat(getComputedStyle(root).getPropertyValue('--hand-left-y')) || 150;
+      
+      // Calculate from shoulder (approximately -150, 60 from face center)
+      const shoulderX = -150;
+      const shoulderY = 60;
+      const dx = handX - shoulderX;
+      const dy = handY - shoulderY;
+      
+      const length = Math.sqrt(dx * dx + dy * dy) * 0.9;
+      const angle = Math.atan2(dx, dy) * (180 / Math.PI);
+      
+      root.style.setProperty('--arm-left-length', Math.min(Math.max(length, 80), 250) + 'px');
+      root.style.setProperty('--arm-left-angle', (angle + 180) + 'deg');
+    }
+
+    function syncRightArm() {
+      const handX = parseFloat(getComputedStyle(root).getPropertyValue('--hand-right-x')) || 120;
+      const handY = parseFloat(getComputedStyle(root).getPropertyValue('--hand-right-y')) || 150;
+      
+      const shoulderX = 150;
+      const shoulderY = 60;
+      const dx = handX - shoulderX;
+      const dy = handY - shoulderY;
+      
+      const length = Math.sqrt(dx * dx + dy * dy) * 0.9;
+      const angle = Math.atan2(dx, dy) * (180 / Math.PI);
+      
+      root.style.setProperty('--arm-right-length', Math.min(Math.max(length, 80), 250) + 'px');
+      root.style.setProperty('--arm-right-angle', (angle + 180) + 'deg');
+    }
+
+    function syncArms() {
+      syncLeftArm();
+      syncRightArm();
+    }
+
+    // Update setLeftHand and setRightHand to auto-sync arms
+    function setLeftHand(x, y, rotate = 15) {
+      root.style.setProperty('--hand-left-x', x + 'px');
+      root.style.setProperty('--hand-left-y', y + 'px');
+      root.style.setProperty('--hand-left-rotate', rotate + 'deg');
+      syncLeftArm();
+    }
+
+    function setRightHand(x, y, rotate = -15) {
+      root.style.setProperty('--hand-right-x', x + 'px');
+      root.style.setProperty('--hand-right-y', y + 'px');
+      root.style.setProperty('--hand-right-rotate', rotate + 'deg');
+      syncRightArm();
+    }
+
+    function resetHands() {
+      root.style.setProperty('--hand-left-x', '-120px');
+      root.style.setProperty('--hand-left-y', '150px');
+      root.style.setProperty('--hand-left-rotate', '15deg');
+      root.style.setProperty('--hand-right-x', '120px');
+      root.style.setProperty('--hand-right-y', '150px');
+      root.style.setProperty('--hand-right-rotate', '-15deg');
+      hideHands();
+      root.style.setProperty('--arm-left-length', '120px');
+      root.style.setProperty('--arm-right-length', '120px');
+      root.style.setProperty('--arm-left-angle', '25deg');
+      root.style.setProperty('--arm-right-angle', '-25deg');
+    }
+
+    function handsUp() {
+      showHands();
+      setLeftHand(-180, -80, 25);
+      setRightHand(180, -80, -25);
+    }
+
+    function handsFacepalm() {
+      showHands();
+      setLeftHand(-60, 60, 45);
+      setRightHand(60, 60, -45);
+    }
+
+    function handsShrug() {
+      showHands();
+      setLeftHand(-200, 20, 30);
+      setRightHand(200, 20, -30);
+    }
+
+    function handsClap() {
+      showHands();
+      setLeftHand(-30, 180, 80);
+      setRightHand(30, 180, -80);
+    }
+
+    function handsAngry() {
+      showHands();
+      setLeftHand(-160, 50, 40);
+      setRightHand(160, 50, -40);
+    }
+
+    // ============ MICROEXPRESSIONS ============
+    
+    function microExpression(type) {
+      switch(type) {
+        case 'surprised':
+          setEyebrows(-8, 8);
+          eyes.forEach(eye => eye.style.transform = 'scale(1.1)');
+          setTimeout(() => {
+            setEyebrows(8, -8);
+            eyes.forEach(eye => eye.style.transform = 'scaleY(1)');
+          }, 300);
+          break;
+        case 'suspicious':
+          setEyebrows(12, -5);
+          eyes.forEach(eye => eye.style.transform = 'scaleY(0.85)');
+          setTimeout(() => {
+            setEyebrows(8, -8);
+            eyes.forEach(eye => eye.style.transform = 'scaleY(1)');
+          }, 600);
+          break;
+        case 'reading':
+          // Eyes scan back and forth
+          movePupils(-5, 3);
+          setTimeout(() => movePupils(5, 3), 200);
+          setTimeout(() => movePupils(-3, 4), 400);
+          setTimeout(() => movePupils(3, 4), 600);
+          break;
+        case 'smug':
+          setEyebrows(10, -6);
+          eyes.forEach(eye => eye.style.transform = 'scaleY(0.9)');
+          setTimeout(() => resetFace(), 800);
+          break;
+        case 'disgust':
+          setEyebrows(15, -15);
+          nose.style.transform = 'translateX(-50%) scaleY(0.85) translateY(-3px)';
+          mouth.style.transform = 'translateX(-50%) skewX(-5deg)';
+          setTimeout(() => {
+            nose.style.transform = 'translateX(-50%)';
+            mouth.style.transform = 'translateX(-50%)';
+            setEyebrows(8, -8);
+          }, 500);
+          break;
+        case 'anticipation':
+          // Slight lean forward, eyes widen slightly
+          moveFace(0, -5);
+          setEyebrows(5, -5);
+          eyes.forEach(eye => eye.style.transform = 'scale(1.05)');
+          break;
+      }
+    }
+
+    // ============ ENHANCED EYEBROW FLOW ============
+    
+    function setEyebrows(leftDeg, rightDeg, leftY = 0, rightY = 0) {
+      root.style.setProperty('--eyebrow-left-rotate', leftDeg + 'deg');
+      root.style.setProperty('--eyebrow-right-rotate', rightDeg + 'deg');
+      root.style.setProperty('--eyebrow-left-y', leftY + 'px');
+      root.style.setProperty('--eyebrow-right-y', rightY + 'px');
+    }
+
+    function flowEyebrows(targetLeft, targetRight, duration = 300) {
+      const startLeft = parseFloat(getComputedStyle(root).getPropertyValue('--eyebrow-left-rotate')) || 8;
+      const startRight = parseFloat(getComputedStyle(root).getPropertyValue('--eyebrow-right-rotate')) || -8;
+      const startTime = Date.now();
+      
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+        
+        const currentLeft = startLeft + (targetLeft - startLeft) * eased;
+        const currentRight = startRight + (targetRight - startRight) * eased;
+        
+        root.style.setProperty('--eyebrow-left-rotate', currentLeft + 'deg');
+        root.style.setProperty('--eyebrow-right-rotate', currentRight + 'deg');
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      }
+      animate();
+    }
+
+    // ============ LOOK AT FUNCTION ============
+    
+    function lookAt(x, y) {
+      faceRect = face.getBoundingClientRect();
+      faceCenterX = faceRect.left + faceRect.width / 2;
+      faceCenterY = faceRect.top + faceRect.height / 2;
+      
+      const dx = x - faceCenterX;
+      const dy = y - faceCenterY;
+      
+      const maxMove = 12;
+      const pupilX = Math.max(-maxMove, Math.min(maxMove, dx / 20));
+      const pupilY = Math.max(-maxMove, Math.min(maxMove, dy / 20));
+      
+      movePupils(pupilX, pupilY);
+      
+      // Slight head tilt toward target
+      rotateFace(dx / 100);
+    }
+
+    // ============ TRANSFORM RAGE MODE ============
+    
+    function transformRage() {
+      if (isTransformed) return;
+      isTransformed = true;
+      
+      // Build up
+      setVignette(0.3);
+      screenShake(3, 1000);
+      
+      let buildPhase = 0;
+      const buildInterval = setInterval(() => {
+        buildPhase++;
+        
+        // Face grows and changes color
+        root.style.setProperty('--face-scale', 1 + buildPhase * 0.02);
+        
+        // Eyes intensify
+        eyes.forEach(eye => {
+          eye.style.transform = `scaleY(${1 - buildPhase * 0.03})`;
+          eye.style.boxShadow = `0 0 ${buildPhase * 3}px rgba(255,0,0,0.5)`;
+        });
+        
+        // Eyebrows get angrier
+        setEyebrows(8 + buildPhase * 2, -8 - buildPhase * 2);
+        
+        if (buildPhase >= 15) {
+          clearInterval(buildInterval);
+          
+          // TRANSFORM!
+          screenFlash('#ff0000', 200);
+          face.classList.add('transform-rage');
+          
+          // Demonic eyes
+          document.querySelectorAll('.pupil').forEach(p => {
+            p.style.background = '#ff0000';
+            p.style.boxShadow = '0 0 15px #ff0000';
+            p.style.width = '8px';
+            p.style.height = '8px';
+          });
+          
+          // Mouth opens menacingly
+          setMouthOpen(15);
+          
+          // Shake violently
+          let rageShakes = 0;
+          const rageInterval = setInterval(() => {
+            rageShakes++;
+            rotateFace(rageShakes % 2 ? 5 : -5);
+            moveFace(rageShakes % 2 ? 8 : -8, 0);
+            screenShake(10, 100);
+            
+            if (rageShakes >= 30) {
+              clearInterval(rageInterval);
+              
+              // Calm down
+              setTimeout(() => {
+                face.classList.remove('transform-rage');
+                document.querySelectorAll('.pupil').forEach(p => {
+                  p.style.background = 'var(--theme-face-bg)';
+                  p.style.boxShadow = '0 0 6px rgba(255, 255, 255, 0.5)';
+                  p.style.width = '14px';
+                  p.style.height = '14px';
+                });
+                eyes.forEach(eye => {
+                  eye.style.boxShadow = '';
+                });
+                root.style.setProperty('--face-scale', '1');
+                setVignette(0);
+                setMouthOpen(0);
+                resetFace();
+                isTransformed = false;
+              }, 500);
+            }
+          }, 50);
+        }
+      }, 80);
+    }
+
+    // ============ ENVIRONMENT FUNCTIONS ============
+    
+    function setBackground(color) {
+      root.style.setProperty('--bg-color', color);
+    }
+
+    function setVignette(opacity) {
+      root.style.setProperty('--vignette-opacity', opacity);
+    }
+
+    function screenFlash(color = '#fff', duration = 100) {
+      flash.style.background = color;
+      flash.style.opacity = '1';
+      setTimeout(() => {
+        flash.style.transition = `opacity ${duration}ms ease`;
+        flash.style.opacity = '0';
+        setTimeout(() => {
+          flash.style.transition = '';
+        }, duration);
+      }, 50);
+    }
+
+    function screenShake(intensity = 5, duration = 500) {
+      const startTime = Date.now();
+      const shakeInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        if (elapsed > duration) {
+          clearInterval(shakeInterval);
+          root.style.setProperty('--screen-shake', '0px');
+          return;
+        }
+        const remaining = 1 - (elapsed / duration);
+        const shake = (Math.random() - 0.5) * intensity * 2 * remaining;
+        root.style.setProperty('--screen-shake', shake + 'px');
+      }, 16);
+    }
+
+    function spawnParticles(count = 10, color = '#000', type = 'burst') {
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.background = color;
+        particle.style.width = (5 + Math.random() * 10) + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.left = '50%';
+        particle.style.top = '50%';
+        particles.appendChild(particle);
+
+        const angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+        const velocity = 100 + Math.random() * 200;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity;
+
+        let x = 0, y = 0, opacity = 1;
+        const animateParticle = () => {
+          x += vx * 0.016;
+          y += vy * 0.016 + 2; // gravity
+          opacity -= 0.02;
+          particle.style.transform = `translate(${x}px, ${y}px)`;
+          particle.style.opacity = opacity;
+          if (opacity > 0) {
+            requestAnimationFrame(animateParticle);
+          } else {
+            particle.remove();
+          }
+        };
+        requestAnimationFrame(animateParticle);
+      }
+    }
+
+    function rainParticles(duration = 3000, color = '#4444ff') {
+      const endTime = Date.now() + duration;
+      const spawnRain = () => {
+        if (Date.now() > endTime) return;
+        const drop = document.createElement('div');
+        drop.className = 'particle';
+        drop.style.background = color;
+        drop.style.width = '3px';
+        drop.style.height = '15px';
+        drop.style.left = Math.random() * 100 + '%';
+        drop.style.top = '-20px';
+        drop.style.borderRadius = '2px';
+        particles.appendChild(drop);
+
+        let y = -20;
+        const fall = () => {
+          y += 15;
+          drop.style.top = y + 'px';
+          if (y < window.innerHeight) {
+            requestAnimationFrame(fall);
+          } else {
+            drop.remove();
+          }
+        };
+        requestAnimationFrame(fall);
+        setTimeout(spawnRain, 50 + Math.random() * 100);
+      };
+      spawnRain();
+    }
+
+    // ============ HAND FUNCTIONS ============
+    
+    function showHands() {
+      root.style.setProperty('--hand-left-opacity', '1');
+      root.style.setProperty('--hand-right-opacity', '1');
+      root.style.setProperty('--arm-left-opacity', '1');
+      root.style.setProperty('--arm-right-opacity', '1');
+    }
+
+    function hideHands() {
+      root.style.setProperty('--hand-left-opacity', '0');
+      root.style.setProperty('--hand-right-opacity', '0');
+      root.style.setProperty('--arm-left-opacity', '0');
+      root.style.setProperty('--arm-right-opacity', '0');
+    }
+
+    function showLeftHand() {
+      root.style.setProperty('--hand-left-opacity', '1');
+      root.style.setProperty('--arm-left-opacity', '1');
+    }
+
+    function showRightHand() {
+      root.style.setProperty('--hand-right-opacity', '1');
+      root.style.setProperty('--arm-right-opacity', '1');
+    }
+
+    function hideLeftHand() {
+      root.style.setProperty('--hand-left-opacity', '0');
+      root.style.setProperty('--arm-left-opacity', '0');
+    }
+
+    function hideRightHand() {
+      root.style.setProperty('--hand-right-opacity', '0');
+      root.style.setProperty('--arm-right-opacity', '0');
+    }
+
+    function handWave(which = 'right') {
+      if (which === 'right') {
+        showRightHand();
+        let wavePhase = 0;
+        const waveInterval = setInterval(() => {
+          wavePhase++;
+          setRightHand(200, -50 + Math.sin(wavePhase * 0.5) * 20, -30 + Math.sin(wavePhase * 0.8) * 15);
+          if (wavePhase > 20) {
+            clearInterval(waveInterval);
+            hideRightHand();
+            resetHands();
+          }
+        }, 50);
+      }
+    }
+
+    // ============ CORE FUNCTIONS ============
+    
+    function setMouthOpen(pixels) {
+      root.style.setProperty('--mouth-open', pixels + 'px');
+    }
+
+    function movePupils(x, y) {
+      root.style.setProperty('--pupil-x', x + 'px');
+      root.style.setProperty('--pupil-y', y + 'px');
+    }
+
+    function setEyebrows(leftDeg, rightDeg) {
+      root.style.setProperty('--eyebrow-left-rotate', leftDeg + 'deg');
+      root.style.setProperty('--eyebrow-right-rotate', rightDeg + 'deg');
+    }
+
+    function moveFace(x, y) {
+      root.style.setProperty('--face-x', x + 'px');
+      root.style.setProperty('--face-y', y + 'px');
+    }
+
+    function rotateFace(deg) {
+      root.style.setProperty('--face-rotate', deg + 'deg');
+    }
+
+    // ============ HEAD SHAKE NO ============
+    
+    function shakeNo(callback) {
+      let shakeCount = 0;
+      const shakeSequence = [12, -12, 10, -10, 6, -6, 3, -3, 0];
+      
+      function doShake() {
+        if (shakeCount < shakeSequence.length) {
+          rotateFace(shakeSequence[shakeCount]);
+          // Pupils lag behind slightly for realism
+          movePupils(-shakeSequence[shakeCount] * 0.3, 0);
+          shakeCount++;
+          setTimeout(doShake, 80);
+        } else {
+          rotateFace(0);
+          movePupils(0, 0);
+          if (callback) callback();
+        }
+      }
+      
+      // Disapproving expression during shake
+      setEyebrows(12, -12);
+      eyes.forEach(eye => {
+        eye.style.transform = 'scaleY(0.85)';
+      });
+      
+      doShake();
+      
+      setTimeout(() => {
+        setEyebrows(8, -8);
+        eyes.forEach(eye => {
+          eye.style.transform = 'scaleY(1)';
+        });
+      }, shakeSequence.length * 80 + 200);
+    }
+
+    // ============ HEAD NOD YES ============
+    
+    function nodYes(callback) {
+      let nodCount = 0;
+      const nodSequence = [
+        { y: -8, rotate: -3 },
+        { y: 5, rotate: 2 },
+        { y: -5, rotate: -2 },
+        { y: 3, rotate: 1 },
+        { y: 0, rotate: 0 }
+      ];
+      
+      function doNod() {
+        if (nodCount < nodSequence.length) {
+          moveFace(0, nodSequence[nodCount].y);
+          rotateFace(nodSequence[nodCount].rotate);
+          movePupils(0, -nodSequence[nodCount].y * 0.2);
+          nodCount++;
+          setTimeout(doNod, 120);
+        } else {
+          moveFace(0, 0);
+          rotateFace(0);
+          movePupils(0, 0);
+          if (callback) callback();
+        }
+      }
+      
+      doNod();
+    }
+
+    // ============ FACE DRIFT/SWAY ============
+    
+    let swayPhase = 0;
+    function subtleSway() {
+      if (!isFlinching && !isStartled) {
+        swayPhase += 0.02;
+        const swayX = Math.sin(swayPhase) * 3;
+        const swayY = Math.cos(swayPhase * 0.7) * 2;
+        const swayRotate = Math.sin(swayPhase * 0.5) * 0.5;
+        moveFace(swayX, swayY);
+        rotateFace(swayRotate);
+      }
+      requestAnimationFrame(subtleSway);
+    }
+    subtleSway();
+
+    // ============ 1. PUPIL MOUSE TRACKING ============
+    
+    document.addEventListener('mousemove', (e) => {
+      if (isBlinking || isFlinching) return;
+      
+      lastMouseMove = Date.now();
+      faceRect = face.getBoundingClientRect();
+      faceCenterX = faceRect.left + faceRect.width / 2;
+      faceCenterY = faceRect.top + faceRect.height / 2;
+      
+      const dx = e.clientX - faceCenterX;
+      const dy = e.clientY - faceCenterY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      // Check if mouse is inside face area
+      mouseInFace = distance < 150;
+      
+      // Clamp pupil movement
+      const maxMove = 12;
+      const pupilX = Math.max(-maxMove, Math.min(maxMove, dx / 15));
+      const pupilY = Math.max(-maxMove, Math.min(maxMove, dy / 15));
+      
+      movePupils(pupilX, pupilY);
+      
+      // 2. FLINCH when too close
+      if (distance < 80 && !isFlinching) {
+        flinch();
+      }
+      
+      // Track stare time for suspicion
+      stareTime += 16;
+    });
+
+    // Touch support for flinch
+    document.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      faceRect = face.getBoundingClientRect();
+      faceCenterX = faceRect.left + faceRect.width / 2;
+      faceCenterY = faceRect.top + faceRect.height / 2;
+      
+      const dx = touch.clientX - faceCenterX;
+      const dy = touch.clientY - faceCenterY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance < 120) {
+        flinch();
+      }
+    });
+
+    // ============ 2. FLINCH ============
+    
+    function flinch() {
+      if (isFlinching) return;
+      isFlinching = true;
+      
+      // Squint eyes
+      eyes.forEach(eye => {
+        eye.style.transform = 'scaleY(0.5)';
+      });
+      
+      // Hands fly up defensively
+      showHands();
+      setLeftHand(-120, -20, 35);
+      setRightHand(120, -20, -35);
+      
+      // Recoil back
+      moveFace(0, 8);
+      face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(0.95)`;
+      setEyebrows(20, -20);
+      setMouthOpen(0);
+      nose.style.transform = 'translateX(-50%) scaleY(0.9)';
+      
+      setTimeout(() => {
+        eyes.forEach(eye => {
+          eye.style.transform = 'scaleY(1)';
+        });
+        face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1)`;
+        moveFace(0, 0);
+        setEyebrows(8, -8);
+        nose.style.transform = 'translateX(-50%) scaleY(1)';
+        
+        // Lower hands
+        setLeftHand(-140, 100, 20);
+        setRightHand(140, 100, -20);
+        
+        setTimeout(() => {
+          hideHands();
+          resetHands();
+          isFlinching = false;
+        }, 200);
+      }, 300);
+    }
+
+    // ============ 3. RANDOM BLINKS ============
+    
+    function blink() {
+      if (isBlinking || isFlinching) return;
+      isBlinking = true;
+      
+      eyes.forEach(eye => {
+        eye.style.transform = 'scaleY(0.1)';
+      });
+      
+      setTimeout(() => {
+        eyes.forEach(eye => {
+          eye.style.transform = 'scaleY(1)';
+        });
+        isBlinking = false;
+      }, 120);
+    }
+
+    // Random blink interval (2-6 seconds)
+    function scheduleNextBlink() {
+      const delay = 2000 + Math.random() * 4000;
+      setTimeout(() => {
+        blink();
+        scheduleNextBlink();
+      }, delay);
+    }
+    scheduleNextBlink();
+
+    // ============ 4. EYE DRIFT ============
+    
+    function eyeDrift() {
+      if (Date.now() - lastMouseMove < 2000) return; // Only drift when mouse idle
+      
+      const driftX = (Math.random() - 0.5) * 8;
+      const driftY = (Math.random() - 0.5) * 6;
+      
+      movePupils(driftX, driftY);
+      
+      // Snap back after a moment
+      setTimeout(() => {
+        if (Date.now() - lastMouseMove > 2000) {
+          movePupils(0, 0);
+        }
+      }, 800 + Math.random() * 1200);
+    }
+
+    setInterval(eyeDrift, 3000 + Math.random() * 2000);
+
+    // ============ 6. SUSPICION BUILD-UP ============
+    
+    setInterval(() => {
+      if (mouseInFace && !isFlinching) {
+        suspicionLevel = Math.min(suspicionLevel + 1, 100);
+        
+        if (suspicionLevel > 30) {
+          // One eyebrow raises
+          setEyebrows(8 - suspicionLevel/10, -8 - suspicionLevel/5);
+        }
+        if (suspicionLevel > 60) {
+          // Eyes narrow slightly
+          eyes.forEach(eye => {
+            eye.style.transform = `scaleY(${1 - suspicionLevel/500})`;
+          });
+        }
+        if (suspicionLevel > 90) {
+          // Look away dismissively
+          movePupils(-12, 0);
+        }
+      } else {
+        suspicionLevel = Math.max(suspicionLevel - 2, 0);
+        if (suspicionLevel < 30 && !isFlinching && !isBlinking) {
+          setEyebrows(8, -8);
+          eyes.forEach(eye => {
+            eye.style.transform = 'scaleY(1)';
+          });
+        }
+      }
+    }, 100);
+
+    // ============ 7. STARTLE RESPONSE ============
+    
+    document.addEventListener('click', (e) => {
+      if (isStartled) return;
+      if (e.target.closest('.face')) return; // Don't double-trigger with face click
+      isStartled = true;
+      
+      // Jump up
+      face.style.transition = 'transform 0.1s ease';
+      moveFace(0, -15);
+      face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1.08)`;
+      setEyebrows(-5, 5); // Raised
+      setMouthOpen(8);
+      
+      // Pupils dilate (grow)
+      document.querySelectorAll('.pupil').forEach(p => {
+        p.style.width = '18px';
+        p.style.height = '18px';
+      });
+      
+      setTimeout(() => {
+        moveFace(0, 0);
+        face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1)`;
+        setEyebrows(12, -12); // Extra grumpy after startle
+        setMouthOpen(0);
+        document.querySelectorAll('.pupil').forEach(p => {
+          p.style.width = '14px';
+          p.style.height = '14px';
+        });
+        
+        setTimeout(() => {
+          setEyebrows(8, -8);
+          face.style.transition = 'transform 0.2s ease';
+          isStartled = false;
+        }, 1000);
+      }, 400);
+    });
+
+    // ============ 8. MICRO-TWITCHES ============
+    
+    function microTwitch() {
+      if (isFlinching || isBlinking) return;
+      
+      const twitchType = Math.floor(Math.random() * 4);
+      
+      switch(twitchType) {
+        case 0: // Eyebrow twitch
+          eyebrowLeft.style.transform = `rotate(${8 + Math.random() * 5}deg)`;
+          setTimeout(() => {
+            eyebrowLeft.style.transform = 'rotate(8deg)';
+          }, 100);
+          break;
+        case 1: // Mouth corner twitch
+          mouth.style.transform = 'translateX(-50%) skewX(2deg)';
+          setTimeout(() => {
+            mouth.style.transform = 'translateX(-50%)';
+          }, 80);
+          break;
+        case 2: // Nose scrunch
+          nose.style.transform = 'translateX(-50%) scaleY(0.95)';
+          setTimeout(() => {
+            nose.style.transform = 'translateX(-50%)';
+          }, 100);
+          break;
+        case 3: // Single eye squint
+          const eye = eyes[Math.floor(Math.random() * 2)];
+          eye.style.transform = 'scaleY(0.85)';
+          setTimeout(() => {
+            eye.style.transform = 'scaleY(1)';
+          }, 150);
+          break;
+      }
+    }
+
+    setInterval(microTwitch, 4000 + Math.random() * 3000);
+
+    // ============ 9. SLEEPY MODE (after inactivity) ============
+    
+    let sleepyTimeout;
+    function checkSleepy() {
+      clearTimeout(sleepyTimeout);
+      sleepyTimeout = setTimeout(() => {
+        if (Date.now() - lastMouseMove > 15000) {
+          // Getting sleepy
+          eyes.forEach(eye => {
+            eye.style.transform = 'scaleY(0.6)';
+          });
+          setEyebrows(3, -3); // Relaxed brows
+          movePupils(0, 3); // Eyes droop down
+        }
+      }, 15000);
+    }
+    
+    document.addEventListener('mousemove', checkSleepy);
+    checkSleepy();
+
+    // ============ 10. ANNOYANCE ESCALATION ============
+    
+    let pokeCount = 0;
+    let lastPoke = 0;
+    
+    face.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const now = Date.now();
+      
+      if (now - lastPoke < 2000) {
+        pokeCount++;
+      } else {
+        pokeCount = 1;
+      }
+      lastPoke = now;
+      
+      if (pokeCount === 1) {
+        setEyebrows(12, -12);
+        setTimeout(() => setEyebrows(8, -8), 800);
+      } else if (pokeCount === 2) {
+        // Head shake "no" on second poke
+        shakeNo();
+      } else if (pokeCount >= 3) {
+        // Full rage mode
+        setEyebrows(25, -25);
+        face.style.transform = 'scale(1.05)';
+        eyes.forEach(eye => {
+          eye.style.transform = 'scaleY(0.7)';
+        });
+        document.querySelectorAll('.pupil').forEach(p => {
+          p.style.width = '8px';
+          p.style.height = '8px';
+        });
+        
+        // Violent shake
+        let shakes = 0;
+        const shakeInterval = setInterval(() => {
+          rotateFace(shakes % 2 ? 5 : -5);
+          moveFace(shakes % 2 ? 8 : -8, 0);
+          shakes++;
+          if (shakes > 14) {
+            clearInterval(shakeInterval);
+            rotateFace(0);
+            moveFace(0, 0);
+            face.style.transform = 'scale(1)';
+            setEyebrows(8, -8);
+            eyes.forEach(eye => {
+              eye.style.transform = 'scaleY(1)';
+            });
+            document.querySelectorAll('.pupil').forEach(p => {
+              p.style.width = '14px';
+              p.style.height = '14px';
+            });
+            pokeCount = 0;
+          }
+        }, 40);
+      }
+    });
+
+    // ============ 11. DOUBLE-TAKE ============
+    
+    let lastPupilX = 0;
+    setInterval(() => {
+      if (Math.random() < 0.1 && !isFlinching && !isBlinking) {
+        // Quick look away and back
+        const currentX = parseFloat(getComputedStyle(root).getPropertyValue('--pupil-x')) || 0;
+        movePupils(-currentX * 1.5, 0);
+        setTimeout(() => movePupils(currentX, 0), 200);
+        setTimeout(() => {
+          movePupils(-currentX * 0.5, 0);
+          setTimeout(() => movePupils(currentX, 0), 150);
+        }, 350);
+      }
+    }, 8000);
+
+    // ============ 12. SLOW BURN GLARE ============
+    
+    let glareTimeout;
+    document.addEventListener('mousemove', () => {
+      clearTimeout(glareTimeout);
+      glareTimeout = setTimeout(() => {
+        if (mouseInFace) {
+          // Slow intensifying glare
+          let intensity = 0;
+          const glareInterval = setInterval(() => {
+            intensity++;
+            setEyebrows(8 + intensity, -8 - intensity);
+            if (intensity >= 15 || !mouseInFace) {
+              clearInterval(glareInterval);
+              setTimeout(() => setEyebrows(8, -8), 500);
+            }
+          }, 200);
+        }
+      }, 5000);
+    });
+
+    // ============ 13. EXASPERATED SIGH ============
+    
+    setInterval(() => {
+      if (Math.random() < 0.15 && !isFlinching && !isStartled) {
+        // Deep breath in
+        face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1.03)`;
+        setEyebrows(5, -5);
+        
+        setTimeout(() => {
+          // Exhale with head drop
+          face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(0.98)`;
+          moveFace(0, 5);
+          setMouthOpen(4);
+          movePupils(0, 5); // Eyes roll down
+          rotateFace(2); // Head tips forward
+          
+          setTimeout(() => {
+            face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1)`;
+            moveFace(0, 0);
+            setMouthOpen(0);
+            movePupils(0, 0);
+            rotateFace(0);
+            setEyebrows(8, -8);
+          }, 600);
+        }, 400);
+      }
+    }, 12000);
+
+    // ============ 14. JUDGEMENTAL SIDE-EYE ============
+    
+    setInterval(() => {
+      if (Math.random() < 0.12 && !isFlinching && !mouseInFace) {
+        // Full side-eye with head turn
+        const direction = Math.random() > 0.5 ? 1 : -1;
+        
+        // Head turns slightly opposite to where eyes look
+        rotateFace(-3 * direction);
+        moveFace(5 * direction, 0);
+        
+        // Eyes look hard to the side
+        movePupils(12 * direction, 2);
+        
+        // One eyebrow raised (the one in direction of look)
+        if (direction > 0) {
+          setEyebrows(0, -15);
+        } else {
+          setEyebrows(15, 0);
+        }
+        
+        // Slight eye narrow
+        eyes.forEach(eye => {
+          eye.style.transform = 'scaleY(0.9)';
+        });
+        
+        // Hold the judgment
+        setTimeout(() => {
+          // Slow return with lingering suspicion
+          rotateFace(-1.5 * direction);
+          movePupils(6 * direction, 1);
+          
+          setTimeout(() => {
+            movePupils(0, 0);
+            rotateFace(0);
+            moveFace(0, 0);
+            setEyebrows(8, -8);
+            eyes.forEach(eye => {
+              eye.style.transform = 'scaleY(1)';
+            });
+          }, 400);
+        }, 1800);
+      }
+    }, 8000);
+
+    // ============ 15. HEAD SHAKE ON REPEATED ANNOYANCE ============
+    
+    // Trigger head shake when poke count hits 2
+    let lastShakeTime = 0;
+
+    // ============ KEYBOARD CONTROLS FOR TESTING ============
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'n' || e.key === 'N') {
+        shakeNo();
+      }
+      if (e.key === 'y' || e.key === 'Y') {
+        nodYes();
+      }
+      if (e.key === 'e' || e.key === 'E') {
+        eyeRoll();
+      }
+      if (e.key === 'r' || e.key === 'R') {
+        rageMode();
+      }
+      if (e.key === 's' || e.key === 'S') {
+        sarcasticSlow();
+      }
+      if (e.key === 'd' || e.key === 'D') {
+        dramaticDisbelief();
+      }
+      if (e.key === 'z' || e.key === 'Z') {
+        zenMode();
+      }
+      if (e.key === 'c' || e.key === 'C') {
+        coffeePerk();
+      }
+      if (e.key === 'l' || e.key === 'L') {
+        laserEyes();
+      }
+      if (e.key === 'w' || e.key === 'W') {
+        whatever();
+      }
+      if (e.key === '1') {
+        sneezeFakeout();
+      }
+      if (e.key === '2') {
+        existentialCrisis();
+      }
+      if (e.key === '3') {
+        jumpscaredSoul();
+      }
+      if (e.key === '4') {
+        vibeThenCringe();
+      }
+      if (e.key === '5') {
+        windowsShutdown();
+      }
+      if (e.key === '6') {
+        facepalm();
+      }
+      if (e.key === '7') {
+        applause();
+      }
+      if (e.key === '8') {
+        shrugLife();
+      }
+      if (e.key === '9') {
+        tantrum();
+      }
+      if (e.key === '0') {
+        mindBlown();
+      }
+      if (e.key === 'h' || e.key === 'H') {
+        hiWave();
+      }
+      if (e.key === 't' || e.key === 'T') {
+        grumpToggleTheme();
+      }
+      if (e.key === 'x' || e.key === 'X') {
+        slapChat();
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        transformRage();
+      }
+      if (e.key === '-') {
+        theMatrix();
+      }
+      if (e.key === '=') {
+        cosmicAscension();
+      }
+      if (e.key === 'Backspace') {
+        theImpossible();
+      }
+      if (e.key === 'g' || e.key === 'G') {
+        grumpTyping();
+      }
+      if (e.key === 'b' || e.key === 'B') {
+        ragebaitSequence();
+      }
+    });
+
+    // ============ GRUMP PULLS OUT KEYBOARD ============
+    
+    function grumpTyping() {
+      // Look down anticipating
+      microExpression('anticipation');
+      movePupils(0, 8);
+      
+      setTimeout(() => {
+        // Hands reach down
+        showHands();
+        setLeftHand(-150, 250, 30);
+        setRightHand(150, 250, -30);
+        
+        setTimeout(() => {
+          // Pull up keyboard
+          root.style.setProperty('--keyboard-opacity', '1');
+          root.style.setProperty('--keyboard-y', '-100px');
+          
+          // Hands position over keyboard
+          setLeftHand(-80, 180, 50);
+          setRightHand(80, 180, -50);
+          
+          // Look at keyboard
+          movePupils(0, 10);
+          setEyebrows(10, -10);
+          
+          // Start angry typing
+          setTimeout(() => {
+            let typeCount = 0;
+            const typeInterval = setInterval(() => {
+              typeCount++;
+              
+              // Random key presses
+              const randomKey = keys[Math.floor(Math.random() * keys.length)];
+              randomKey.classList.add('pressed');
+              setTimeout(() => randomKey.classList.remove('pressed'), 80);
+              
+              // Alternate hands
+              if (typeCount % 2 === 0) {
+                setLeftHand(-80 + (typeCount % 4 ? 5 : -5), 175, 50);
+              } else {
+                setRightHand(80 + (typeCount % 4 ? -5 : 5), 175, -50);
+              }
+              
+              // Face gets increasingly frustrated
+              if (typeCount % 5 === 0) {
+                setEyebrows(10 + typeCount / 2, -10 - typeCount / 2);
+              }
+              
+              // Occasional aggressive space bar
+              if (typeCount % 8 === 0) {
+                const spaceKey = grumpKeyboard.querySelector('.space');
+                spaceKey.classList.add('pressed');
+                setTimeout(() => spaceKey.classList.remove('pressed'), 100);
+                
+                // Both hands slam
+                setLeftHand(-60, 170, 55);
+                setRightHand(60, 170, -55);
+              }
+              
+              if (typeCount >= 30) {
+                clearInterval(typeInterval);
+                
+                // Slam keyboard and push it away
+                screenShake(5, 200);
+                setLeftHand(-120, 200, 40);
+                setRightHand(120, 200, -40);
+                root.style.setProperty('--keyboard-y', '50px');
+                root.style.setProperty('--keyboard-rotate', '10deg');
+                
+                setTimeout(() => {
+                  root.style.setProperty('--keyboard-opacity', '0');
+                  root.style.setProperty('--keyboard-y', '0px');
+                  root.style.setProperty('--keyboard-rotate', '0deg');
+                  hideHands();
+                  resetHands();
+                  resetFace();
+                }, 500);
+              }
+            }, 100);
+          }, 500);
+        }, 400);
+      }, 300);
+    }
+
+    // ============ RAGEBAIT SEQUENCE ============
+    
+    function ragebaitSequence() {
+      // Pick a random ragebait
+      const baits = [typingThenStop, seenNoReply, loadingFail, almostSent, readReceiptHell];
+      baits[Math.floor(Math.random() * baits.length)]();
+    }
+
+    // Typing dots that disappear
+    function typingThenStop() {
+      // Add typing indicator
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'chat-message typing';
+      typingDiv.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
+      chatMessages.appendChild(typingDiv);
+      
+      // Grump watches expectantly
+      lookAt(chatContainer.getBoundingClientRect().left + 100, chatContainer.getBoundingClientRect().top + 50);
+      setEyebrows(5, -5);
+      
+      // Wait... then remove with no message
+      setTimeout(() => {
+        typingDiv.style.animation = 'none';
+        typingDiv.style.opacity = '0';
+        typingDiv.style.transform = 'scale(0.8)';
+        
+        // Grump's disappointment
+        setTimeout(() => {
+          typingDiv.remove();
+          microExpression('disgust');
+          setEyebrows(15, -15);
+          
+          // Angry exhale
+          setMouthOpen(5);
+          setTimeout(() => {
+            setMouthOpen(0);
+            resetFace();
+          }, 400);
+        }, 300);
+      }, 3000);
+    }
+
+    // Seen but no reply
+    function seenNoReply() {
+      // Add a message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-message user';
+      userMsg.textContent = 'hello?';
+      chatMessages.appendChild(userMsg);
+      
+      // Then add "Seen" indicator
+      setTimeout(() => {
+        const seenDiv = document.createElement('div');
+        seenDiv.className = 'chat-message';
+        seenDiv.style.fontSize = '12px';
+        seenDiv.style.opacity = '0.4';
+        seenDiv.textContent = 'Seen';
+        seenDiv.style.textAlign = 'right';
+        chatMessages.appendChild(seenDiv);
+        
+        // Grump stares
+        lookAt(chatContainer.getBoundingClientRect().left + 200, chatContainer.getBoundingClientRect().top);
+        setEyebrows(12, -12);
+        eyes.forEach(eye => eye.style.transform = 'scaleY(0.8)');
+        
+        // Building rage over time
+        let rageTime = 0;
+        const rageInterval = setInterval(() => {
+          rageTime++;
+          setEyebrows(12 + rageTime, -12 - rageTime);
+          
+          if (rageTime >= 10) {
+            clearInterval(rageInterval);
+            
+            // Explosion
+            shakeNo();
+            setTimeout(() => {
+              seenDiv.remove();
+              userMsg.remove();
+              resetFace();
+            }, 800);
+          }
+        }, 300);
+      }, 1000);
+    }
+
+    // Loading that fails
+    function loadingFail() {
+      setBackground('#fafafa');
+      
+      // Add loading message
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'chat-message grump';
+      loadingDiv.textContent = 'Loading...';
+      chatMessages.appendChild(loadingDiv);
+      
+      // Grump watches hopefully
+      microExpression('anticipation');
+      
+      let dots = 0;
+      const loadInterval = setInterval(() => {
+        dots++;
+        loadingDiv.textContent = 'Loading' + '.'.repeat((dots % 3) + 1);
+        
+        // Grump gets more impatient
+        if (dots > 8) {
+          setEyebrows(10 + dots - 8, -10 - (dots - 8));
+        }
+        
+        if (dots >= 15) {
+          clearInterval(loadInterval);
+          
+          // Fail!
+          loadingDiv.textContent = 'Failed to load';
+          loadingDiv.style.color = '#cc0000';
+          
+          screenFlash('#ff0000', 100);
+          microExpression('disgust');
+          
+          // Frustrated groan
+          setMouthOpen(8);
+          moveFace(0, 10);
+          
+          setTimeout(() => {
+            loadingDiv.remove();
+            setMouthOpen(0);
+            setBackground('var(--theme-bg)');
+            resetFace();
+          }, 1500);
+        }
+      }, 400);
+    }
+
+    // Almost sent then fails
+    function almostSent() {
+      // Grump types a message
+      const grumpMsg = document.createElement('div');
+      grumpMsg.className = 'chat-message grump';
+      grumpMsg.textContent = '';
+      grumpMsg.style.opacity = '0.5';
+      chatMessages.appendChild(grumpMsg);
+      
+      const message = "Actually I wanted to say—";
+      let charIndex = 0;
+      
+      // Type it out
+      const typeInterval = setInterval(() => {
+        charIndex++;
+        grumpMsg.textContent = message.substring(0, charIndex);
+        
+        // Grump focused on typing
+        if (charIndex < message.length) {
+          movePupils(0, 5);
+        }
+        
+        if (charIndex >= message.length) {
+          clearInterval(typeInterval);
+          
+          // About to send...
+          grumpMsg.style.opacity = '0.8';
+          microExpression('anticipation');
+          
+          setTimeout(() => {
+            // DELETE!
+            grumpMsg.style.animation = 'none';
+            grumpMsg.style.opacity = '0';
+            grumpMsg.style.transform = 'translateX(50px)';
+            grumpMsg.style.transition = 'all 0.3s ease';
+            
+            // Grump's devastation
+            setEyebrows(-10, 10);
+            eyes.forEach(eye => eye.style.transform = 'scale(1.1)');
+            setMouthOpen(5);
+            
+            setTimeout(() => {
+              grumpMsg.remove();
+              // Sad acceptance
+              setEyebrows(5, -5);
+              eyes.forEach(eye => eye.style.transform = 'scaleY(0.7)');
+              moveFace(0, 8);
+              setMouthOpen(0);
+              
+              setTimeout(() => resetFace(), 1000);
+            }, 500);
+          }, 800);
+        }
+      }, 80);
+    }
+
+    // Read receipt anxiety
+    function readReceiptHell() {
+      const messages = ['hey', 'you there?', '???'];
+      let msgIndex = 0;
+      
+      const sendNext = () => {
+        if (msgIndex >= messages.length) {
+          // Final disappointment
+          setTimeout(() => {
+            // Clear all
+            const msgs = chatMessages.querySelectorAll('.chat-message.user');
+            msgs.forEach((m, i) => {
+              setTimeout(() => {
+                m.style.opacity = '0';
+                m.style.transform = 'translateY(-10px)';
+                setTimeout(() => m.remove(), 300);
+              }, i * 100);
+            });
+            
+            resetFace();
+          }, 2000);
+          return;
+        }
+        
+        const msg = document.createElement('div');
+        msg.className = 'chat-message user';
+        msg.textContent = messages[msgIndex];
+        chatMessages.appendChild(msg);
+        
+        // Grump watches with increasing despair
+        lookAt(chatContainer.getBoundingClientRect().left + 200, chatContainer.getBoundingClientRect().top);
+        setEyebrows(5 + msgIndex * 4, -5 - msgIndex * 4);
+        
+        if (msgIndex > 0) {
+          eyes.forEach(eye => eye.style.transform = `scaleY(${1 - msgIndex * 0.1})`);
+        }
+        
+        msgIndex++;
+        setTimeout(sendNext, 1500);
+      };
+      
+      sendNext();
+    }
+
+    // ============ NEW HAND-BASED ANIMATIONS ============
+
+    // FACEPALM - complete disappointment
+    function facepalm() {
+      setBackground('#f8f8f8');
+      
+      // Start with disbelief
+      setEyebrows(-10, 10);
+      eyes.forEach(eye => {
+        eye.style.transform = 'scale(1.1)';
+      });
+      
+      setTimeout(() => {
+        // Transition to disappointment
+        setEyebrows(15, -15);
+        setMouthOpen(0);
+        
+        // Right hand rises
+        showRightHand();
+        setRightHand(200, 100, -20);
+        
+        setTimeout(() => {
+          // Hand approaches face
+          let palmPhase = 0;
+          const palmInterval = setInterval(() => {
+            palmPhase++;
+            
+            // Hand moves toward face
+            setRightHand(200 - palmPhase * 15, 100 - palmPhase * 8, -20 + palmPhase * 5);
+            
+            // Face anticipates impact
+            if (palmPhase > 5) {
+              moveFace(palmPhase * 0.5, 0);
+              eyes.forEach(eye => {
+                eye.style.transform = `scaleY(${1 - palmPhase * 0.05})`;
+              });
+            }
+            
+            if (palmPhase >= 12) {
+              clearInterval(palmInterval);
+              
+              // IMPACT
+              setRightHand(20, 20, 70);
+              screenShake(3, 200);
+              
+              // Face obscured, defeated posture
+              eyes.forEach(eye => {
+                eye.style.transform = 'scaleY(0.2)';
+              });
+              setEyebrows(5, -5);
+              moveFace(10, 5);
+              rotateFace(-5);
+              
+              // Hold the shame
+              setTimeout(() => {
+                // Slowly drag hand down face
+                let dragPhase = 0;
+                const dragInterval = setInterval(() => {
+                  dragPhase++;
+                  setRightHand(20 + dragPhase * 3, 20 + dragPhase * 10, 70 - dragPhase * 3);
+                  
+                  // Face revealed progressively
+                  eyes.forEach(eye => {
+                    eye.style.transform = `scaleY(${0.2 + dragPhase * 0.08})`;
+                  });
+                  
+                  if (dragPhase >= 10) {
+                    clearInterval(dragInterval);
+                    
+                    // Deep sigh
+                    setMouthOpen(5);
+                    moveFace(0, 8);
+                    setTimeout(() => {
+                      setMouthOpen(0);
+                      resetFace();
+                      hideHands();
+                      resetHands();
+                      setBackground('#ffffff');
+                    }, 500);
+                  }
+                }, 80);
+              }, 1500);
+            }
+          }, 50);
+        }, 300);
+      }, 400);
+    }
+
+    // APPLAUSE - sarcastic slow clap
+    function applause() {
+      setBackground('#fffff8');
+      
+      // Unimpressed face
+      setEyebrows(12, -12);
+      eyes.forEach(eye => {
+        eye.style.transform = 'scaleY(0.8)';
+      });
+      movePupils(0, 3);
+      
+      // Hands come up
+      showHands();
+      setLeftHand(-100, 150, 80);
+      setRightHand(100, 150, -80);
+      
+      let clapCount = 0;
+      const clapInterval = setInterval(() => {
+        clapCount++;
+        
+        // Clap together
+        if (clapCount % 2 === 1) {
+          setLeftHand(-30, 120, 85);
+          setRightHand(30, 120, -85);
+          // Eyes narrow more with each clap
+          eyes.forEach(eye => {
+            eye.style.transform = `scaleY(${0.8 - clapCount * 0.02})`;
+          });
+        } else {
+          setLeftHand(-100, 140, 80);
+          setRightHand(100, 140, -80);
+        }
+        
+        // Face gets more sarcastic
+        if (clapCount % 4 === 0) {
+          rotateFace(clapCount % 8 ? 3 : -3);
+        }
+        
+        if (clapCount >= 12) {
+          clearInterval(clapInterval);
+          
+          // Stop clapping, maximum judgment
+          setLeftHand(-120, 160, 75);
+          setRightHand(120, 160, -75);
+          setEyebrows(18, -18);
+          movePupils(-8, 0); // Look away
+          rotateFace(5);
+          
+          setTimeout(() => {
+            hideHands();
+            resetHands();
+            resetFace();
+            setBackground('#ffffff');
+          }, 1500);
+        }
+      }, 400);
+    }
+
+    // SHRUG - ultimate indifference
+    function shrugLife() {
+      setBackground('#f5f5f5');
+      
+      // Face: I don't know, I don't care
+      setEyebrows(-5, 5);
+      setMouthOpen(0);
+      mouth.style.transform = 'translateX(-50%) rotate(5deg)';
+      movePupils(0, -3);
+      
+      // Hands come up in shrug
+      showHands();
+      
+      let shrugPhase = 0;
+      const shrugInterval = setInterval(() => {
+        shrugPhase++;
+        
+        // Rising shrug
+        setLeftHand(-180 - shrugPhase * 2, 50 - shrugPhase * 8, 25 + shrugPhase * 2);
+        setRightHand(180 + shrugPhase * 2, 50 - shrugPhase * 8, -25 - shrugPhase * 2);
+        
+        // Face rises with shrug
+        moveFace(0, -shrugPhase * 1.5);
+        
+        // Eyebrows go more confused
+        setEyebrows(-5 - shrugPhase, 5 + shrugPhase);
+        
+        if (shrugPhase >= 12) {
+          clearInterval(shrugInterval);
+          
+          // Hold the shrug
+          setTimeout(() => {
+            // Drop everything
+            let dropPhase = 0;
+            const dropInterval = setInterval(() => {
+              dropPhase++;
+              
+              setLeftHand(-180 - 24 + dropPhase * 2, -46 + dropPhase * 15, 49 - dropPhase * 3);
+              setRightHand(180 + 24 - dropPhase * 2, -46 + dropPhase * 15, -49 + dropPhase * 3);
+              moveFace(0, -18 + dropPhase * 2);
+              setEyebrows(-17 + dropPhase * 2, 17 - dropPhase * 2);
+              
+              if (dropPhase >= 12) {
+                clearInterval(dropInterval);
+                mouth.style.transform = 'translateX(-50%)';
+                hideHands();
+                resetHands();
+                resetFace();
+                setBackground('#ffffff');
+              }
+            }, 40);
+          }, 1000);
+        }
+      }, 50);
+    }
+
+    // TANTRUM - full toddler meltdown
+    function tantrum() {
+      setBackground('#ffeeee');
+      setVignette(0.2);
+      
+      // Pre-tantrum tremble
+      setEyebrows(20, -20);
+      setMouthOpen(10);
+      
+      showHands();
+      setLeftHand(-130, 100, 20);
+      setRightHand(130, 100, -20);
+      
+      setTimeout(() => {
+        // FULL TANTRUM
+        let tantrumPhase = 0;
+        const tantrumInterval = setInterval(() => {
+          tantrumPhase++;
+          
+          // Flailing hands
+          setLeftHand(
+            -130 + Math.sin(tantrumPhase * 0.8) * 50,
+            100 + Math.sin(tantrumPhase * 1.2) * 60 - tantrumPhase * 3,
+            20 + Math.sin(tantrumPhase) * 30
+          );
+          setRightHand(
+            130 + Math.sin(tantrumPhase * 0.8 + Math.PI) * 50,
+            100 + Math.sin(tantrumPhase * 1.2 + Math.PI) * 60 - tantrumPhase * 3,
+            -20 + Math.sin(tantrumPhase + Math.PI) * 30
+          );
+          
+          // Face shaking
+          rotateFace(Math.sin(tantrumPhase * 2) * 8);
+          moveFace(Math.sin(tantrumPhase * 1.5) * 10, Math.abs(Math.sin(tantrumPhase)) * -10);
+          
+          // Mouth opens and closes (screaming)
+          setMouthOpen(10 + Math.abs(Math.sin(tantrumPhase * 0.8)) * 15);
+          
+          // Eyes squeeze
+          eyes.forEach(eye => {
+            eye.style.transform = `scaleY(${0.4 + Math.abs(Math.sin(tantrumPhase * 0.5)) * 0.3})`;
+          });
+          
+          // Environment shakes
+          if (tantrumPhase % 3 === 0) {
+            screenShake(5, 100);
+          }
+          
+          // Getting redder
+          setBackground(`rgb(255, ${238 - tantrumPhase * 3}, ${238 - tantrumPhase * 3})`);
+          
+          if (tantrumPhase >= 40) {
+            clearInterval(tantrumInterval);
+            
+            // Exhausted collapse
+            setMouthOpen(3);
+            eyes.forEach(eye => {
+              eye.style.transform = 'scaleY(0.5)';
+            });
+            setEyebrows(3, -3);
+            moveFace(0, 15);
+            rotateFace(8);
+            setLeftHand(-150, 200, 5);
+            setRightHand(150, 200, -5);
+            setBackground('#fff8f8');
+            setVignette(0);
+            
+            // Heavy breathing recovery
+            setTimeout(() => {
+              hideHands();
+              resetHands();
+              setMouthOpen(0);
+              resetFace();
+              setBackground('#ffffff');
+            }, 2000);
+          }
+        }, 50);
+      }, 500);
+    }
+
+    // MIND BLOWN - revelation explosion
+    function mindBlown() {
+      // Start with realization
+      setEyebrows(0, 0);
+      movePupils(0, 0);
+      
+      setTimeout(() => {
+        // The thought forms
+        let thinkPhase = 0;
+        const thinkInterval = setInterval(() => {
+          thinkPhase++;
+          
+          // Eyes slowly widen
+          eyes.forEach(eye => {
+            eye.style.transform = `scale(${1 + thinkPhase * 0.02})`;
+          });
+          
+          // Eyebrows rise
+          setEyebrows(-thinkPhase * 1.5, thinkPhase * 1.5);
+          
+          // Pupils dilate
+          document.querySelectorAll('.pupil').forEach(p => {
+            p.style.width = `${14 + thinkPhase * 0.5}px`;
+            p.style.height = `${14 + thinkPhase * 0.5}px`;
+          });
+          
+          if (thinkPhase >= 15) {
+            clearInterval(thinkInterval);
+            
+            // THE EXPLOSION
+            screenFlash('#fff', 150);
+            screenShake(10, 500);
+            spawnParticles(30, '#ffcc00', 'burst');
+            setBackground('#fffef0');
+            
+            // Hands fly to head
+            showHands();
+            setLeftHand(-100, -80, 50);
+            setRightHand(100, -80, -50);
+            
+            // Mind blown expression
+            setMouthOpen(20);
+            eyes.forEach(eye => {
+              eye.style.transform = 'scale(1.4)';
+            });
+            setEyebrows(-25, 25);
+            moveFace(0, -20);
+            
+            // Explosion from head
+            for (let i = 0; i < 3; i++) {
+              setTimeout(() => {
+                spawnParticles(15, ['#ff6b6b', '#4ecdc4', '#ffe66d', '#95e1d3'][i], 'burst');
+              }, i * 150);
+            }
+            
+            // Hands tremble at temples
+            let tremblePhase = 0;
+            const trembleInterval = setInterval(() => {
+              tremblePhase++;
+              setLeftHand(-100 + (tremblePhase % 2 ? 5 : -5), -80, 50);
+              setRightHand(100 + (tremblePhase % 2 ? -5 : 5), -80, -50);
+              
+              if (tremblePhase >= 20) {
+                clearInterval(trembleInterval);
+                
+                // Slowly recover
+                setTimeout(() => {
+                  eyes.forEach(eye => {
+                    eye.style.transform = 'scale(1)';
+                  });
+                  document.querySelectorAll('.pupil').forEach(p => {
+                    p.style.width = '14px';
+                    p.style.height = '14px';
+                  });
+                  setEyebrows(8, -8);
+                  setMouthOpen(0);
+                  moveFace(0, 0);
+                  hideHands();
+                  resetHands();
+                  setBackground('#ffffff');
+                }, 1000);
+              }
+            }, 50);
+          }
+        }, 60);
+      }, 300);
+    }
+
+    // HI WAVE - awkward greeting
+    function hiWave() {
+      // Slightly awkward face
+      setEyebrows(-3, 3);
+      setMouthOpen(2);
+      
+      showRightHand();
+      setRightHand(220, -50, -30);
+      
+      let wavePhase = 0;
+      const waveInterval = setInterval(() => {
+        wavePhase++;
+        
+        // Wave motion
+        setRightHand(
+          220 + Math.sin(wavePhase * 0.6) * 20,
+          -50,
+          -30 + Math.sin(wavePhase * 0.8) * 25
+        );
+        
+        // Face follows slightly
+        rotateFace(Math.sin(wavePhase * 0.3) * 3);
+        movePupils(5, 0);
+        
+        // Awkward mouth movement
+        if (wavePhase % 4 < 2) {
+          setMouthOpen(4);
+        } else {
+          setMouthOpen(2);
+        }
+        
+        if (wavePhase >= 25) {
+          clearInterval(waveInterval);
+          
+          // Awkwardly lower hand
+          setRightHand(180, 100, -20);
+          rotateFace(0);
+          setMouthOpen(0);
+          setEyebrows(8, -8);
+          movePupils(0, 0);
+          
+          setTimeout(() => {
+            hideRightHand();
+            resetHands();
+          }, 300);
+        }
+      }, 60);
+    }
+
+    // ============ COMPLEX ENVIRONMENT ANIMATION 1: THE MATRIX ============
+    
+    function theMatrix() {
+      // Environment goes full Matrix
+      setBackground('#000000');
+      setVignette(0);
+      
+      // Grump realizes something
+      microExpression('surprised');
+      setEyebrows(-10, 10);
+      
+      setTimeout(() => {
+        // Green tint
+        document.body.style.filter = 'hue-rotate(80deg) saturate(2)';
+        
+        // Matrix rain
+        for (let i = 0; i < 50; i++) {
+          setTimeout(() => {
+            const drop = document.createElement('div');
+            drop.className = 'particle';
+            drop.style.background = '#00ff00';
+            drop.style.width = '2px';
+            drop.style.height = (10 + Math.random() * 20) + 'px';
+            drop.style.left = Math.random() * 100 + '%';
+            drop.style.top = '-30px';
+            drop.style.boxShadow = '0 0 10px #00ff00';
+            particles.appendChild(drop);
+            
+            let y = -30;
+            const speed = 5 + Math.random() * 10;
+            const fall = () => {
+              y += speed;
+              drop.style.top = y + 'px';
+              if (y < window.innerHeight + 30) {
+                requestAnimationFrame(fall);
+              } else {
+                drop.remove();
+              }
+            };
+            requestAnimationFrame(fall);
+          }, i * 50);
+        }
+        
+        // Grump looks around in wonder
+        setTimeout(() => {
+          movePupils(-10, -5);
+          rotateFace(-5);
+          setTimeout(() => {
+            movePupils(10, 0);
+            rotateFace(5);
+          }, 400);
+        }, 500);
+        
+        // "I know kung fu" moment
+        setTimeout(() => {
+          setEyebrows(0, 0);
+          eyes.forEach(eye => eye.style.transform = 'scaleY(0.7)');
+          
+          // Hands come up in martial arts pose
+          showHands();
+          showLeftArm();
+          showRightArm();
+          setLeftHand(-180, 30, 45);
+          setRightHand(100, -50, -60);
+          
+          // Head tilts
+          rotateFace(-8);
+          moveFace(-10, 0);
+          
+          setTimeout(() => {
+            // Strike pose!
+            screenFlash('#00ff00', 100);
+            setRightHand(200, 80, -20);
+            setLeftHand(-100, 80, 30);
+            rotateFace(10);
+            moveFace(20, 0);
+            setEyebrows(15, -15);
+            
+            // Time slow effect
+            face.style.transition = 'all 0.8s ease';
+            
+            setTimeout(() => {
+              // Return to normal
+              face.style.transition = '';
+              document.body.style.filter = '';
+              setBackground('var(--theme-bg)');
+              hideHands();
+              hideLeftArm();
+              hideRightArm();
+              resetHands();
+              resetFace();
+              
+              // Clear particles
+              particles.innerHTML = '';
+            }, 2000);
+          }, 1500);
+        }, 2000);
+      }, 500);
+    }
+
+    // ============ COMPLEX ENVIRONMENT ANIMATION 2: COSMIC ASCENSION ============
+    
+    function cosmicAscension() {
+      // Begin transcendence
+      setBackground('#0a0a20');
+      setVignette(0.5);
+      
+      // Grump closes eyes, begins meditation
+      eyes.forEach(eye => eye.style.transform = 'scaleY(0.1)');
+      setEyebrows(0, 0);
+      
+      // Arms come up in meditation pose
+      showHands();
+      showLeftArm();
+      showRightArm();
+      setLeftHand(-100, 100, 70);
+      setRightHand(100, 100, -70);
+      
+      // Floating up
+      let floatPhase = 0;
+      const floatInterval = setInterval(() => {
+        floatPhase++;
+        
+        moveFace(Math.sin(floatPhase * 0.1) * 3, -floatPhase * 2);
+        rotateFace(Math.sin(floatPhase * 0.15) * 2);
+        
+        // Spawn cosmic particles
+        if (floatPhase % 3 === 0) {
+          const star = document.createElement('div');
+          star.className = 'particle';
+          star.style.background = ['#fff', '#ffcc00', '#00ffff', '#ff00ff'][Math.floor(Math.random() * 4)];
+          star.style.width = (2 + Math.random() * 4) + 'px';
+          star.style.height = star.style.width;
+          star.style.borderRadius = '50%';
+          star.style.left = Math.random() * 100 + '%';
+          star.style.top = Math.random() * 100 + '%';
+          star.style.boxShadow = `0 0 ${10 + Math.random() * 20}px ${star.style.background}`;
+          particles.appendChild(star);
+          
+          // Twinkle and fade
+          let opacity = 1;
+          const twinkle = () => {
+            opacity -= 0.02;
+            star.style.opacity = opacity * (0.5 + Math.sin(Date.now() * 0.01) * 0.5);
+            if (opacity > 0) {
+              requestAnimationFrame(twinkle);
+            } else {
+              star.remove();
+            }
+          };
+          requestAnimationFrame(twinkle);
+        }
+        
+        // Background gets more cosmic
+        const hue = floatPhase * 2;
+        setBackground(`hsl(${240 + hue % 60}, 50%, ${10 + floatPhase * 0.5}%)`);
+        
+        if (floatPhase >= 40) {
+          clearInterval(floatInterval);
+          
+          // ENLIGHTENMENT
+          screenFlash('#ffffff', 500);
+          
+          // Third eye opens (extra element)
+          const thirdEye = document.createElement('div');
+          thirdEye.style.cssText = `
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: var(--theme-text);
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+            z-index: 100;
+          `;
+          const thirdPupil = document.createElement('div');
+          thirdPupil.style.cssText = `
+            width: 12px;
+            height: 12px;
+            background: #00ffff;
+            box-shadow: 0 0 15px #00ffff;
+          `;
+          thirdEye.appendChild(thirdPupil);
+          face.appendChild(thirdEye);
+          
+          // All eyes open wide
+          eyes.forEach(eye => eye.style.transform = 'scale(1.2)');
+          document.querySelectorAll('.pupil').forEach(p => {
+            p.style.background = '#00ffff';
+            p.style.boxShadow = '0 0 15px #00ffff';
+          });
+          
+          // Cosmic knowledge
+          setTimeout(() => {
+            // Slowly descend
+            let descendPhase = 0;
+            const descendInterval = setInterval(() => {
+              descendPhase++;
+              moveFace(0, -80 + descendPhase * 2);
+              
+              if (descendPhase >= 40) {
+                clearInterval(descendInterval);
+                
+                // Return to grumpy normal
+                thirdEye.remove();
+                document.querySelectorAll('.pupil').forEach(p => {
+                  p.style.background = 'var(--theme-face-bg)';
+                  p.style.boxShadow = '0 0 6px rgba(255, 255, 255, 0.5)';
+                });
+                eyes.forEach(eye => eye.style.transform = 'scaleY(1)');
+                setBackground('var(--theme-bg)');
+                setVignette(0);
+                hideHands();
+                hideLeftArm();
+                hideRightArm();
+                resetHands();
+                resetFace();
+                particles.innerHTML = '';
+                
+                // Still looks slightly enlightened
+                setEyebrows(5, -5);
+                setTimeout(() => setEyebrows(8, -8), 2000);
+              }
+            }, 50);
+          }, 2000);
+        }
+      }, 60);
+    }
+
+    // ============ THE IMPOSSIBLE ANIMATION ============
+    
+    function theImpossible() {
+      // This is the "how tf is he doing this" animation
+      
+      // 1. Face splits into pieces
+      setBackground('#111');
+      setVignette(0.8);
+      screenFlash('#fff', 100);
+      
+      // Create face fragments
+      const fragments = [];
+      const fragmentData = [
+        { el: eyebrowLeft.cloneNode(true), x: -100, y: -150, r: -45 },
+        { el: eyebrowRight.cloneNode(true), x: 100, y: -150, r: 45 },
+        { el: eyes[0].cloneNode(true), x: -120, y: -50, r: -30 },
+        { el: eyes[1].cloneNode(true), x: 120, y: -50, r: 30 },
+        { el: nose.cloneNode(true), x: 0, y: 0, r: 180 },
+        { el: mouth.cloneNode(true), x: 0, y: 100, r: 0 },
+      ];
+      
+      // Hide original face elements
+      face.style.background = 'transparent';
+      face.style.boxShadow = 'none';
+      eyebrowLeft.style.opacity = '0';
+      eyebrowRight.style.opacity = '0';
+      eyes.forEach(e => e.style.opacity = '0');
+      nose.style.opacity = '0';
+      mouth.style.opacity = '0';
+      
+      // Add floating fragments
+      fragmentData.forEach((data, i) => {
+        const frag = data.el;
+        frag.style.position = 'fixed';
+        frag.style.left = '50%';
+        frag.style.top = '50%';
+        frag.style.transform = `translate(-50%, -50%) translate(${data.x}px, ${data.y}px) rotate(${data.r}deg)`;
+        frag.style.transition = 'all 0.5s ease';
+        frag.style.zIndex = '1000';
+        document.body.appendChild(frag);
+        fragments.push({ el: frag, ...data });
+      });
+      
+      // 2. Fragments orbit chaotically
+      let orbitPhase = 0;
+      const orbitInterval = setInterval(() => {
+        orbitPhase++;
+        
+        fragments.forEach((frag, i) => {
+          const angle = orbitPhase * 0.1 + (i * Math.PI / 3);
+          const radius = 100 + Math.sin(orbitPhase * 0.05 + i) * 50;
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+          const r = orbitPhase * 5 + i * 60;
+          frag.el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${r}deg)`;
+        });
+        
+        // Screen pulses
+        if (orbitPhase % 20 === 0) {
+          screenFlash('#ff00ff', 50);
+        }
+        
+        if (orbitPhase >= 60) {
+          clearInterval(orbitInterval);
+          
+          // 3. Fragments reassemble into... DIFFERENT face
+          fragments.forEach((frag, i) => {
+            // Wrong positions!
+            const wrongPositions = [
+              { x: 0, y: 100 }, // eyebrow where mouth should be
+              { x: 0, y: -100 }, // other eyebrow on top
+              { x: -50, y: 0 }, // eye on left side
+              { x: 50, y: 0 }, // eye on right
+              { x: 0, y: 50 }, // nose in middle
+              { x: 0, y: -50 }, // mouth on top
+            ];
+            frag.el.style.transform = `translate(-50%, -50%) translate(${wrongPositions[i].x}px, ${wrongPositions[i].y}px) rotate(0deg)`;
+          });
+          
+          setTimeout(() => {
+            // Grump "notices" something is wrong
+            // Eyes animate independently
+            const floatingEyes = fragments.filter(f => f.el.classList.contains('eye'));
+            floatingEyes.forEach(eye => {
+              eye.el.style.transform += ' scale(1.2)';
+            });
+            
+            setTimeout(() => {
+              // 4. SCREAM and explode
+              screenShake(20, 500);
+              spawnParticles(50, '#ff0000');
+              
+              // Fragments fly off screen
+              fragments.forEach((frag, i) => {
+                const angle = (i / fragments.length) * Math.PI * 2;
+                const dist = 1000;
+                frag.el.style.transform = `translate(-50%, -50%) translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) rotate(${720}deg)`;
+                frag.el.style.opacity = '0';
+              });
+              
+              setTimeout(() => {
+                // 5. Everything goes black
+                setBackground('#000');
+                fragments.forEach(f => f.el.remove());
+                
+                setTimeout(() => {
+                  // 6. Grump slowly fades back in, piece by piece
+                  face.style.background = 'var(--theme-face-bg)';
+                  face.style.boxShadow = '';
+                  
+                  const elements = [eyebrowLeft, eyebrowRight, eyes[0], eyes[1], nose, mouth];
+                  elements.forEach((el, i) => {
+                    setTimeout(() => {
+                      el.style.opacity = '1';
+                      el.style.transform += ' scale(1.2)';
+                      setTimeout(() => {
+                        el.style.transform = el.style.transform.replace(' scale(1.2)', '');
+                      }, 100);
+                    }, i * 200);
+                  });
+                  
+                  setTimeout(() => {
+                    // 7. Grump looks TRAUMATIZED
+                    setBackground('var(--theme-bg)');
+                    setVignette(0);
+                    
+                    eyes.forEach(eye => {
+                      eye.style.opacity = '1';
+                      eye.style.transform = 'scale(1.3)';
+                    });
+                    document.querySelectorAll('.pupil').forEach(p => {
+                      p.style.width = '4px';
+                      p.style.height = '4px';
+                    });
+                    setEyebrows(-15, 15);
+                    setMouthOpen(10);
+                    
+                    // Shaking
+                    let traumaShakes = 0;
+                    const traumaInterval = setInterval(() => {
+                      traumaShakes++;
+                      rotateFace(traumaShakes % 2 ? 1 : -1);
+                      
+                      if (traumaShakes >= 20) {
+                        clearInterval(traumaInterval);
+                        
+                        // Slow recovery
+                        setTimeout(() => {
+                          eyes.forEach(eye => eye.style.transform = 'scaleY(1)');
+                          document.querySelectorAll('.pupil').forEach(p => {
+                            p.style.width = '14px';
+                            p.style.height = '14px';
+                          });
+                          setEyebrows(8, -8);
+                          setMouthOpen(0);
+                          rotateFace(0);
+                          
+                          // Slow blink
+                          setTimeout(() => blink(), 500);
+                        }, 1000);
+                      }
+                    }, 50);
+                  }, 1400);
+                }, 1000);
+              }, 800);
+            }, 800);
+          }, 1000);
+        }
+      }, 50);
+    }
+
+    // ============ COOL ABILITIES ============
+
+    // EYE ROLL - full dramatic eye roll
+    function eyeRoll() {
+      // Eyebrows go flat with exasperation
+      setEyebrows(0, 0);
+      
+      // Roll sequence
+      movePupils(0, -10);
+      setTimeout(() => movePupils(8, -8), 100);
+      setTimeout(() => movePupils(10, 0), 200);
+      setTimeout(() => movePupils(8, 8), 300);
+      setTimeout(() => movePupils(0, 10), 400);
+      setTimeout(() => movePupils(-8, 8), 500);
+      setTimeout(() => movePupils(-10, 0), 600);
+      setTimeout(() => movePupils(-8, -8), 700);
+      setTimeout(() => {
+        movePupils(0, 0);
+        // Eyebrows return extra grumpy
+        setEyebrows(12, -12);
+        setTimeout(() => setEyebrows(8, -8), 500);
+      }, 800);
+      
+      // Head tilts back slightly during roll
+      moveFace(0, -5);
+      rotateFace(-3);
+      setTimeout(() => {
+        moveFace(0, 0);
+        rotateFace(0);
+      }, 900);
+    }
+
+    // RAGE MODE - full meltdown
+    function rageMode() {
+      let rageLevel = 0;
+      
+      // Environment starts darkening
+      setVignette(0.3);
+      setBackground('#fff5f5');
+      
+      // Hands come up angry
+      showHands();
+      setLeftHand(-140, 80, 30);
+      setRightHand(140, 80, -30);
+      
+      const rageInterval = setInterval(() => {
+        rageLevel++;
+        
+        // Progressive eyebrow anger
+        setEyebrows(8 + rageLevel * 2, -8 - rageLevel * 2);
+        
+        // Eyes get smaller and angrier
+        eyes.forEach(eye => {
+          eye.style.transform = `scaleY(${1 - rageLevel * 0.05})`;
+        });
+        
+        // Pupils shrink
+        document.querySelectorAll('.pupil').forEach(p => {
+          p.style.width = `${14 - rageLevel}px`;
+          p.style.height = `${14 - rageLevel}px`;
+        });
+        
+        // Face shakes increasingly
+        rotateFace((rageLevel % 2 ? 1 : -1) * rageLevel * 0.5);
+        
+        // Face gets bigger (angrier presence)
+        face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(${1 + rageLevel * 0.01})`;
+        
+        // Hands shake with rage
+        setLeftHand(-140 + (rageLevel % 2 ? 5 : -5), 80 - rageLevel * 2, 30 + rageLevel);
+        setRightHand(140 + (rageLevel % 2 ? -5 : 5), 80 - rageLevel * 2, -30 - rageLevel);
+        
+        // Environment intensifies
+        setVignette(0.3 + rageLevel * 0.03);
+        setBackground(`rgb(255, ${255 - rageLevel * 8}, ${255 - rageLevel * 8})`);
+        
+        if (rageLevel >= 15) {
+          clearInterval(rageInterval);
+          
+          // Explosion shake
+          screenShake(15, 800);
+          screenFlash('#ff0000', 200);
+          spawnParticles(20, '#ff4444', 'burst');
+          
+          let explodeShakes = 0;
+          const explodeInterval = setInterval(() => {
+            rotateFace(explodeShakes % 2 ? 8 : -8);
+            moveFace(explodeShakes % 2 ? 10 : -10, 0);
+            setLeftHand(-140 + (explodeShakes % 2 ? 15 : -15), 50, 45);
+            setRightHand(140 + (explodeShakes % 2 ? -15 : 15), 50, -45);
+            explodeShakes++;
+            if (explodeShakes > 20) {
+              clearInterval(explodeInterval);
+              // Collapse exhausted
+              resetFace();
+              setEyebrows(3, -3);
+              eyes.forEach(eye => {
+                eye.style.transform = 'scaleY(0.7)';
+              });
+              moveFace(0, 10);
+              
+              // Hands drop
+              setLeftHand(-160, 200, 10);
+              setRightHand(160, 200, -10);
+              
+              // Environment recovers
+              setVignette(0);
+              setBackground('#ffffff');
+              
+              setTimeout(() => {
+                resetFace();
+                hideHands();
+                resetHands();
+              }, 2000);
+            }
+          }, 30);
+        }
+      }, 100);
+    }
+
+    // SARCASTIC SLOW BLINK
+    function sarcasticSlow() {
+      // Eyebrows raise in disbelief first
+      setEyebrows(-5, 5);
+      
+      setTimeout(() => {
+        // Slooooow close
+        let closeAmount = 1;
+        const closeInterval = setInterval(() => {
+          closeAmount -= 0.05;
+          eyes.forEach(eye => {
+            eye.style.transform = `scaleY(${closeAmount})`;
+          });
+          // Eyebrows slowly flatten
+          setEyebrows(-5 + (1 - closeAmount) * 10, 5 - (1 - closeAmount) * 10);
+          
+          if (closeAmount <= 0.1) {
+            clearInterval(closeInterval);
+            
+            // Hold it...
+            setTimeout(() => {
+              // Slow open with maximum judgment
+              let openAmount = 0.1;
+              const openInterval = setInterval(() => {
+                openAmount += 0.03;
+                eyes.forEach(eye => {
+                  eye.style.transform = `scaleY(${openAmount})`;
+                });
+                
+                if (openAmount >= 1) {
+                  clearInterval(openInterval);
+                  // Land on disappointed eyebrows
+                  setEyebrows(15, -15);
+                  setTimeout(() => setEyebrows(8, -8), 1000);
+                }
+              }, 30);
+            }, 600);
+          }
+        }, 40);
+      }, 300);
+    }
+
+    // DRAMATIC DISBELIEF
+    function dramaticDisbelief() {
+      // Eyebrows shoot up
+      setEyebrows(-15, 15);
+      
+      // Eyes widen
+      eyes.forEach(eye => {
+        eye.style.transform = 'scale(1.15)';
+      });
+      
+      // Pupils dilate
+      document.querySelectorAll('.pupil').forEach(p => {
+        p.style.width = '18px';
+        p.style.height = '18px';
+      });
+      
+      // Head pulls back
+      moveFace(0, -15);
+      face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1.05)`;
+      
+      // Mouth drops
+      setMouthOpen(15);
+      
+      // Hands come up in disbelief
+      showHands();
+      setLeftHand(-170, 30, 35);
+      setRightHand(170, 30, -35);
+      
+      // Hold the shock
+      setTimeout(() => {
+        // Slowly transition to "are you kidding me"
+        setEyebrows(20, -20);
+        eyes.forEach(eye => {
+          eye.style.transform = 'scaleY(0.7)';
+        });
+        document.querySelectorAll('.pupil').forEach(p => {
+          p.style.width = '10px';
+          p.style.height = '10px';
+        });
+        moveFace(0, 0);
+        face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1)`;
+        setMouthOpen(0);
+        
+        // Hands drop in disappointment
+        setLeftHand(-150, 150, 15);
+        setRightHand(150, 150, -15);
+        
+        setTimeout(() => {
+          hideHands();
+          resetHands();
+          resetFace();
+        }, 1500);
+      }, 1200);
+    }
+
+    // ZEN MODE - reluctant calm
+    function zenMode() {
+      // Deep breath
+      face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1.05)`;
+      setEyebrows(3, -3);
+      
+      setTimeout(() => {
+        // Eyes slowly close
+        let closeAmount = 1;
+        const closeInterval = setInterval(() => {
+          closeAmount -= 0.02;
+          eyes.forEach(eye => {
+            eye.style.transform = `scaleY(${Math.max(closeAmount, 0.15)})`;
+          });
+          
+          if (closeAmount <= 0.15) {
+            clearInterval(closeInterval);
+          }
+        }, 30);
+        
+        // Gentle sway
+        let zenPhase = 0;
+        const zenSway = setInterval(() => {
+          zenPhase += 0.05;
+          rotateFace(Math.sin(zenPhase) * 2);
+          moveFace(Math.sin(zenPhase * 0.7) * 5, Math.cos(zenPhase) * 3);
+          
+          if (zenPhase > Math.PI * 4) {
+            clearInterval(zenSway);
+            // Snap out annoyed
+            eyes.forEach(eye => {
+              eye.style.transform = 'scaleY(1)';
+            });
+            setEyebrows(15, -15);
+            rotateFace(0);
+            moveFace(0, 0);
+            face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1)`;
+            setTimeout(() => setEyebrows(8, -8), 800);
+          }
+        }, 50);
+      }, 500);
+    }
+
+    // COFFEE PERK - sudden alertness
+    function coffeePerk() {
+      // Start sleepy
+      eyes.forEach(eye => {
+        eye.style.transform = 'scaleY(0.5)';
+      });
+      setEyebrows(2, -2);
+      moveFace(0, 5);
+      
+      setTimeout(() => {
+        // JOLT
+        eyes.forEach(eye => {
+          eye.style.transform = 'scale(1.2)';
+        });
+        document.querySelectorAll('.pupil').forEach(p => {
+          p.style.width = '6px';
+          p.style.height = '6px';
+        });
+        setEyebrows(-10, 10);
+        moveFace(0, -20);
+        face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1.1)`;
+        
+        // Vibrate
+        let vibes = 0;
+        const vibeInterval = setInterval(() => {
+          moveFace(vibes % 2 ? 3 : -3, -20 + vibes);
+          vibes++;
+          if (vibes > 20) {
+            clearInterval(vibeInterval);
+            resetFace();
+            // Slightly too alert
+            document.querySelectorAll('.pupil').forEach(p => {
+              p.style.width = '8px';
+              p.style.height = '8px';
+            });
+            setTimeout(() => {
+              document.querySelectorAll('.pupil').forEach(p => {
+                p.style.width = '14px';
+                p.style.height = '14px';
+              });
+            }, 2000);
+          }
+        }, 30);
+      }, 800);
+    }
+
+    // LASER EYES - pew pew
+    function laserEyes() {
+      // Power up
+      setEyebrows(0, 0);
+      document.querySelectorAll('.pupil').forEach(p => {
+        p.style.width = '4px';
+        p.style.height = '4px';
+        p.style.boxShadow = '0 0 10px #ff0000, 0 0 20px #ff0000';
+        p.style.background = '#ff0000';
+      });
+      
+      // Charging...
+      let charge = 0;
+      const chargeInterval = setInterval(() => {
+        charge++;
+        face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(${(charge % 2 ? 0.5 : -0.5)}deg) scale(${1 + charge * 0.005})`;
+        
+        if (charge >= 20) {
+          clearInterval(chargeInterval);
+          
+          // FIRE!
+          document.querySelectorAll('.pupil').forEach(p => {
+            p.style.width = '20px';
+            p.style.height = '4px';
+            p.style.boxShadow = '0 0 30px #ff0000, 20px 0 40px #ff0000';
+          });
+          face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1.15)`;
+          moveFace(0, -10);
+          
+          setTimeout(() => {
+            // Exhausted
+            document.querySelectorAll('.pupil').forEach(p => {
+              p.style.width = '14px';
+              p.style.height = '14px';
+              p.style.boxShadow = '0 0 6px rgba(255, 255, 255, 0.5)';
+              p.style.background = '#fff';
+            });
+            resetFace();
+            eyes.forEach(eye => {
+              eye.style.transform = 'scaleY(0.7)';
+            });
+            setEyebrows(5, -5);
+            setTimeout(() => resetFace(), 1500);
+          }, 500);
+        }
+      }, 50);
+    }
+
+    // WHATEVER - dismissive
+    function whatever() {
+      // Look away
+      movePupils(-12, -5);
+      setEyebrows(5, -12);
+      rotateFace(8);
+      moveFace(-15, 0);
+      
+      // Eyes half close
+      eyes.forEach(eye => {
+        eye.style.transform = 'scaleY(0.75)';
+      });
+      
+      setTimeout(() => {
+        // Little head shake
+        rotateFace(5);
+        setTimeout(() => rotateFace(10), 100);
+        setTimeout(() => rotateFace(6), 200);
+        
+        setTimeout(() => {
+          resetFace();
+        }, 800);
+      }, 600);
+    }
+
+    // RESET HELPER
+    function resetFace() {
+      setEyebrows(8, -8);
+      eyes.forEach(eye => {
+        eye.style.transform = 'scaleY(1)';
+        eye.style.boxShadow = '';
+      });
+      document.querySelectorAll('.pupil').forEach(p => {
+        p.style.width = '14px';
+        p.style.height = '14px';
+        p.style.background = 'var(--theme-face-bg)';
+        p.style.boxShadow = '0 0 6px rgba(255, 255, 255, 0.5)';
+        p.style.opacity = '1';
+      });
+      moveFace(0, 0);
+      rotateFace(0);
+      movePupils(0, 0);
+      root.style.setProperty('--face-scale', '1');
+      face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(var(--face-scale))`;
+      face.classList.remove('transform-rage');
+      setMouthOpen(0);
+      mouth.style.transform = 'translateX(-50%)';
+      nose.style.transform = 'translateX(-50%)';
+    }
+
+    function fullReset() {
+      resetFace();
+      resetHands();
+      setBackground('var(--theme-bg)');
+      setVignette(0);
+      root.style.setProperty('--chat-x', '0px');
+      root.style.setProperty('--chat-y', '0px');
+      root.style.setProperty('--chat-rotate', '0deg');
+      root.style.setProperty('--chat-opacity', '1');
+      chatVisible = true;
+    }
+
+    // ============ 5 HIGHLY COMPLEX ANIMATIONS ============
+
+    // 1. SNEEZE FAKEOUT - elaborate buildup, nothing happens
+    function sneezeFakeout() {
+      let buildupPhase = 0;
+      
+      // Phase 1: Initial tickle
+      setEyebrows(0, 0);
+      eyes.forEach(eye => {
+        eye.style.transform = 'scaleY(0.9)';
+      });
+      nose.style.transform = 'translateX(-50%) scaleY(1.1)';
+      
+      setTimeout(() => {
+        // Phase 2: Building...
+        const buildInterval = setInterval(() => {
+          buildupPhase++;
+          
+          // Head tilts back progressively
+          moveFace(0, -buildupPhase * 2);
+          rotateFace(-buildupPhase * 0.8);
+          
+          // Eyes squeeze more
+          eyes.forEach(eye => {
+            eye.style.transform = `scaleY(${Math.max(0.9 - buildupPhase * 0.1, 0.2)})`;
+          });
+          
+          // Eyebrows scrunch
+          setEyebrows(buildupPhase * 2, -buildupPhase * 2);
+          
+          // Mouth opens for the sneeze
+          setMouthOpen(buildupPhase * 1.5);
+          
+          // Nose scrunches
+          nose.style.transform = `translateX(-50%) scaleY(${1.1 - buildupPhase * 0.05})`;
+          
+          // Little hitches
+          if (buildupPhase % 2 === 0) {
+            moveFace(0, -buildupPhase * 2 - 3);
+            setTimeout(() => moveFace(0, -buildupPhase * 2), 50);
+          }
+          
+          if (buildupPhase >= 8) {
+            clearInterval(buildInterval);
+            
+            // THE PEAK - maximum pre-sneeze
+            moveFace(0, -25);
+            rotateFace(-12);
+            setMouthOpen(20);
+            eyes.forEach(eye => {
+              eye.style.transform = 'scaleY(0.1)';
+            });
+            
+            // Hold it...
+            setTimeout(() => {
+              // ...nothing happens
+              // Confused pause
+              setTimeout(() => {
+                // Slowly comes back, annoyed
+                moveFace(0, -15);
+                rotateFace(-6);
+                eyes.forEach(eye => {
+                  eye.style.transform = 'scaleY(0.5)';
+                });
+                setMouthOpen(5);
+                
+                setTimeout(() => {
+                  // Opens eyes, looks around confused
+                  eyes.forEach(eye => {
+                    eye.style.transform = 'scaleY(1)';
+                  });
+                  movePupils(-8, 0);
+                  
+                  setTimeout(() => {
+                    movePupils(8, 0);
+                    
+                    setTimeout(() => {
+                      // Frustrated sigh
+                      resetFace();
+                      setEyebrows(15, -15);
+                      setMouthOpen(3);
+                      moveFace(0, 5);
+                      
+                      setTimeout(() => {
+                        setMouthOpen(0);
+                        moveFace(0, 0);
+                        nose.style.transform = 'translateX(-50%)';
+                        setTimeout(() => setEyebrows(8, -8), 500);
+                      }, 400);
+                    }, 300);
+                  }, 300);
+                }, 400);
+              }, 300);
+            }, 500);
+          }
+        }, 150);
+      }, 300);
+    }
+
+    // 2. EXISTENTIAL CRISIS - thousand yard stare into the void
+    function existentialCrisis() {
+      // Environment slowly darkens
+      setBackground('#f8f8fc');
+      
+      // Start normal, then slowly drift
+      movePupils(0, 0);
+      
+      setTimeout(() => {
+        // Eyebrows slowly flatten with realization
+        let phase = 0;
+        const crisisInterval = setInterval(() => {
+          phase++;
+          
+          // Eyebrows slowly rise then fall
+          if (phase < 15) {
+            setEyebrows(8 - phase * 0.5, -8 + phase * 0.5);
+          } else {
+            setEyebrows(-2, 2);
+          }
+          
+          // Eyes slowly widen
+          if (phase < 20) {
+            eyes.forEach(eye => {
+              eye.style.transform = `scale(${1 + phase * 0.008})`;
+            });
+          }
+          
+          // Pupils slowly dilate then shrink to dots
+          if (phase < 15) {
+            document.querySelectorAll('.pupil').forEach(p => {
+              p.style.width = `${14 + phase * 0.3}px`;
+              p.style.height = `${14 + phase * 0.3}px`;
+            });
+          } else {
+            document.querySelectorAll('.pupil').forEach(p => {
+              const shrink = Math.max(18 - (phase - 15) * 1, 4);
+              p.style.width = `${shrink}px`;
+              p.style.height = `${shrink}px`;
+            });
+          }
+          
+          // Slight defocus - pupils drift apart slightly
+          if (phase > 10) {
+            const leftPupil = document.querySelector('.eye.left .pupil');
+            const rightPupil = document.querySelector('.eye.right .pupil');
+            leftPupil.style.transform = `translate(${-2}px, 0)`;
+            rightPupil.style.transform = `translate(${2}px, 0)`;
+          }
+          
+          // Face slowly drops
+          moveFace(0, phase * 0.3);
+          
+          // Environment gets darker
+          setVignette(Math.min(phase * 0.02, 0.6));
+          const gray = Math.max(248 - phase * 2, 200);
+          setBackground(`rgb(${gray}, ${gray}, ${gray + 10})`);
+          
+          if (phase >= 40) {
+            clearInterval(crisisInterval);
+            
+            // Long pause in the void
+            setTimeout(() => {
+              // Single slow blink
+              eyes.forEach(eye => {
+                eye.style.transform = 'scaleY(0.1)';
+              });
+              
+              setTimeout(() => {
+                eyes.forEach(eye => {
+                  eye.style.transform = 'scaleY(1)';
+                });
+                
+                // Snap out of it with a head shake
+                setTimeout(() => {
+                  setVignette(0);
+                  setBackground('#ffffff');
+                  shakeNo(() => {
+                    resetFace();
+                    // Still looks slightly haunted
+                    setEyebrows(6, -6);
+                    setTimeout(() => setEyebrows(8, -8), 2000);
+                  });
+                }, 500);
+              }, 400);
+            }, 1500);
+          }
+        }, 80);
+      }, 200);
+    }
+
+    // 3. JUMPSCARE - SOUL LEAVES BODY
+    function jumpscaredSoul() {
+      // Environment darkens
+      setVignette(0.5);
+      setBackground('#f0f0ff');
+      screenFlash('#fff', 50);
+      
+      // Create ghost overlay
+      const ghost = document.createElement('div');
+      ghost.className = 'ghost-face';
+      ghost.innerHTML = face.innerHTML;
+      ghost.style.cssText = `
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.7);
+        opacity: 0.8;
+        pointer-events: none;
+        z-index: 100;
+      `;
+      face.parentNode.appendChild(ghost);
+      
+      // Initial shock - hands fly up
+      showHands();
+      setLeftHand(-200, -100, 40);
+      setRightHand(200, -100, -40);
+      
+      setEyebrows(-20, 20);
+      eyes.forEach(eye => {
+        eye.style.transform = 'scale(1.3)';
+      });
+      document.querySelectorAll('.pupil').forEach(p => {
+        p.style.width = '6px';
+        p.style.height = '6px';
+      });
+      setMouthOpen(25);
+      
+      // Soul rises
+      let soulRise = 0;
+      const riseInterval = setInterval(() => {
+        soulRise++;
+        ghost.style.transform = `translateY(${-soulRise * 8}px)`;
+        ghost.style.opacity = 0.8 - soulRise * 0.03;
+        
+        // Hands slowly drop as soul leaves
+        setLeftHand(-200 + soulRise * 2, -100 + soulRise * 8, 40 - soulRise);
+        setRightHand(200 - soulRise * 2, -100 + soulRise * 8, -40 + soulRise);
+        
+        // Body goes limp
+        if (soulRise > 5) {
+          eyes.forEach(eye => {
+            eye.style.transform = `scale(${1.3 - soulRise * 0.03})`;
+          });
+          setMouthOpen(25 - soulRise);
+          moveFace(0, soulRise * 2);
+          setEyebrows(-20 + soulRise * 2, 20 - soulRise * 2);
+        }
+        
+        if (soulRise >= 25) {
+          clearInterval(riseInterval);
+          ghost.remove();
+          
+          // Collapse - hands go limp
+          eyes.forEach(eye => {
+            eye.style.transform = 'scaleY(0.1)';
+          });
+          setMouthOpen(0);
+          moveFace(0, 30);
+          rotateFace(5);
+          setLeftHand(-150, 200, 5);
+          setRightHand(150, 200, -5);
+          
+          // Soul returns
+          setTimeout(() => {
+            // Create returning ghost
+            const returnGhost = document.createElement('div');
+            returnGhost.innerHTML = face.innerHTML;
+            returnGhost.style.cssText = `
+              position: absolute;
+              width: 300px;
+              height: 300px;
+              background: rgba(255,255,255,0.5);
+              opacity: 0;
+              pointer-events: none;
+              z-index: 100;
+              transform: translateY(-200px);
+            `;
+            face.parentNode.appendChild(returnGhost);
+            
+            let soulReturn = 0;
+            const returnInterval = setInterval(() => {
+              soulReturn++;
+              returnGhost.style.transform = `translateY(${-200 + soulReturn * 8}px)`;
+              returnGhost.style.opacity = soulReturn * 0.04;
+              
+              if (soulReturn >= 25) {
+                clearInterval(returnInterval);
+                returnGhost.remove();
+                
+                // GASP back to life
+                screenFlash('#fff', 100);
+                eyes.forEach(eye => {
+                  eye.style.transform = 'scale(1.2)';
+                });
+                setEyebrows(-10, 10);
+                setMouthOpen(15);
+                moveFace(0, -10);
+                rotateFace(0);
+                document.querySelectorAll('.pupil').forEach(p => {
+                  p.style.width = '16px';
+                  p.style.height = '16px';
+                });
+                
+                // Clutch chest - hands come to chest
+                setLeftHand(-80, 100, 60);
+                setRightHand(80, 100, -60);
+                
+                setTimeout(() => {
+                  face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(0.95)`;
+                  setEyebrows(5, -5);
+                  
+                  // Heavy breathing - hands move with breath
+                  let breaths = 0;
+                  const breathInterval = setInterval(() => {
+                    breaths++;
+                    face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(${0.95 + (breaths % 2) * 0.05})`;
+                    setLeftHand(-80 + (breaths % 2 ? 5 : -5), 100, 60);
+                    setRightHand(80 + (breaths % 2 ? -5 : 5), 100, -60);
+                    
+                    if (breaths >= 6) {
+                      clearInterval(breathInterval);
+                      resetFace();
+                      setVignette(0);
+                      setBackground('#ffffff');
+                      // Traumatized look
+                      setEyebrows(5, -5);
+                      document.querySelectorAll('.pupil').forEach(p => {
+                        p.style.width = '10px';
+                        p.style.height = '10px';
+                      });
+                      
+                      // Slowly lower hands
+                      setTimeout(() => {
+                        hideHands();
+                        resetHands();
+                        setTimeout(() => resetFace(), 1000);
+                      }, 500);
+                    }
+                  }, 300);
+                }, 300);
+              }
+            }, 30);
+          }, 800);
+        }
+      }, 30);
+    }
+
+    // 4. VIBING THEN REMEMBERS SOMETHING EMBARRASSING
+    function vibeThenCringe() {
+      // Start vibing - happy environment
+      setBackground('#fffef5');
+      
+      setEyebrows(3, -3);
+      eyes.forEach(eye => {
+        eye.style.transform = 'scaleY(0.8)';
+      });
+      
+      let vibePhase = 0;
+      const vibeInterval = setInterval(() => {
+        vibePhase++;
+        
+        // Gentle happy sway
+        rotateFace(Math.sin(vibePhase * 0.3) * 5);
+        moveFace(Math.sin(vibePhase * 0.2) * 8, Math.cos(vibePhase * 0.25) * 4);
+        movePupils(Math.sin(vibePhase * 0.15) * 3, 2);
+        
+        // Slight mouth movement like humming
+        if (vibePhase % 4 < 2) {
+          setMouthOpen(2);
+        } else {
+          setMouthOpen(0);
+        }
+        
+        if (vibePhase >= 35) {
+          clearInterval(vibeInterval);
+          
+          // THE MEMORY HITS
+          // Freeze
+          rotateFace(0);
+          moveFace(0, 0);
+          setMouthOpen(0);
+          setBackground('#ffffff');
+          
+          setTimeout(() => {
+            // Eyes snap open
+            eyes.forEach(eye => {
+              eye.style.transform = 'scale(1.15)';
+            });
+            setEyebrows(-5, 5);
+            document.querySelectorAll('.pupil').forEach(p => {
+              p.style.width = '8px';
+              p.style.height = '8px';
+            });
+            
+            // Thousand yard stare of cringe
+            movePupils(0, 0);
+            
+            setTimeout(() => {
+              // The cringe wave hits
+              setBackground('#fff0f0');
+              setVignette(0.2);
+              
+              // Eyes squeeze shut
+              eyes.forEach(eye => {
+                eye.style.transform = 'scaleY(0.15)';
+              });
+              setEyebrows(20, -20);
+              
+              // Face scrunches
+              nose.style.transform = 'translateX(-50%) scaleY(0.85)';
+              setMouthOpen(0);
+              mouth.style.transform = 'translateX(-50%) scaleY(0.7)';
+              
+              // Hands come up to hide face
+              showHands();
+              setLeftHand(-80, 50, 50);
+              setRightHand(80, 50, -50);
+              
+              // Physical recoil
+              moveFace(-10, 5);
+              rotateFace(-8);
+              face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(0.92)`;
+              
+              // Full body cringe shudder
+              setTimeout(() => {
+                let shudders = 0;
+                const shudderInterval = setInterval(() => {
+                  shudders++;
+                  rotateFace(-8 + (shudders % 2 ? 3 : -3));
+                  moveFace(-10 + (shudders % 2 ? 4 : -4), 5);
+                  setLeftHand(-80 + (shudders % 2 ? 5 : -5), 50, 50);
+                  setRightHand(80 + (shudders % 2 ? -5 : 5), 50, -50);
+                  
+                  if (shudders >= 8) {
+                    clearInterval(shudderInterval);
+                    
+                    // Deep breath, try to recover
+                    setTimeout(() => {
+                      face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1)`;
+                      eyes.forEach(eye => {
+                        eye.style.transform = 'scaleY(0.7)';
+                      });
+                      setEyebrows(10, -10);
+                      moveFace(0, 3);
+                      rotateFace(0);
+                      nose.style.transform = 'translateX(-50%)';
+                      mouth.style.transform = 'translateX(-50%)';
+                      
+                      // Lower hands
+                      setLeftHand(-130, 150, 20);
+                      setRightHand(130, 150, -20);
+                      
+                      // Exhale
+                      setMouthOpen(5);
+                      setTimeout(() => {
+                        setMouthOpen(0);
+                        setVignette(0);
+                        setBackground('#ffffff');
+                        hideHands();
+                        resetHands();
+                        setTimeout(() => resetFace(), 800);
+                      }, 400);
+                    }, 400);
+                  }
+                }, 60);
+              }, 300);
+            }, 600);
+          }, 200);
+        }
+      }, 60);
+    }
+
+    // 5. WINDOWS SHUTDOWN/STARTUP
+    function windowsShutdown() {
+      // "Shutting down..."
+      setEyebrows(0, 0);
+      
+      // Eyes slowly close with that Windows feel
+      let shutdownPhase = 0;
+      const shutdownInterval = setInterval(() => {
+        shutdownPhase++;
+        
+        // Progressive eye close
+        eyes.forEach(eye => {
+          eye.style.transform = `scaleY(${1 - shutdownPhase * 0.05})`;
+        });
+        
+        // Pupils fade (go dim)
+        document.querySelectorAll('.pupil').forEach(p => {
+          const opacity = 1 - shutdownPhase * 0.05;
+          p.style.opacity = opacity;
+        });
+        
+        // Face slowly drops
+        moveFace(0, shutdownPhase * 0.8);
+        
+        // Eyebrows relax completely
+        setEyebrows(shutdownPhase * 0.3, -shutdownPhase * 0.3);
+        
+        // Environment dims
+        const brightness = 255 - shutdownPhase * 5;
+        setBackground(`rgb(${brightness}, ${brightness}, ${brightness})`);
+        
+        if (shutdownPhase >= 20) {
+          clearInterval(shutdownInterval);
+          
+          // Fully "off"
+          eyes.forEach(eye => {
+            eye.style.transform = 'scaleY(0)';
+          });
+          moveFace(0, 20);
+          setEyebrows(5, -5);
+          setBackground('#1a1a1a');
+          
+          // Blue screen flicker
+          setTimeout(() => {
+            // Brief "error" flicker
+            screenFlash('#0000aa', 100);
+            setBackground('#0000aa');
+            eyes.forEach(eye => {
+              eye.style.transform = 'scaleY(0.3)';
+              eye.style.background = '#0000aa';
+            });
+            document.querySelectorAll('.pupil').forEach(p => {
+              p.style.background = '#ffffff';
+              p.style.opacity = '1';
+            });
+            
+            setTimeout(() => {
+              eyes.forEach(eye => {
+                eye.style.transform = 'scaleY(0)';
+                eye.style.background = '#000';
+              });
+              setBackground('#000000');
+              
+              // STARTUP
+              setTimeout(() => {
+                // Boot sequence
+                let bootPhase = 0;
+                const bootInterval = setInterval(() => {
+                  bootPhase++;
+                  
+                  // Eyes open with startup energy
+                  if (bootPhase < 5) {
+                    // Loading flickers
+                    eyes.forEach(eye => {
+                      eye.style.transform = `scaleY(${bootPhase % 2 ? 0.1 : 0})`;
+                    });
+                    // Environment flickers
+                    setBackground(bootPhase % 2 ? '#111' : '#000');
+                  } else {
+                    // SNAP AWAKE
+                    screenFlash('#fff', 100);
+                    setBackground('#ffffff');
+                    eyes.forEach(eye => {
+                      eye.style.transform = 'scale(1.2)';
+                    });
+                    setEyebrows(-15, 15);
+                    document.querySelectorAll('.pupil').forEach(p => {
+                      p.style.width = '6px';
+                      p.style.height = '6px';
+                      p.style.opacity = '1';
+                    });
+                    moveFace(0, -15);
+                    face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1.1)`;
+                    
+                    clearInterval(bootInterval);
+                    
+                    // Hyper alert
+                    setTimeout(() => {
+                      // Rapid look around
+                      movePupils(-10, 0);
+                      setTimeout(() => movePupils(10, 0), 100);
+                      setTimeout(() => movePupils(-5, -5), 200);
+                      setTimeout(() => movePupils(5, 5), 300);
+                      setTimeout(() => movePupils(0, 0), 400);
+                      
+                      setTimeout(() => {
+                        // Settle into confused alertness
+                        eyes.forEach(eye => {
+                          eye.style.transform = 'scaleY(1)';
+                        });
+                        face.style.transform = `translate(var(--face-x), var(--face-y)) rotate(var(--face-rotate)) scale(1)`;
+                        moveFace(0, 0);
+                        document.querySelectorAll('.pupil').forEach(p => {
+                          p.style.width = '14px';
+                          p.style.height = '14px';
+                        });
+                        setEyebrows(10, -10);
+                        
+                        // Still processing
+                        setTimeout(() => {
+                          // Slow blink of "what just happened"
+                          eyes.forEach(eye => {
+                            eye.style.transform = 'scaleY(0.1)';
+                          });
+                          setTimeout(() => {
+                            eyes.forEach(eye => {
+                              eye.style.transform = 'scaleY(1)';
+                            });
+                            setEyebrows(8, -8);
+                          }, 200);
+                        }, 600);
+                      }, 500);
+                    }, 100);
+                  }
+                }, 80);
+              }, 1000);
+            }, 150);
+          }, 1500);
+        }
+      }, 60);
+    }
+
+  </script>
+</body>
+</html>

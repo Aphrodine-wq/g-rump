@@ -72,7 +72,8 @@
   waitForElements().then(({ face, chatMessages, chatInput }) => {
     try {
       console.log('Grump2: Elements found, initializing...');
-      const root = document.documentElement;
+      // Target the wrapper for CSS variables so they are scoped to the component
+      const styleTarget = document.querySelector('.grump2-wrapper') || document.documentElement;
       const eyes = face ? face.querySelectorAll('.eye') : [];
       const mouth = face ? face.querySelector('.mouth') : null;
       const nose = face ? face.querySelector('.nose') : null;
@@ -106,10 +107,10 @@
       const tween = (target, props, dur, easing = t => t < .5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2) => {
         return new Promise(resolve => {
           const start = performance.now(), keys = Object.keys(props);
-          const init = keys.reduce((a,k)=>(a[k]=parseFloat(getComputedStyle(root).getPropertyValue(props[k]))||0,a),{});
+          const init = keys.reduce((a,k)=>(a[k]=parseFloat(getComputedStyle(styleTarget).getPropertyValue(props[k]))||0,a),{});
           const step = now => {
             const t = Math.min((now-start)/dur,1), eased = easing(t);
-            keys.forEach(k=> root.style.setProperty(props[k], (init[k]+(target[k]-init[k])*eased).toFixed(2)+'px'));
+            keys.forEach(k=> styleTarget.style.setProperty(props[k], (init[k]+(target[k]-init[k])*eased).toFixed(2)+'px'));
             if(t<1) requestAnimationFrame(step);
             else resolve();
           }; requestAnimationFrame(step);
@@ -135,46 +136,46 @@
       };
 
       const setEyebrows=(l,r)=>{ 
-        if (!root) return;
-        root.style.setProperty('--eyebrow-left-rotate',l+'deg'); 
-        root.style.setProperty('--eyebrow-right-rotate',r+'deg'); 
+        if (!styleTarget) return;
+        styleTarget.style.setProperty('--eyebrow-left-rotate',l+'deg'); 
+        styleTarget.style.setProperty('--eyebrow-right-rotate',r+'deg'); 
       };
 
       const movePupils=(x,y)=>{ 
-        if (!root) return;
-        root.style.setProperty('--pupil-x',x+'px'); 
-        root.style.setProperty('--pupil-y',y+'px'); 
+        if (!styleTarget) return;
+        styleTarget.style.setProperty('--pupil-x',x+'px'); 
+        styleTarget.style.setProperty('--pupil-y',y+'px'); 
       };
 
       const setMouthOpen=v=>{
-        if (!root) return;
-        root.style.setProperty('--mouth-open',v+'px');
+        if (!styleTarget) return;
+        styleTarget.style.setProperty('--mouth-open',v+'px');
       };
 
       const moveFace=(x,y)=>{
-        if (!root) return;
-        root.style.setProperty('--face-x',x+'px');
-        root.style.setProperty('--face-y',y+'px');
+        if (!styleTarget) return;
+        styleTarget.style.setProperty('--face-x',x+'px');
+        styleTarget.style.setProperty('--face-y',y+'px');
       };
 
       const scaleFace=s=>{
-        if (!root) return;
-        root.style.setProperty('--face-scale',s);
+        if (!styleTarget) return;
+        styleTarget.style.setProperty('--face-scale',s);
       };
 
       const rotateFace=d=>{
-        if (!root) return;
-        root.style.setProperty('--face-rotate',d+'deg');
+        if (!styleTarget) return;
+        styleTarget.style.setProperty('--face-rotate',d+'deg');
       };
 
       const setBackground=c=>{
-        if (!root) return;
-        root.style.setProperty('--bg-color',c);
+        if (!styleTarget) return;
+        styleTarget.style.setProperty('--bg-color',c);
       };
 
       const setVignette=v=>{
-        if (!root) return;
-        root.style.setProperty('--vignette-opacity',v);
+        if (!styleTarget) return;
+        styleTarget.style.setProperty('--vignette-opacity',v);
       };
 
       const lookAt=(x,y)=>{ 
@@ -193,15 +194,15 @@
       };
 
       const slapChat=()=>{ 
-        if(!chatMessages || !root) return;
+        if(!chatMessages || !styleTarget) return;
         try {
-          root.style.setProperty('--chat-x','800px'); 
-          root.style.setProperty('--chat-rotate','45deg'); 
-          root.style.setProperty('--chat-opacity','0'); 
+          styleTarget.style.setProperty('--chat-x','800px'); 
+          styleTarget.style.setProperty('--chat-rotate','45deg'); 
+          styleTarget.style.setProperty('--chat-opacity','0'); 
           setTimeout(()=>{ 
-            root.style.setProperty('--chat-x','0px'); 
-            root.style.setProperty('--chat-rotate','0deg'); 
-            root.style.setProperty('--chat-opacity','1'); 
+            styleTarget.style.setProperty('--chat-x','0px'); 
+            styleTarget.style.setProperty('--chat-rotate','0deg'); 
+            styleTarget.style.setProperty('--chat-opacity','1'); 
           },3000); 
         } catch (e) {
           console.warn('Grump2: Error in slapChat', e);
@@ -223,8 +224,8 @@
         ()=> rotateFace(rand(-1,1)),
         
         // EYEBROW MOVEMENTS (51-100)
-        ()=> root && root.style.setProperty('--eyebrow-left-rotate', rand(-15,-5)+'deg'),
-        ()=> root && root.style.setProperty('--eyebrow-right-rotate', rand(5,15)+'deg'),
+        ()=> styleTarget && styleTarget.style.setProperty('--eyebrow-left-rotate', rand(-15,-5)+'deg'),
+        ()=> styleTarget && styleTarget.style.setProperty('--eyebrow-right-rotate', rand(5,15)+'deg'),
         ()=> setEyebrows(rand(-10,10), rand(-10,10)),
         ()=> setEyebrows(15, -15),
         ()=> setEyebrows(-12, -12),
