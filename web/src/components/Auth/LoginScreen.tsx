@@ -26,16 +26,21 @@ export const LoginScreen: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#F5F5F7] flex items-center justify-center z-50 overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-[#F5F5F7] flex items-center justify-center z-50 overflow-y-auto"
+      style={{ backgroundColor: '#F5F5F7', zIndex: 9999 }}
+    >
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm p-6 bg-white rounded-3xl shadow-soft m-4"
+        style={{ backgroundColor: '#ffffff' }}
       >
         <div className="text-center mb-6">
           <motion.h1 
             className="text-3xl font-black mb-1 tracking-tight text-gray-900"
             layoutId="title"
+            style={{ color: '#111827' }} // Explicit color
           >
             g-rump
           </motion.h1>
@@ -58,8 +63,9 @@ export const LoginScreen: React.FC = () => {
                   placeholder="Your Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full p-3 bg-gray-50 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:shadow-float transition-all duration-300 text-sm"
+                  className="w-full p-3 bg-gray-50 rounded-xl outline-none text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-black transition-all duration-300 text-sm"
                   required={!isLogin}
+                  style={{ color: '#111827' }} // Explicit color
                 />
               </motion.div>
             )}
@@ -70,8 +76,9 @@ export const LoginScreen: React.FC = () => {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 bg-gray-50 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:shadow-float transition-all duration-300 text-sm"
+            className="w-full p-3 bg-gray-50 rounded-xl outline-none text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-black transition-all duration-300 text-sm"
             required
+            style={{ color: '#111827' }} // Explicit color
           />
 
           <input
@@ -79,8 +86,9 @@ export const LoginScreen: React.FC = () => {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 bg-gray-50 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:shadow-float transition-all duration-300 text-sm"
+            className="w-full p-3 bg-gray-50 rounded-xl outline-none text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-black transition-all duration-300 text-sm"
             required
+            style={{ color: '#111827' }} // Explicit color
           />
 
           {error && (
