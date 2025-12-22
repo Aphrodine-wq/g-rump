@@ -12,6 +12,10 @@ import Grump2 from './Grump2'
 import MessageBubble from './MessageBubble'
 import TypingIndicator from './TypingIndicator'
 import AnimationPreview from './AnimationPreview'
+import AppLaunch from './animations/AppLaunch'
+import ScreenShake from './animations/ScreenShake'
+import MessageSlam from './animations/MessageSlam'
+import ParticleEffects from './ParticleEffects'
 import ExportModal from './ExportModal'
 import { MessageSkeleton } from './LoadingSkeleton'
 import './ChatInterface.css'
@@ -31,6 +35,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
   const [currentAnimation, setCurrentAnimation] = useState<Animation | null>(null)
   const [unlockToast, setUnlockToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
   const [isRageMode, setIsRageMode] = useState(false)
+  const [isAppLaunching, setIsAppLaunching] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const chatMessagesRef = useRef<HTMLDivElement>(null)
@@ -132,10 +137,20 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
     setTimeout(() => setUnlockToast(null), 2000)
   }
 
+  if (isAppLaunching) {
+    return (
+      <AppLaunch onComplete={() => setIsAppLaunching(false)}>
+        <div />
+      </AppLaunch>
+    )
+  }
+
   return (
-    <div className={`chat-interface ${isRageMode ? 'rage-mode-active' : ''}`}>
-      {/* Header */}
-      <header className="chat-header">
+    <ScreenShake>
+      <div className={`chat-interface ${isRageMode ? 'rage-mode-active' : ''}`}>
+        <ParticleEffects />
+        {/* Header */}
+        <header className="chat-header">
         <div className="header-left">
           <span className="header-title text-3xl">g-rump</span>
           <button className="header-btn" onClick={handleNewChat}>New Chat</button>
@@ -175,11 +190,12 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
             )}
 
             {messages.map((msg, idx) => (
-              <MessageBubble
-                key={idx}
-                message={msg}
-                index={idx}
-              />
+              <MessageSlam key={idx} isGrumpMessage={msg.sender === 'grump'}>
+                <MessageBubble
+                  message={msg}
+                  index={idx}
+                />
+              </MessageSlam>
             ))}
 
             {isTyping && (
@@ -322,7 +338,8 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
           onClose={() => setUnlockToast(null)}
         />
       )}
-    </div>
+      </div>
+    </ScreenShake>
   )
 }
 
