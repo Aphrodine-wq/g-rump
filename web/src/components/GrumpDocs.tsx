@@ -43,6 +43,47 @@ export const GrumpDocs: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </ul>
           </DocSection>
 
+          <DocSection title="Audio System">
+            <p className="text-gray-600 leading-relaxed mb-4">
+              GRUMP features a modular audio engine (`services/audio`) that handles procedural sound generation, 
+              file playback, and third-party integrations.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+               <div className="bg-gray-50 p-4 rounded-xl">
+                 <h4 className="font-semibold mb-2">Procedural Audio</h4>
+                 <p className="text-sm text-gray-600">Real-time synthesis of sound effects (grumbles, chimes) using Web Audio API oscillators.</p>
+               </div>
+               <div className="bg-gray-50 p-4 rounded-xl">
+                 <h4 className="font-semibold mb-2">Integrations</h4>
+                 <p className="text-sm text-gray-600">Support for Spotify playback, Google Speech-to-Text, and browser-native Text-to-Speech.</p>
+               </div>
+            </div>
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-xl font-mono text-sm overflow-x-auto">
+              <code>
+                {`// Example usage
+import { audioManager } from '../services/audio';
+
+// Play procedural success sound
+audioManager.grump.success();
+
+// Speak text
+audioManager.voice.speak("I am very grumpy today.");`}
+              </code>
+            </div>
+          </DocSection>
+
+          <DocSection title="Procedural Animation Engine">
+            <p className="text-gray-600 leading-relaxed mb-4">
+              The enhanced procedural engine (`proceduralEngine.ts`) generates complex CSS keyframes based on intent.
+            </p>
+            <ul className="list-disc list-inside text-gray-600 space-y-2 mb-4">
+              <li><strong>Glitch:</strong> Cyberpunk clip-path distortion</li>
+              <li><strong>Orbit:</strong> Multi-axis rotational physics</li>
+              <li><strong>Typewriter:</strong> Stepped text reveal animations</li>
+              <li><strong>Neon Pulse:</strong> Layered shadow glowing effects</li>
+            </ul>
+          </DocSection>
+
           <DocSection title="Configuration Variables">
             <p className="text-gray-600 mb-6">
               GRUMP's behavior and appearance are controlled by a centralized configuration object.
