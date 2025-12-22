@@ -7,7 +7,7 @@ import { useAnimation } from '../store/AnimationStore'
 import { useAchievements } from '../store/AchievementsStore'
 import { animationApi, type Animation } from '../services/animationApi'
 import { contextAwarenessService } from '../services/ContextAwareness'
-import { grumpAudio } from '../services/GrumpAudio'
+import { audioManager } from '../services/audio'
 import Grump2 from './Grump2'
 import MessageBubble from './MessageBubble'
 import TypingIndicator from './TypingIndicator'
@@ -67,20 +67,20 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
       transitionToState('maximumGrump')
       triggerEyeRoll()
       triggerScreenShake()
-      grumpAudio.error()
+      audioManager.grump.error()
     } else if (analysis.emotionalState === 'annoyed') {
       transitionToState('annoyed')
       triggerEyeRoll()
-      grumpAudio.grumble()
+      audioManager.grump.grumble()
     } else if (analysis.emotionalState === 'skeptical') {
       transitionToState('skeptical')
-      grumpAudio.grumble()
+      audioManager.grump.grumble()
     }
 
     // Record interaction and check for unlocks
     const unlocks = recordInteraction({ analysis, content: userMessage })
     if (unlocks.length > 0) {
-      grumpAudio.success()
+      audioManager.grump.success()
       const unlockNames = unlocks.map(u => u.name).join(', ')
       setUnlockToast({
         message: `New unlock${unlocks.length > 1 ? 's' : ''}: ${unlockNames}!`,
@@ -94,7 +94,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
 
     // Send chat message and wait for response
     await sendMessage(userMessage)
-    grumpAudio.type()
+    audioManager.grump.type()
 
     // If it's an animation request, create the animation after a short delay
     // This allows the chat response to come through first
@@ -109,10 +109,10 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
           })
 
           setCurrentAnimation(animation)
-          grumpAudio.success()
+          audioManager.grump.success()
         } catch (error) {
           console.error('Failed to create animation:', error)
-          grumpAudio.error()
+          audioManager.grump.error()
         }
       }, 1500) // Wait 1.5s for chat response
     }

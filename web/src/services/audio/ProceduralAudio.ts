@@ -1,24 +1,17 @@
-// Procedural Audio Engine for GRUMP
+// Procedural Audio Engine
 // Generates synthesized sound effects using Web Audio API
 
-class GrumpAudioEngine {
-  private ctx: AudioContext | null = null;
-  private isMuted: boolean = false;
+export class ProceduralAudio {
+  private ctx: AudioContext;
+  private masterGain: GainNode;
 
-  constructor() {
-    // Initialize on first user interaction to bypass autoplay policy
-    window.addEventListener('click', () => this.init(), { once: true });
-  }
-
-  private init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
+  constructor(context: AudioContext) {
+    this.ctx = context;
+    this.masterGain = this.ctx.createGain();
+    this.masterGain.connect(this.ctx.destination);
   }
 
   private createOscillator(type: OscillatorType, freq: number, duration: number, vol: number = 0.1) {
-    if (!this.ctx || this.isMuted) return;
-
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
 
@@ -29,7 +22,7 @@ class GrumpAudioEngine {
     gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
 
     osc.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.masterGain);
 
     osc.start();
     osc.stop(this.ctx.currentTime + duration);
@@ -37,8 +30,6 @@ class GrumpAudioEngine {
 
   // "Grump" voice - low frequency sawtooth with modulation
   public grumble() {
-    if (!this.ctx || this.isMuted) return;
-
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     const filter = this.ctx.createBiquadFilter();
@@ -55,7 +46,7 @@ class GrumpAudioEngine {
 
     osc.connect(filter);
     filter.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.masterGain);
 
     osc.start();
     osc.stop(this.ctx.currentTime + 0.3);
@@ -63,9 +54,6 @@ class GrumpAudioEngine {
 
   // Success chime - Major triad arpeggio
   public success() {
-    if (!this.ctx || this.isMuted) return;
-    
-    const now = this.ctx.currentTime;
     const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
 
     notes.forEach((freq, i) => {
@@ -77,21 +65,16 @@ class GrumpAudioEngine {
 
   // Error buzz - Discordant sawtooth
   public error() {
-    if (!this.ctx || this.isMuted) return;
     this.createOscillator('sawtooth', 150, 0.3, 0.1);
     setTimeout(() => this.createOscillator('sawtooth', 140, 0.3, 0.1), 50);
   }
 
   // Typing sound - High pitch tick
   public type() {
-    if (!this.ctx || this.isMuted) return;
     this.createOscillator('square', 800, 0.05, 0.02);
   }
 
-  public toggleMute() {
-    this.isMuted = !this.isMuted;
-    return this.isMuted;
+  public setVolume(vol: number) {
+    this.masterGain.gain.setValueAtTime(vol, this.ctx.currentTime);
   }
 }
-
-export const grumpAudio = new GrumpAudioEngine();
