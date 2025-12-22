@@ -143,6 +143,91 @@ const generateKeyframes = (prompt: string): AnimationProperties => {
   };
 };
 
+const generatePhaserCode = (props: AnimationProperties): string => {
+  return `
+class AnimationScene extends Phaser.Scene {
+    preload() {
+        this.load.image('hero', 'assets/hero.png');
+    }
+
+    create() {
+        const hero = this.add.sprite(400, 300, 'hero');
+        
+        // Generated Animation: ${props.name}
+        this.tweens.add({
+            targets: hero,
+            duration: ${parseInt(props.duration) * 1000},
+            ease: '${props.timing === 'linear' ? 'Linear' : 'Sine.easeInOut'}',
+            yoyo: true,
+            repeat: -1,
+            // Mapping CSS keyframes to Tween props (simplified)
+            y: ${props.name.includes('bounce') ? '-=100' : '+=0'},
+            angle: ${props.name.includes('spin') ? 360 : 0},
+            alpha: ${props.name.includes('fade') ? 0.3 : 1},
+            scale: ${props.name.includes('pulse') ? 1.2 : 1}
+        });
+    }
+}
+`.trim();
+};
+
+const generateReactCanvasCode = (props: AnimationProperties): string => {
+  return `
+import React, { useRef, useEffect } from 'react';
+
+const CanvasAnimation = () => {
+  const canvasRef = useRef(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let frameId;
+    let startTime;
+    
+    const animate = (time) => {
+      if (!startTime) startTime = time;
+      const progress = (time - startTime) / ${parseInt(props.duration) * 1000};
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#6366f1';
+      
+      // Animation Logic: ${props.name}
+      const y = 150 + Math.sin(progress * Math.PI * 2) * ${props.name.includes('bounce') ? 50 : 0};
+      const rotation = progress * Math.PI * 2 * ${props.name.includes('spin') ? 1 : 0};
+      
+      ctx.save();
+      ctx.translate(150, y);
+      ctx.rotate(rotation);
+      ctx.fillRect(-25, -25, 50, 50);
+      ctx.restore();
+      
+      frameId = requestAnimationFrame(animate);
+    };
+    
+    frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
+  return <canvas ref={canvasRef} width={300} height={300} />;
+};
+`.trim();
+};
+
+const generateSVGCode = (props: AnimationProperties): string => {
+  return `
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="75" y="75" width="50" height="50" fill="#6366f1">
+    ${props.name.includes('spin') ? 
+    `<animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="${props.duration}" repeatCount="indefinite"/>` : ''}
+    ${props.name.includes('bounce') ? 
+    `<animate attributeName="y" values="75;25;75" dur="${props.duration}" repeatCount="indefinite"/>` : ''}
+    ${props.name.includes('fade') ? 
+    `<animate attributeName="opacity" values="1;0.3;1" dur="${props.duration}" repeatCount="indefinite"/>` : ''}
+  </rect>
+</svg>
+`.trim();
+};
+
 export const createProceduralAnimation = (prompt: string) => {
   const props = generateKeyframes(prompt);
   const css = `
@@ -164,6 +249,9 @@ ${props.keyframes}
 
   return {
     css,
+    phaser: generatePhaserCode(props),
+    reactCanvas: generateReactCanvasCode(props),
+    svg: generateSVGCode(props),
     ...props
   };
 };

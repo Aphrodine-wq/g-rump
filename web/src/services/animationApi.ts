@@ -20,6 +20,12 @@ export interface Animation {
   style?: string
   format?: string
   createdAt: string
+  variants?: {
+    phaser?: string
+    reactCanvas?: string
+    svg?: string
+    css?: string
+  }
 }
 
 export interface ExportRequest {
@@ -99,7 +105,13 @@ class AnimationApi {
         prompt: request.prompt,
         style: request.style || 'default',
         format: request.format || 'css',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        variants: {
+            css: procedural.css,
+            phaser: procedural.phaser,
+            reactCanvas: procedural.reactCanvas,
+            svg: procedural.svg
+        }
       }
     }
   }
