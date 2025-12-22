@@ -8,9 +8,11 @@ interface Grump2Props {
   size?: 'small' | 'medium' | 'large' | number
   className?: string
   style?: React.CSSProperties
+  isRageMode?: boolean
+  isCoding?: boolean
 }
 
-export default function Grump2({ size = 'medium', className = '', style = {} }: Grump2Props) {
+export default function Grump2({ size = 'medium', className = '', style = {}, isRageMode = false, isCoding = false }: Grump2Props) {
   const BASE_SIZE = 300
   
   const getSizeInPixels = () => {
@@ -28,7 +30,7 @@ export default function Grump2({ size = 'medium', className = '', style = {} }: 
 
   return (
     <div 
-      className={`grump2-wrapper ${className}`} 
+      className={`grump2-wrapper ${className} ${isRageMode ? 'rage-mode' : ''} ${isCoding ? 'coding-mode' : ''}`} 
       style={{ 
         width: targetSize, 
         height: targetSize, 
@@ -48,6 +50,11 @@ export default function Grump2({ size = 'medium', className = '', style = {} }: 
           left: 0
         } as React.CSSProperties}
       >
+        {isCoding && (
+          <div className="coding-overlay absolute inset-0 flex items-center justify-center opacity-50 pointer-events-none">
+             {/* Optional: Add laptop or glasses here via CSS or SVG */}
+          </div>
+        )}
         {/* Arms */}
         <div className="arm left" />
         <div className="arm right" />

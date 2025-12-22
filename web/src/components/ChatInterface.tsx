@@ -29,6 +29,7 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
   const [showExportModal, setShowExportModal] = useState(false)
   const [currentAnimation, setCurrentAnimation] = useState<Animation | null>(null)
   const [unlockToast, setUnlockToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
+  const [isRageMode, setIsRageMode] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const chatMessagesRef = useRef<HTMLDivElement>(null)
@@ -36,6 +37,16 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
   useEffect(() => {
     scrollToBottom()
   }, [messages, isTyping])
+
+  const toggleRageMode = () => {
+    setIsRageMode(!isRageMode)
+    if (!isRageMode) {
+      transitionToState('maximumGrump')
+      triggerScreenShake()
+    } else {
+      transitionToState('idle')
+    }
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -107,14 +118,20 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
   }
 
   return (
-    <div className="chat-interface">
+    <div className={`chat-interface ${isRageMode ? 'rage-mode-active' : ''}`}>
       {/* Header */}
       <header className="chat-header">
         <div className="header-left">
-          <span className="header-title">g-rump</span>
+          <span className="header-title text-3xl">g-rump</span>
           <button className="header-btn" onClick={() => createNewSession()}>New Chat</button>
         </div>
         <div className="header-right">
+          <button 
+            className={`header-btn ${isRageMode ? 'bg-red-500 text-white' : ''}`}
+            onClick={toggleRageMode}
+          >
+            {isRageMode ? '😡 RAGE ON' : '😤 Rage Mode'}
+          </button>
           <button className="header-btn" onClick={() => onNavigate?.('templates')}>Templates</button>
           <button className="header-btn" onClick={() => onNavigate?.('gamedev')}>Game Dev</button>
           <button className="header-btn" onClick={() => onNavigate?.('dashboard')}>Dashboard</button>
@@ -131,8 +148,8 @@ export default function ChatInterface({ onNavigate }: ChatInterfaceProps = {}) {
           <AngerMeter />
 
           {/* Grump2 - Always visible */}
-          <div className="grump2-fixed-container">
-            <Grump2 />
+          <div className="grump2-display-area">
+            <Grump2 isRageMode={isRageMode} size={isRageMode ? 'large' : 'medium'} />
           </div>
           
           <div className="chat-messages" id="chatMessages" ref={chatMessagesRef}>

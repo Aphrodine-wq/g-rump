@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
+import Grump2 from './Grump2'
 import './GameDevWorkspace.css'
 
 interface Entity {
@@ -732,6 +733,11 @@ export default function GameDevWorkspace({
             </div>
           </div>
         )}
+      </div>
+
+      {/* Grump Assistant */}
+      <div className="fixed bottom-6 right-6 z-50 pointer-events-none">
+        <Grump2 size="small" isCoding={true} />
       </div>
 
       {/* Save Dialog */}
