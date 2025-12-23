@@ -166,7 +166,7 @@ export default function ParticleEffects() {
         y: Math.random() * 100,
         rotation: Math.random() * 90
       })))
-    }, 50)
+    }, 150) // Reduced from 50ms to 150ms for stability
 
     setTimeout(() => {
       clearInterval(interval)
