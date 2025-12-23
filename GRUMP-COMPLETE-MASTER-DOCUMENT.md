@@ -2,6 +2,8 @@
 
 **Everything you need to know about G-Rump in one place.**
 
+**🎯 CORE REFERENCE DOCUMENT** - This is the primary go-to document for agents and developers. All other documentation points here.
+
 ---
 
 ## Table of Contents
@@ -1519,41 +1521,34 @@ KNOWLEDGE_BASE_GITHUB_FOLDER=https://github.com/user/repo/tree/main/docs/knowled
 #### Free Tier
 - **Price**: $0
 - **Features**:
-  - 3 animations/day (90/month)
-  - Preview only (no downloads)
-  - Basic exports (GIF, MP4) - watermarked
-  - 720p resolution
-  - G-Rump watermark
-  - Standard response speed
+  - 10 animations/day
+  - Watermark on exports
+  - Basic exports (GIF, MP4)
+  - Standard quality
   - Community support
 
 #### G-Rump Pro
-- **Price**: $49/month or $490/year (save 17%)
+- **Price**: $12/month
 - **Features**:
-  - 200 animations/day (6,000/month)
-  - All export formats (Lottie, CSS, etc)
+  - Unlimited animations
+  - All export formats (Lottie, CSS, sprite sheets, code)
   - 4K resolution
   - No watermark
   - Priority rendering
   - Animation history
   - Custom palettes
-  - API access (200 calls/day)
+  - API access
   - Email support
-  - 14-day free trial
 
 #### G-Rump Team
-- **Price**: $199/month per seat
+- **Price**: $29/seat/month
 - **Features**:
   - All Pro features
-  - 500 animations/day per seat (15,000/month)
-  - Team workspace
-  - Brand kit (colors, fonts, logos)
-  - Collaboration tools
+  - Team collaboration
+  - Brand kits (colors, fonts, logos)
   - Admin controls
-  - SSO integration
   - Priority support
   - Invoice billing
-  - Custom integrations
 
 #### G-Rump API
 - **Price**: $0.05 per animation
@@ -1720,6 +1715,26 @@ If G-Rump can always answer that question—clearly, defensibly, consistently—
 
 ---
 
-*Last Updated: 2025*
-*Version: 2.0 - Complete Animation System*
+*Last Updated: 2025-12-23*
+*Version: 2.2 - Mass Update & Critical Fixes*
+
+## Recent Updates (Dec 2025)
+
+### Mass Update (v2.2)
+- **Idle Head Tilt**: Character now subtly tilts head during idle states for more life-like presence.
+- **Quick Replies**: Added "I'm bored", "Make me laugh", "Roast my code" buttons for instant interaction.
+- **Anger Meter Tooltip**: Hovering over the anger meter now shows exact percentage.
+- **Mobile Beta Badge**: Added visual indicator for beta status on mobile.
+- **Expanded Context Triggers**: Added 9+ new keywords (slow, hurry, roast, code, etc.) for smarter reactions.
+
+### Critical Fixes
+- **Crash Prevention**: Removed experimental 200fps CSS optimization that was causing GPU crashes. Throttled glitch particle effects.
+- **Login Screen**: Fixed black screen issue by enforcing explicit background colors and z-index layering.
+- **Backend Routing**: Fixed 404 on `/history` endpoint by correcting route order precedence.
+- **Web/Mobile Parity**: Synchronized `AnimationStore` across platforms, bringing "10x" expansion features to mobile.
+
+### Feature Expansion (10x)
+- **Animation Library**: Added 20+ new procedural animations (bounce, shake, gelatin, etc.).
+- **Emotional Intelligence**: Added 15+ new emotional states (bored, ecstatic, panicked, etc.).
+- **Context Awareness**: Vastly expanded dictionary of trigger words for character reactions.
 
