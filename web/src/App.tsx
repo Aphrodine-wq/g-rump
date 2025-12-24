@@ -26,8 +26,8 @@ type View = 'landing' | 'chat' | 'templates' | 'dashboard' | 'settings' | 'prici
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth()
   const [currentView, setCurrentView] = useState<View>(() => {
-    const hasOnboarded = localStorage.getItem('hasCompletedOnboarding') === 'true'
-    return hasOnboarded ? 'landing' : 'onboarding'
+    // DEV: Force gamedev view for IDE mode
+    return 'gamedev'
   })
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   const [pendingTemplatePrompt, setPendingTemplatePrompt] = useState<string | null>(null)
@@ -65,11 +65,7 @@ function AppContent() {
   }
 
   const handleNavigate = (view: View) => {
-    // Protected routes
-    if (!isAuthenticated && ['chat', 'dashboard', 'settings', 'gamedev'].includes(view)) {
-      setShowLoginModal(true)
-      return
-    }
+    // DEV: Bypass auth for IDE mode
     setCurrentView(view)
   }
 
@@ -86,7 +82,7 @@ function AppContent() {
     <div className="app">
       {showLoginModal && !isAuthenticated && <LoginScreen />}
       
-      <PageTransition key={currentView}>
+      <PageTransition transitionKey={currentView}>
         {currentView === 'onboarding' && (
           <OnboardingFlow onComplete={handleOnboardingComplete} />
         )}

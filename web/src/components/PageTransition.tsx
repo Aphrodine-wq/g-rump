@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 
 interface PageTransitionProps {
   children: ReactNode
-  key: string
+  transitionKey: string
 }
 
 const pageVariants = {
@@ -32,11 +32,11 @@ const pageVariants = {
   }
 }
 
-export function PageTransition({ children, key }: PageTransitionProps) {
+export function PageTransition({ children, transitionKey }: PageTransitionProps) {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={key}
+        key={transitionKey}
         initial="initial"
         animate="animate"
         exit="exit"

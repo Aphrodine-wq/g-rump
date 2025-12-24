@@ -1,0 +1,388 @@
+# Grump iOS App — Product Requirements Document (PRD)
+
+**Version:** 1.0  
+**Last Updated:** December 2024  
+**Status:** Draft
+
+---
+
+## 1. Executive Summary
+
+### 1.1 Product Overview
+**Grump** is an iOS chat application featuring a character-driven AI assistant whose entire personality is being a reluctant, perpetually unimpressed hater who still manages to be genuinely helpful. Unlike typical AI assistants that perform enthusiasm, Grump represents the exhausted honesty we all feel—and that authenticity is the product.
+
+### 1.2 Vision Statement
+*"The AI assistant for people who are tired of AI assistants acting like they're thrilled to help."*
+
+### 1.3 Target Audience
+- **Primary:** Gen Z and Millennials (18-35) who resonate with dry humor, irony, and authenticity over corporate pleasantness
+- **Secondary:** Anyone exhausted by performative positivity in digital products
+- **Psychographic:** Users who find standard AI assistants sterile, cringe, or annoying; people who appreciate wit and realness
+
+### 1.4 Core Value Proposition
+1. **Authentic Personality** — Grump feels like talking to a real (tired) friend, not a corporate chatbot
+2. **Actually Helpful** — Despite the attitude, Grump provides genuinely useful responses
+3. **Entertainment + Utility** — It's fun to use AND functional
+4. **Anti-AI-Slop Positioning** — A direct antithesis to generic, overly positive AI assistants
+
+---
+
+## 2. Product Goals & Success Metrics
+
+### 2.1 Business Goals
+| Goal | Target | Timeline |
+|------|--------|----------|
+| App Store Launch | Live on iOS App Store | Q1 2025 |
+| User Acquisition | 50,000 downloads | First 90 days |
+| Retention | 40% D7, 25% D30 | Ongoing |
+| Engagement | 5+ messages per session avg | Ongoing |
+| Revenue (if freemium) | $X MRR | Month 6 |
+
+### 2.2 Success Metrics (KPIs)
+- **Daily Active Users (DAU)**
+- **Messages Sent Per Session**
+- **Session Length**
+- **Return Rate (D1, D7, D30)**
+- **App Store Rating (Target: 4.5+)**
+- **Social Shares / Screenshots** — Virality indicator
+- **Subscription Conversion (if applicable)**
+
+---
+
+## 3. User Personas
+
+### Persona 1: "Maya" — The Chronically Online Creative
+- **Age:** 24
+- **Occupation:** Freelance designer
+- **Behavior:** Spends too much time on Twitter/X, appreciates irony, hates corporate speak
+- **Pain Point:** AI tools feel sterile and cringe; she wants something that matches her energy
+- **Use Case:** Uses Grump for brainstorming, venting, and killing time with actual entertainment
+
+### Persona 2: "Jordan" — The Burnt Out Professional  
+- **Age:** 29
+- **Occupation:** Product Manager
+- **Behavior:** Overworked, sardonic sense of humor, screenshots funny AI responses to send to friends
+- **Pain Point:** Needs help but hates how fake AI assistants sound
+- **Use Case:** Uses Grump for work tasks but appreciates that it doesn't pretend everything is exciting
+
+### Persona 3: "Alex" — The Meme Connoisseur
+- **Age:** 21
+- **Occupation:** College student
+- **Behavior:** Deep in internet culture, values authenticity and humor above all
+- **Pain Point:** Most apps are boring; wants something that actually entertains
+- **Use Case:** Uses Grump purely for entertainment and to screenshot conversations for social media
+
+---
+
+## 4. Feature Requirements
+
+### 4.1 Core Features (MVP)
+
+#### 4.1.1 Chat Interface
+| Requirement | Description | Priority |
+|-------------|-------------|----------|
+| Message Input | Text input field with send button | P0 |
+| Message Display | Chat bubble UI showing user and Grump messages | P0 |
+| Grump Avatar | Animated avatar showing Grump's expressions | P0 |
+| Typing Indicator | Custom "Grump is reluctantly typing..." indicator | P0 |
+| Message History | Persistent conversation history per session | P0 |
+| New Chat | Ability to start fresh conversation | P0 |
+
+#### 4.1.2 Grump's AI Personality
+| Requirement | Description | Priority |
+|-------------|-------------|----------|
+| Character Consistency | All responses match Grump's voice and personality | P0 |
+| Context Awareness | Grump remembers conversation context within session | P0 |
+| Helpful Despite Attitude | Responses must be genuinely useful, not just snarky | P0 |
+| Mood Variations | Subtle variations in grumpiness based on topic/time | P1 |
+| Appropriate Tone Shifts | Softer approach for sensitive topics | P0 |
+
+#### 4.1.3 Onboarding
+| Requirement | Description | Priority |
+|-------------|-------------|----------|
+| First Launch Experience | Brief, on-brand intro to Grump's personality | P0 |
+| Permission Requests | Notifications (if applicable) | P1 |
+| No Account Required (MVP) | Frictionless entry, account optional | P0 |
+
+### 4.2 Secondary Features (V1.1+)
+
+#### 4.2.1 Conversation Management
+| Requirement | Description | Priority |
+|-------------|-------------|----------|
+| Chat History | Access to past conversations | P1 |
+| Search Conversations | Find past messages | P2 |
+| Delete Conversations | Privacy control | P1 |
+| Export Chat | Share conversation as text/image | P1 |
+
+#### 4.2.2 Personalization
+| Requirement | Description | Priority |
+|-------------|-------------|----------|
+| Username | Grump can address user by name (with appropriate reluctance) | P1 |
+| Grump Memory | Remembers key facts about user across sessions | P2 |
+| Grumpiness Level | User-adjustable slider (Mildly Annoyed → Maximum Hater) | P2 |
+
+#### 4.2.3 Engagement Features
+| Requirement | Description | Priority |
+|-------------|-------------|----------|
+| Daily Grump | Push notification with daily grumpy message/observation | P1 |
+| Streak Tracking | "Days of tolerating each other" counter | P2 |
+| Grump Reactions | Tap to trigger Grump expressions/animations | P2 |
+| Screenshot Mode | Optimized sharing format for conversations | P1 |
+
+### 4.3 Future Features (V2+)
+- Voice Input/Output (Grump's voice)
+- Widgets ("Grump's thought of the day")
+- Apple Watch app (tiny grumpy companion)
+- Themed Grump variants (Coffee Grump, Monday Grump, etc.)
+- Multiplayer (Grump roasts group chats)
+
+---
+
+## 5. Design Requirements
+
+### 5.1 Visual Identity
+
+#### Color Palette
+| Color | Hex | Usage |
+|-------|-----|-------|
+| Background | #0A0A0A | Primary background |
+| Surface | #1A1A1A | Cards, chat bubbles (Grump) |
+| Border | #333333 | Dividers, outlines |
+| Accent | #FF6B6B | Highlights, Grump's mood indicator |
+| Text Primary | #E0E0E0 | Main text |
+| Text Secondary | #888888 | Timestamps, hints |
+| User Bubble | #2A2A2A | User message background |
+
+#### Typography
+- **Primary Font:** SF Pro (system) or Inter
+- **Grump's Voice:** Slightly different weight/style to distinguish his messages
+- **No Emojis in Grump Messages** (except rare 😒 or 💀)
+
+#### Avatar Design
+- Minimalist face with angry eyebrows
+- Frowning/flat mouth expression
+- Subtle glow effect matching accent color
+- Micro-animations for different states:
+  - Idle: Slow blink, slight movement
+  - Typing: Eye roll animation
+  - Responding: Eyebrow furrow
+  - Rare Approval: Almost-smile (very rare)
+
+### 5.2 UI Components
+
+#### Chat Bubbles
+- Grump's messages: Left-aligned, darker background, accent border
+- User messages: Right-aligned, slightly lighter background
+- Timestamps: Subtle, below messages
+- Grump's name/avatar: Small indicator on first message of sequence
+
+#### Input Area
+- Dark input field with placeholder: "Say something. I guess."
+- Send button: Accent color, minimal design
+- Character limit indicator (if applicable)
+
+#### Navigation
+- Minimal navigation
+- Settings accessible via icon
+- Chat history in slide-out drawer or separate tab
+
+### 5.3 Animation & Microinteractions
+- **Message Send:** Smooth bubble appearance
+- **Typing Indicator:** Custom animation with reluctant energy
+- **Avatar Reactions:** Responds to message sentiment
+- **Haptic Feedback:** Subtle haptics on key interactions
+- **Pull to Refresh:** Grump sighs (animation + maybe text)
+
+---
+
+## 6. Technical Requirements
+
+### 6.1 Platform & Compatibility
+| Requirement | Specification |
+|-------------|---------------|
+| Platform | iOS (iPhone primary, iPad secondary) |
+| Minimum iOS Version | iOS 16.0+ |
+| Device Support | iPhone 12 and newer (optimized) |
+| Orientation | Portrait only (MVP) |
+
+### 6.2 Architecture
+
+#### Frontend
+- **Framework:** SwiftUI (preferred) or UIKit
+- **State Management:** Combine / SwiftUI native
+- **Local Storage:** CoreData or SwiftData for chat history
+
+#### Backend / AI
+| Option | Description | Considerations |
+|--------|-------------|----------------|
+| Anthropic API (Claude) | Direct integration with Claude API | Best quality, requires API management |
+| OpenAI API | GPT-4 with custom system prompt | Alternative, widely supported |
+| Custom Fine-tuned Model | Self-hosted model trained on Grump persona | Most control, highest complexity |
+| Hybrid | Primary + fallback provider | Reliability |
+
+#### API Layer
+- RESTful API or direct SDK integration
+- Request queuing for poor connectivity
+- Response caching where appropriate
+- Rate limiting handling
+
+### 6.3 Performance Requirements
+| Metric | Target |
+|--------|--------|
+| App Launch | < 2 seconds to interactive |
+| Message Send → Response Start | < 1.5 seconds (perceived) |
+| Typing Indicator | Immediate on send |
+| Crash Rate | < 0.1% |
+| ANR Rate | < 0.1% |
+
+### 6.4 Security & Privacy
+- No account required (MVP) — anonymous usage
+- Local chat storage (not synced to cloud in MVP)
+- API keys secured (not exposed in client)
+- Privacy policy compliant (GDPR, CCPA considerations)
+- Optional: End-to-end encryption for chat history
+
+### 6.5 Analytics
+- Anonymous usage analytics (with consent)
+- Track: Session length, messages sent, feature usage, retention
+- Crash reporting (Crashlytics / Sentry)
+- A/B testing capability for prompts/features
+
+---
+
+## 7. Monetization Strategy
+
+### 7.1 Model Options
+
+#### Option A: Freemium
+| Tier | Access | Price |
+|------|--------|-------|
+| Free | X messages/day, basic features | $0 |
+| Grump Premium | Unlimited messages, history, customization | $4.99/month or $39.99/year |
+
+#### Option B: One-Time Purchase
+| Tier | Access | Price |
+|------|--------|-------|
+| Free Trial | Limited messages to try | $0 |
+| Full Unlock | Unlimited everything | $9.99 one-time |
+
+#### Option C: Free with Ads (Not Recommended)
+Ads would break immersion and brand. Avoid unless necessary.
+
+### 7.2 Premium Features (if Freemium)
+- Unlimited daily messages
+- Full chat history access
+- Grumpiness level customization
+- Grump Memory (remembers you)
+- Exclusive Grump reactions/animations
+- Early access to new features
+
+---
+
+## 8. Content & Safety
+
+### 8.1 Content Guidelines
+- Grump is sarcastic, not mean
+- No punching down at users
+- Appropriate topic handling (see Master Prompt)
+- Clear boundaries on harmful content
+
+### 8.2 Moderation
+- AI-level filtering for harmful requests
+- User blocking/reporting capability
+- Content policy documentation
+
+### 8.3 Sensitive Topic Handling
+- Mental health: Grump softens, provides resources if needed
+- Safety concerns: Direct, helpful, drops persona
+- Self-harm/crisis: Immediate resource provision, caring tone
+
+---
+
+## 9. Launch Plan
+
+### 9.1 Development Phases
+
+#### Phase 1: MVP (8-10 weeks)
+- Core chat interface
+- Grump AI integration with personality
+- Basic onboarding
+- Local chat storage
+- App Store submission
+
+#### Phase 2: Polish (4-6 weeks)
+- Avatar animations
+- Push notifications (Daily Grump)
+- Chat history management
+- Screenshot/sharing optimization
+- Bug fixes from beta feedback
+
+#### Phase 3: Growth (Ongoing)
+- Premium features
+- Grump Memory
+- Marketing campaigns
+- Feature iterations based on data
+
+### 9.2 Beta Testing
+- TestFlight beta with 100-500 users
+- Focus groups from target personas
+- Iterate on personality/prompt based on feedback
+- 2-4 week beta period minimum
+
+### 9.3 Launch Marketing
+- **Social Media:** Twitter/X, TikTok, Instagram (screenshot-worthy conversations)
+- **Influencer Seeding:** Send to creators in humor/tech/lifestyle spaces
+- **PR:** Tech blogs, app review sites
+- **App Store Optimization:** Keywords, screenshots, preview video
+- **Viral Mechanics:** Easy sharing, screenshot mode, daily grumpy quotes
+
+---
+
+## 10. Risks & Mitigation
+
+| Risk | Impact | Likelihood | Mitigation |
+|------|--------|------------|------------|
+| AI responses break character | High | Medium | Robust system prompt, testing, fallback responses |
+| API costs exceed budget | High | Medium | Rate limiting, caching, usage tiers |
+| App Store rejection | High | Low | Review guidelines compliance, content moderation |
+| Low retention | High | Medium | Notification strategy, engagement features, content variety |
+| Copycat apps | Medium | High | Brand building, community, feature velocity |
+| Negative reception | Medium | Low | Beta testing, iteration, clear positioning |
+
+---
+
+## 11. Open Questions
+
+1. **Monetization:** Freemium vs. one-time purchase? Need market research.
+2. **Voice:** Should Grump have a voice? What voice? (V2 consideration)
+3. **Multiplayer:** Is there a social/shared component? (V2 consideration)
+4. **Platform Expansion:** Android timeline?
+5. **Grump Lore:** Should there be backstory? Grump universe?
+
+---
+
+## 12. Appendix
+
+### A. Competitive Analysis
+| Competitor | Positioning | Grump Differentiation |
+|------------|-------------|----------------------|
+| ChatGPT | Neutral, helpful assistant | Personality-first, entertainment value |
+| Character.AI | Create any character | Single, polished, signature character |
+| Replika | Emotional companion | Sarcastic friend, not romantic/therapeutic |
+| Pi | Warm, conversational AI | Warm vs. grumpy positioning |
+
+### B. Reference Links
+- Master Prompt Document: [grump_master_prompt.md]
+- Brand Guidelines: [TBD]
+- Figma Designs: [TBD]
+- Technical Spec: [TBD]
+
+### C. Revision History
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | Dec 2024 | — | Initial draft |
+
+---
+
+*"You read all that? Incredible. Now go build something."*  
+— Grump
